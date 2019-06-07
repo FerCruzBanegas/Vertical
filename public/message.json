@@ -1,0 +1,14 @@
+{
+  "MSG001":"Los datos se registraron correctamente!",
+  "MSG002":"Los datos se actualizaron correctamente!",
+  "MSG003":"El registro se eliminó correctamente!",
+  "MSG004":"O registro não pode ser salvo!!! Verifique os erros e tente novamente.",
+  "MSG005":"O registro não pode ser apagado!!! Há informações cadastradas com esse registro.",
+  "MSG006":"No es posible iniciar sesión , verifique sus datos.",
+  "MSG007":"No es posible iniciar sesión , usuario dado de baja.",
+  "MSG008":"Se cerró la sesión correctamente.",
+  "MSG009":"No tiene una sesión activa. Desconecte e ingrese nuevamente.",
+  "MSG010":"Usted no está autorizado para realizar esta acción.",
+  "MSG011":"El recurso al que intenta acceder no se encuentra disponible.",
+  "MSG012":"No es posible realizar esta acción, por favor inténtelo de nuevo más tarde."
+}
