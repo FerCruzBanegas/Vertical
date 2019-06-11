@@ -15,10 +15,10 @@ class CreateMaterialsTable extends Migration
     {
         Schema::create('materials', function (Blueprint $table) {
             $table->increments('id');
-            $table->char('name', 100);
-            $table->date('date');
-            $table->mediumText('note');
-            $table->float('amount', 9, 2);
+            $table->string('name', 120);
+            $table->enum('unity', ['amarro', 'barra', 'bolsa', 'caja', 'cajón', 'carga', 'dm³', 'fajo', 'fardo', 'g', 'galón', 'glb', 'ha', 'juego', 'kg', 'l', 'lata', 'lb', 'm', 'm²', 'm³', 'mm', 'perfil', 'pie', 'pie²', 'placa', 'plomo', 'pqte', 'pto', 'pza', 'resma', 'rollo', 't', 'tubo', 'turril', 'unds']);
+            $table->mediumText('description');
+            $table->float('price', 9, 2)->nullable();
             $table->integer('category_id')->unsigned();
             $table->softDeletes();
             $table->timestamps();

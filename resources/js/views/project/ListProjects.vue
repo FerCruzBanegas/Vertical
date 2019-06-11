@@ -92,6 +92,9 @@
                     <template slot="no-data">
                       <center>Sin Resultados</center>
                     </template>
+                    <template v-slot:pageText="props">
+                      {{ props.pageStart }} - {{ props.pageStop }} de {{ props.itemsLength }}
+                    </template>
                   </v-data-table>
                 </v-card>
               </v-flex>

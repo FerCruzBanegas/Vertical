@@ -25,6 +25,11 @@ class Project extends ApiModel
         return $this->belongsTo(ProjectType::class);
     }
 
+    public function incomes()
+    {
+        return $this->hasMany(Income::class);
+    }
+
     public static function listProjects()
     {
         return static::orderBy('name')->select('id', 'name');

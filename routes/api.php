@@ -18,6 +18,7 @@ Route::post('/login', 'Auth\AuthController@login');
 Route::get('project-types/listing', 'ProjectTypeController@listing');
 Route::get('projects/listing', 'ProjectController@listing');
 Route::get('categories/listing', 'CategoryController@listing');
+Route::get('income-types/listing', 'IncomeTypeController@listing');
 
 Route::group(['middleware' => ['auth:api']], function () {//TODO Borre el midleware 'acl:api'
     Route::post('logout', 'Auth\AuthController@logout');
@@ -43,5 +44,26 @@ Route::group(['middleware' => ['auth:api']], function () {//TODO Borre el midlew
     Route::post('categories', 'CategoryController@store')->name('categories.create');
     Route::put('categories/{id}', 'CategoryController@update')->name('categories.update');
     Route::delete('categories/{id}', 'CategoryController@destroy')->name('categories.destroy');
+
+    //Material
+    Route::get('materials', 'MaterialController@index')->name('materials.index');
+    Route::get('materials/{id}', 'MaterialController@show');
+    Route::post('materials', 'MaterialController@store')->name('materials.create');
+    Route::put('materials/{id}', 'MaterialController@update')->name('materials.update');
+    Route::delete('materials/{id}', 'MaterialController@destroy')->name('materials.destroy');
+
+    //Income-Types
+    Route::get('income-types', 'IncomeTypeController@index')->name('income-types.index');
+    Route::get('income-types/{id}', 'IncomeTypeController@show');
+    Route::post('income-types', 'IncomeTypeController@store')->name('income-types.create');
+    Route::put('income-types/{id}', 'IncomeTypeController@update')->name('income-types.update');
+    Route::delete('income-types/{id}', 'IncomeTypeController@destroy')->name('income-types.destroy');
+
+    //Income
+    Route::get('income', 'IncomeController@index')->name('income.index');
+    Route::get('income/{id}', 'IncomeController@show');
+    Route::post('income', 'IncomeController@store')->name('income.create');
+    Route::put('income/{id}', 'IncomeController@update')->name('income.update');
+    Route::delete('income/{id}', 'IncomeController@destroy')->name('income.destroy');
 
 });

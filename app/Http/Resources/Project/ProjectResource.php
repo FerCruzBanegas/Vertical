@@ -19,7 +19,7 @@ class ProjectResource extends JsonResource
             'name' => $this->name,
             'comments' => $this->comments,
             'start_date' => $this->start_date,
-            'project_type' => $this->project_type_id
+            'project_type_id' => $this->project_type_id
         ];
     }
 }

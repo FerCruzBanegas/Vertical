@@ -145,6 +145,8 @@ return [
         'message'               => 'mensaje',
         //added
         'comments'              => 'comentarios',
-        'start_date'            => 'fecha de inicio'
+        'start_date'            => 'fecha de inicio',
+        'unity'                 => 'unidad',
+        'price'                 => 'precio',
     ],
 ];

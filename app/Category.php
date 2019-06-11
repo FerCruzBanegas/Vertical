@@ -20,7 +20,7 @@ class Category extends ApiModel
         return $this->hasMany(Material::class);
     }
 
-    public static function lisCategories()
+    public static function listCategories()
     {
         return static::orderBy('id', 'DESC')->select('id', 'name')->get();
     }

@@ -13,13 +13,13 @@
       <v-toolbar flat color="">
         <v-list>
           <v-list-tile>
-              <img src="/img/logo.png" width="210px" v-if="!miniVariant">
-              <img src="/img/logo2.png" width="45px" v-else="miniVariant">
+            <img src="/img/logo.png" width="210px" v-if="!miniVariant">
+            <img src="/img/logo2.png" width="45px" v-else="miniVariant">
           </v-list-tile>
         </v-list>
       </v-toolbar>
       <v-divider></v-divider>
-      <v-list dense>
+      <v-list>
         <template v-for="item in items">
           <v-layout
             row
@@ -33,7 +33,6 @@
             v-model="item.model"
             :key="item.text"
             :prepend-icon="item.model ? item.icon : item['icon-alt']"
-            append-icon=""
           >
             <v-list-tile slot="activator">
               <v-list-tile-content>
@@ -101,9 +100,48 @@
         miniVariant: false,
         items: [
         { icon: 'home', text: 'Inicio', url: '/dashboard', name: 'home' },
-        { icon: 'show_chart', text: 'Gráficas', url: '/graphics', name: 'graphics' },
-        { icon: 'public', text: 'Espacios', url: '/billboards', name: 'billboards' },
-        { icon: 'assignment', text: 'Reportes', url: '/reports', name: 'reports' },
+        {
+          icon: 'domain',
+          'icon-alt': 'domain',
+          text: 'Proyectos',
+          model: false,
+          children: [
+            { icon: 'description', text: 'Tipos De Proyecto', url: '/project-types' },
+            { icon: 'create', text: 'Registrar Nuevo', url: '/projects/create' },
+            { icon: 'list', text: 'Ver Lista', url: '/projects' }
+          ]
+        },
+        {
+          icon: 'build',
+          'icon-alt': 'build',
+          text: 'Materiales',
+          model: false,
+          children: [
+            { icon: 'description', text: 'Tipos De Material', url: '/material-types' },
+            { icon: 'create', text: 'Registrar Nuevo', url: '/materials/create', name: 'profile' },
+            { icon: 'list', text: 'Ver Lista', url: '/materials', name: 'alert' }
+          ]
+        },
+        {
+          icon: 'attach_money',
+          'icon-alt': 'attach_money',
+          text: 'Ingresos',
+          model: false,
+          children: [
+            { icon: 'create', text: 'Registrar Nuevo', url: '/incomes/create', name: 'profile' },
+            { icon: 'list', text: 'Ver Lista', url: '/incomes', name: 'alert' }
+          ]
+        },
+        {
+          icon: 'money_off',
+          'icon-alt': 'money_off',
+          text: 'Egresos',
+          model: false,
+          children: [
+            { icon: 'create', text: 'Registrar Nuevo', url: '/expenses/create', name: 'profile' },
+            { icon: 'list', text: 'Ver Todos', url: '/expenses', name: 'alert' }
+          ]
+        },
         {
           icon: 'settings',
           'icon-alt': 'settings',
@@ -113,19 +151,9 @@
             { icon: 'person', text: 'Perfil', url: '/profile', name: 'profile' },
             { icon: 'notifications_active', text: 'Alerta', url: '/alert/edit', name: 'alert' }
           ]
-        },
-        {
-          icon: 'build',
-          'icon-alt': 'build',
-          text: 'Administración',
-          model: false,
-          children: [
-            { icon: 'group', text: 'Usuarios', url: '/users', name: 'users' },
-            { icon: 'create', text: 'Espacios', url: '/administration', name: 'admin' }
-          ]
         }
       ],
-        width: 220
+        width: 260
       }
     }
   }

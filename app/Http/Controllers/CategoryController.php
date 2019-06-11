@@ -8,7 +8,7 @@ use App\Http\Requests\CategoryRequest;
 use App\Http\Resources\Category\CategoryResource;
 use App\Http\Resources\Category\CategoryCollection;
 
-class CategoryController extends Controller
+class CategoryController extends ApiController
 {
     private $category;
 
@@ -77,7 +77,7 @@ class CategoryController extends Controller
 
     public function listing()
     {
-    	$categories = $this->category->listProjectTypes();
+    	$categories = $this->category->listCategories();
         return $this->respond($categories);
     }
 }

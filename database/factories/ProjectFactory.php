@@ -6,11 +6,9 @@ use Faker\Generator as Faker;
 $factory->define(Project::class, function (Faker $faker) {
     return [
         'uuid' => $faker->uuid,
-        'name' => $faker->sentence,
-        'comments' => $faker->text,
-        'star_date' => $faker->date,
-        'project_types_id' => function () {
-            return factory(App\ProjectType::class)->create()->id;
-        }
+        'name' => (string)$faker->sentence(),
+        'comments' => (string)$faker->text(),
+        'start_date' => $faker->date(),
+        'project_types_id' => rand(1, 60),
     ];
 });

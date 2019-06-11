@@ -4,7 +4,7 @@
       <v-flex d-flex xs12 sm12 md12>
         <v-card>
           <v-card-title primary-title>
-            <h3 class="headline mb-0">Lista Tipo de Proyectos</h3>
+            <h3 class="headline mb-0">Lista Tipos de Proyecto</h3>
           </v-card-title>
           <v-container fluid>
             <v-layout>
@@ -37,6 +37,7 @@
                     :total-items="totalItems"
                     :loading="loading"
                     class="elevation-1"
+                    rows-per-page-text="Items por página"
                   >
                     <v-progress-linear height="3" slot="progress" color="red darken-3" indeterminate></v-progress-linear>
                     <template slot="items" slot-scope="props">
@@ -72,6 +73,9 @@
                     </template>
                     <template slot="no-data">
                       <center>Sin Resultados</center>
+                    </template>
+                    <template v-slot:pageText="props">
+                      {{ props.pageStart }} - {{ props.pageStop }} de {{ props.itemsLength }}
                     </template>
                   </v-data-table>
                 </v-card>

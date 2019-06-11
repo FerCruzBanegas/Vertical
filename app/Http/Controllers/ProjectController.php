@@ -74,7 +74,7 @@ class ProjectController extends ApiController
         } catch (\Exception $e) {
             return $this->respondInternalError();
         }
-        return $this->respondUpdated($project);
+        return $this->respondUpdated();
     }
 
     public function destroy($id)

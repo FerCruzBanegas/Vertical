@@ -12,7 +12,7 @@
                 <v-card>
                   <v-card-text>
                     <v-layout row wrap>
-                      <v-flex xs12 sm12 md5 lg5>
+                      <v-flex xs12 sm12 md6 lg6>
                         <v-layout row wrap>
                           <v-flex xs12 sm12 md12 lg12>
                             <v-text-field

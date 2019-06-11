@@ -21,11 +21,11 @@ class CreateProjectsTable extends Migration
             $table->date('start_date');
             $table->date('end_date')->nullable();
             $table->tinyInteger('state')->default('1');
-            $table->integer('project_types_id')->unsigned();
+            $table->integer('project_type_id')->unsigned();
             $table->softDeletes();
             $table->timestamps();
 
-            $table->foreign('project_types_id')->references('id')->on('project_types')
+            $table->foreign('project_type_id')->references('id')->on('project_types')
                 ->onDelete('cascade')
                 ->onUpdate('cascade');
         });

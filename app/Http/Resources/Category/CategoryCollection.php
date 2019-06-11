@@ -21,7 +21,7 @@ class CategoryCollection extends ResourceCollection
                     'name' => $category->name,
                     'description' => $category->description,
                     'created' => (string) $category->created_at,
-                    // 'materials' => $category->materials->count()
+                    'materials' => $category->materials->count()
                 ];
             }),
         ];
