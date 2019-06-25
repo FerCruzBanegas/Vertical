@@ -42,7 +42,7 @@
                     <v-progress-linear height="3" slot="progress" color="red darken-3" indeterminate></v-progress-linear>
                     <template slot="items" slot-scope="props">
                       <td class="justify-center layout px-0">
-                        <v-btn icon class="mx-0">
+                        <v-btn icon class="mx-0" :to="{ name: 'ShowProject', params: { id: props.item.id }}">
                           <v-icon color="grey darken-1">visibility</v-icon>
                         </v-btn>
                       </td>

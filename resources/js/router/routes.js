@@ -7,6 +7,7 @@ import FormProjectType from '../views/project-type/FormProjectType.vue'
 //project
 import ListProjects from '../views/project/ListProjects.vue'
 import FormProject from '../views/project/FormProject.vue'
+import ShowProject from '../views/project/ShowProject.vue'
 //material-type
 import ListMaterialTypes from '../views/material-type/ListMaterialTypes.vue'
 import FormMaterialType from '../views/material-type/FormMaterialType.vue'
@@ -74,6 +75,11 @@ export default [
             path: ':id/edit',
             name: 'EditProject',
             component: FormProject
+          },
+          {
+            path: ':id/show',
+            name: 'ShowProject',
+            component: ShowProject
           }
         ]
       },

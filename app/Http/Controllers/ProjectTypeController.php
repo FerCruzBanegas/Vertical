@@ -47,6 +47,10 @@ class ProjectTypeController extends ApiController
     {
         try {
             $this->projectType->create($request->all());
+            // activity()
+            //    ->causedBy(auth()->user())
+            //    ->performedOn($projectType)
+            //    ->log('created type');
         } catch (\Exception $e) {
             return $this->respondInternalError();
         }

@@ -24,4 +24,10 @@ class Material extends ApiModel
     {
         return static::orderBy('id', 'DESC')->select('id', 'name')->get();
     }
+
+    public function expenses()
+    {
+        return $this->belongsToMany(Expense::class);
+    }
+
 }

@@ -11,6 +11,10 @@ const mix = require('laravel-mix');
  |
  */
 
-mix.js('resources/js/app.js', 'public/js')
+mix.scripts([
+	    'node_modules/webdatarocks/webdatarocks.toolbar.min.js',
+	    'node_modules/webdatarocks/webdatarocks.js',
+	], 'public/js/libs.js')
+   .js('resources/js/app.js', 'public/js')
    .sass('resources/sass/app.scss', 'public/css')
    .sourceMaps()

@@ -74,4 +74,10 @@ class IncomeTypeController extends ApiController
         }
         return $this->respondDeleted();
     }
+
+    public function listing()
+    {
+        $incometypes = $this->incomeType->listIncomeTypes();
+        return $this->respond($incometypes);
+    }
 }

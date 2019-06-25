@@ -15,7 +15,8 @@ class CreateExpensesTable extends Migration
     {
         Schema::create('expenses', function (Blueprint $table) {
             $table->increments('id');
-            $table->string('title', 80);
+            $table->string('title', 60);
+            $table->enum('unity', ['Tarjeta', 'Efectivo', 'Cheque', 'Credito', 'Transferencia']);
             $table->date('date');
             $table->mediumText('note')->nullable();
             $table->float('amount', 9, 2);

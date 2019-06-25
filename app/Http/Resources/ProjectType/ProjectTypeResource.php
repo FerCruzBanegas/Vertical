@@ -3,6 +3,7 @@
 namespace App\Http\Resources\ProjectType;
 
 use Illuminate\Http\Resources\Json\JsonResource;
+use App\Http\Resources\Activity\ActivityResource;
 
 class ProjectTypeResource extends JsonResource
 {
@@ -17,7 +18,8 @@ class ProjectTypeResource extends JsonResource
         return [
             'id' => $this->id,
             'name' => $this->name,
-            'description' => $this->description
+            'description' => $this->description,
+            'activities' => new ActivityResource($this->activities),
         ];
     }
 }

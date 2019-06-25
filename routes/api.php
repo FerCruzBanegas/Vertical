@@ -13,12 +13,28 @@
 |
  */
 
+Route::get('/test', function() {
+    // $expenses = \App\Expense::with([
+    //     'expense_type',
+    //     'materials'
+    // ])->where('project_id', '=', 35)->get();
+
+    $projectType = \App\ProjectType::findOrFail(62);
+    $data =  $projectType->activities()->where('description', 'updated')->orderBy('created_at', 'desc')->first();
+    return response()->json($data);
+});
+
+// \DB::listen(function($query) {
+//     var_dump($query->sql);
+// });
+
 Route::post('/login', 'Auth\AuthController@login');
 
 Route::get('project-types/listing', 'ProjectTypeController@listing');
 Route::get('projects/listing', 'ProjectController@listing');
 Route::get('categories/listing', 'CategoryController@listing');
 Route::get('income-types/listing', 'IncomeTypeController@listing');
+Route::get('expense-types/listing', 'ExpenseTypeController@listing');
 
 Route::group(['middleware' => ['auth:api']], function () {//TODO Borre el midleware 'acl:api'
     Route::post('logout', 'Auth\AuthController@logout');
@@ -65,5 +81,19 @@ Route::group(['middleware' => ['auth:api']], function () {//TODO Borre el midlew
     Route::post('income', 'IncomeController@store')->name('income.create');
     Route::put('income/{id}', 'IncomeController@update')->name('income.update');
     Route::delete('income/{id}', 'IncomeController@destroy')->name('income.destroy');
+
+    //Expense-Types
+    Route::get('expense-types', 'ExpenseTypeController@index')->name('expense-types.index');
+    Route::get('expense-types/{id}', 'ExpenseTypeController@show');
+    Route::post('expense-types', 'ExpenseTypeController@store')->name('expense-types.create');
+    Route::put('expense-types/{id}', 'ExpenseTypeController@update')->name('expense-types.update');
+    Route::delete('expense-types/{id}', 'ExpenseTypeController@destroy')->name('expense-types.destroy');
+
+    //Expense
+    Route::get('expense', 'ExpenseController@index')->name('expense.index');
+    Route::get('expense/{id}', 'ExpenseController@show');
+    Route::post('expense', 'ExpenseController@store')->name('expense.create');
+    Route::put('expense/{id}', 'ExpenseController@update')->name('expense.update');
+    Route::delete('expense/{id}', 'ExpenseController@destroy')->name('expense.destroy');
 
 });
