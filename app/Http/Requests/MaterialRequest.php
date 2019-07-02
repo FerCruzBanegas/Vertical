@@ -30,7 +30,7 @@ class MaterialRequest extends FormRequest
             'unity' => ['required', Rule::in($this->units)],
             'description' => 'nullable|min:5|max:120',
             'price' => 'nullable|max:9|regex:/^-?[0-9]+(?:\.[0-9]{1,2})?$/',
-            'category_id' => 'required|integer'
+            'material_type_id' => 'required|integer'
         ];
 
         if($this->method() == 'PATCH' || $this->method() == 'PUT') {

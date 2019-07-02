@@ -19,9 +19,16 @@ Route::get('/test', function() {
     //     'materials'
     // ])->where('project_id', '=', 35)->get();
 
-    $projectType = \App\ProjectType::findOrFail(62);
-    $data =  $projectType->activities()->where('description', 'updated')->orderBy('created_at', 'desc')->first();
-    return response()->json($data);
+    // $projectType = \App\Project::findOrFail(62);
+    // $data =  $projectType->activities()->where('description', 'updated')->orderBy('created_at', 'desc')->first();
+    // return response()->json($data);
+
+    // $expenses = \App\Expense::where('project_id', 53)->get();
+    // $incomes = \App\Income::where('project_id', 53)->get();
+
+    $b = \App\Project::with(['expenses', 'incomes'])->findOrFail(53);
+    $events = $b->expenses->merge($b->incomes)->values()->paginate(2);
+    return response()->json($events);
 });
 
 // \DB::listen(function($query) {
@@ -32,7 +39,7 @@ Route::post('/login', 'Auth\AuthController@login');
 
 Route::get('project-types/listing', 'ProjectTypeController@listing');
 Route::get('projects/listing', 'ProjectController@listing');
-Route::get('categories/listing', 'CategoryController@listing');
+Route::get('material-types/listing', 'MaterialTypeController@listing');
 Route::get('income-types/listing', 'IncomeTypeController@listing');
 Route::get('expense-types/listing', 'ExpenseTypeController@listing');
 
@@ -43,6 +50,7 @@ Route::group(['middleware' => ['auth:api']], function () {//TODO Borre el midlew
     //Project-Types
     Route::get('project-types', 'ProjectTypeController@index')->name('project-types.index');
     Route::get('project-types/{id}', 'ProjectTypeController@show');
+    Route::get('project-types/{id}/detail', 'ProjectTypeController@detail');
     Route::post('project-types', 'ProjectTypeController@store')->name('project-types.create');
     Route::put('project-types/{id}', 'ProjectTypeController@update')->name('project-types.update');
     Route::delete('project-types/{id}', 'ProjectTypeController@destroy')->name('project-types.destroy');
@@ -50,20 +58,23 @@ Route::group(['middleware' => ['auth:api']], function () {//TODO Borre el midlew
     //Project
     Route::get('projects', 'ProjectController@index')->name('projects.index');
     Route::get('projects/{id}', 'ProjectController@show');
+    Route::get('projects/{id}/detail', 'ProjectController@detail');
+    Route::get('projects/{id}/events', 'ProjectController@getEvents');
     Route::post('projects', 'ProjectController@store')->name('projects.create');
     Route::put('projects/{id}', 'ProjectController@update')->name('projects.update');
     Route::delete('projects/{id}', 'ProjectController@destroy')->name('projects.destroy');
 
-    //Category
-    Route::get('categories', 'CategoryController@index')->name('categories.index');
-    Route::get('categories/{id}', 'CategoryController@show');
-    Route::post('categories', 'CategoryController@store')->name('categories.create');
-    Route::put('categories/{id}', 'CategoryController@update')->name('categories.update');
-    Route::delete('categories/{id}', 'CategoryController@destroy')->name('categories.destroy');
+    //Material-Types
+    Route::get('material-types', 'MaterialTypeController@index')->name('material-types.index');
+    Route::get('material-types/{id}', 'MaterialTypeController@show');
+    Route::post('material-types', 'MaterialTypeController@store')->name('material-types.create');
+    Route::put('material-types/{id}', 'MaterialTypeController@update')->name('material-types.update');
+    Route::delete('material-types/{id}', 'MaterialTypeController@destroy')->name('material-types.destroy');
 
     //Material
     Route::get('materials', 'MaterialController@index')->name('materials.index');
     Route::get('materials/{id}', 'MaterialController@show');
+    Route::get('materials/{id}/detail', 'MaterialController@detail');
     Route::post('materials', 'MaterialController@store')->name('materials.create');
     Route::put('materials/{id}', 'MaterialController@update')->name('materials.update');
     Route::delete('materials/{id}', 'MaterialController@destroy')->name('materials.destroy');

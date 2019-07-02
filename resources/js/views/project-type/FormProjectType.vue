@@ -2,7 +2,7 @@
   <v-container fluid grid-list-md id="theme">
     <v-layout row wrap>
       <v-flex d-flex xs12 sm12 md12>
-        <v-card>
+        <v-card v-show="success">
           <v-card-title primary-title>
             <h3 class="headline mb-0">{{ addSubtitle }}</h3>
           </v-card-title>
@@ -16,6 +16,7 @@
                         <v-layout row wrap>
                           <v-flex xs12 sm12 md12 lg12>
                             <v-text-field
+                              color="grey darken-2"
                               label="Nombre *"
                               v-model="project_type.name"
                             ></v-text-field>
@@ -24,6 +25,7 @@
                         <v-layout row wrap>
                           <v-flex xs12 sm12 md12 lg12>
                             <v-textarea
+                              color="grey darken-2"
                               label="Descripción"
                               v-model="project_type.description"
                             ></v-textarea>
@@ -32,6 +34,12 @@
                       </v-flex>
                     </v-layout>
                     <small>Los campos con (*) son obligatorios.</small>
+                    <v-switch
+                      v-if="!id"
+                      color="red"
+                      v-model="retry"
+                      label="Quedarme en la página después de registrar los datos."
+                    ></v-switch>
                   </v-card-text>
                   <v-divider class="mt-5"></v-divider>
                   <v-card-actions>
@@ -61,10 +69,11 @@
     name: 'form-project-type',
     data() {
       return {
-        succes: false,
+        success: false,
         loading: false,
         project_type: new ProjectType(),
-        id: this.$route.params.id
+        id: this.$route.params.id,
+        retry: false
       }
     },
 
@@ -90,26 +99,27 @@
         const response = await ProjectTypeService.getProjectTypes(`project-types/${this.id}`)
         if (response.status === 200) {
           this.project_type = response.data.data
+          this.success = true
         }
       },
 
-      submit() {
-        this.loading = true
-        if(this.id) {
-          this._save = axios.put(`/api/category/${this.id}`, this.category)
+      submit: async function() {
+        const vm = this
+        vm.loading = true
+        if(vm.id) {
+          vm._save = await ProjectTypeService.updateProjectType(vm.id, vm.project_type)
         } else {
-          this._save = axios.post('/api/create-category', this.category)
+          vm._save = await ProjectTypeService.storeProjectType(vm.project_type)
         }
-        this._save
-        .then(response => {
-          if(response.data.success) {
-            this.$router.push('/categories')
+        if (vm._save.status === 201 || vm._save.status === 200) {
+          vm.$snotify.simple(vm._save.data.message, 'Felicidades')
+          vm.loading = false
+          if (vm.retry) {
+            vm.project_type = new ProjectType()
+          } else {
+            vm.$router.push('/project-types')
           }
-          this.loading = false
-        })
-        .catch(error =>{
-          this.loading = false
-        })
+        }
       }
     }
   }

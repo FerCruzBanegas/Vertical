@@ -1,7 +1,10 @@
 <template>
   <v-container fluid grid-list-md>
-    <v-layout>
+    <v-layout row wrap>
       <v-flex d-flex xs12 sm12 md12>
+        <modal-delete :message="message" :loading="loading" :remove="remove" @hide="remove = !remove" @deleted="deleted"></modal-delete>
+        <modal-loader :loader="loader"></modal-loader>
+        <modal-type :modal="modal" @hide="modal = !modal" :data="project_type"></modal-type>
         <v-card>
           <v-card-title primary-title>
             <h3 class="headline mb-0">Lista Tipos de Proyecto</h3>
@@ -21,12 +24,15 @@
                     </v-btn>
                     </v-btn>
                     <v-spacer></v-spacer>
+                    <v-btn flat icon color="red darken-3" @click="allData">
+                      <v-icon>cached</v-icon>
+                    </v-btn>
                     <v-text-field
+                      color="grey darken-2"
                       v-model="search"
                       @keypress.enter.prevent="filterData"
                       append-icon="search"
                       label="Buscar"
-                      single-line
                       hide-details
                     ></v-text-field>
                   </v-card-title>
@@ -35,12 +41,17 @@
                     :items="items"
                     :pagination.sync="pagination"
                     :total-items="totalItems"
-                    :loading="loading"
+                    :loading="progress"
                     class="elevation-1"
                     rows-per-page-text="Items por página"
                   >
                     <v-progress-linear height="3" slot="progress" color="red darken-3" indeterminate></v-progress-linear>
                     <template slot="items" slot-scope="props">
+                      <td class="justify-center layout px-0">
+                        <v-btn icon class="mx-0" @click="getDetail(props.item.id)">
+                          <v-icon color="grey darken-1">visibility</v-icon>
+                        </v-btn>
+                      </td>
                       <td>{{ props.item.name }}</td>
                       <td>{{ props.item.description }}</td>
                       <td>
@@ -66,6 +77,7 @@
                           flat 
                           icon class="mx-0" 
                           color="red"
+                          @click="showModal(props.item)"
                         >
                           <v-icon small color="red">delete</v-icon>
                         </v-btn>
@@ -89,15 +101,25 @@
 </template>
 
 <script>
+  import ModalLoader from '../../components/ModalLoader.vue'
+  import ModalType from '../../components/ModalType.vue'
+  import ModalDelete from '../../components/ModalDelete.vue'
   import ProjectTypeService from '../../services/project.type.service'
-
+ 
   export default {
     name: 'list-project-types',
     data () {
       return {
         search: '',
+        progress: false,
+        message: '',
+        remove: false,
         loading: false,
+        loader: false,
+        modal: false,
+        project_type: null,
         headers: [
+          { text: '', align: 'left', sortable: false},
           { text: 'Nombre', value: 'nombre', width: "200" },
           { text: 'Descripción', value: 'descripcion', width: "400" },
           { text: 'Proyectos', sortable: false, value: 'proyectos' },
@@ -110,6 +132,12 @@
           rowsPerPage: 10
         }
       }
+    },
+
+    components: {
+      'modal-loader' : ModalLoader,
+      'modal-type' : ModalType,
+      'modal-delete' : ModalDelete
     },
     
     watch: {
@@ -125,6 +153,42 @@
     },
 
     methods: {
+      setMessage(item) {
+        const projects = item.projects
+        if( projects >= 1) {
+          this.message = `Existen ${projects} proyectos relacionados a esta categoría, si la elimina los proyectos también se borrarán. Desea continuar?`
+        } else {
+          this.message = 'Realmente desea borrar los datos de este registro?'
+        }
+      },
+
+      showModal(item) {
+        this.setMessage(item)
+        this.remove = true
+        this.id = item.id
+      },
+
+      deleted:async function() {
+        this.loading = true
+        const response = await ProjectTypeService.deleteProjectType(`project-types/${this.id}`)
+        if (response.status === 200) {
+          this.loading = false
+          this.remove = false
+          this.getDataFromApi()
+          .then(data => {
+            this.items = data.items
+          })
+        }
+      },
+
+      allData() {
+        this.search = ''
+        this.pagination.page = 1
+        this.getDataFromApi().then(data =>{
+          this.items = data.items
+        })
+      },
+
       filterData() {
         this.getDataFromApi().then(data =>{
           this.items = data.items
@@ -132,7 +196,7 @@
       },
 
       getDataFromApi() {
-        this.loading = true
+        this.progress = true
         return new Promise((resolve, reject) => {
           const { sortBy, descending, page } = this.pagination
           ProjectTypeService.getProjectTypes(this.buildURL())
@@ -142,9 +206,19 @@
             resolve({
               items
             })
-            this.loading = false
+            this.progress = false
           })
         })
+      },
+
+      getDetail: async function(id) {
+        this.loader = true
+        const response = await ProjectTypeService.getProjectTypes(`project-types/${id}`)
+        if (response.status === 200) {
+          this.project_type = response.data.data
+          this.loader = false
+          this.modal = true
+        }
       },
 
       buildURL() {

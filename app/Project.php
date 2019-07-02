@@ -4,10 +4,11 @@ namespace App;
 
 // use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Spatie\Activitylog\Traits\LogsActivity;
 
 class Project extends ApiModel
 {
-	use SoftDeletes;
+	use SoftDeletes, LogsActivity;
 
     protected $dates = ['deleted_at'];
 
@@ -34,7 +35,6 @@ class Project extends ApiModel
     {
         return $this->hasMany(Expense::class);
     }
-
 
     public static function listProjects()
     {

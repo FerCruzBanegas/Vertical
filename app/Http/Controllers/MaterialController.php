@@ -6,6 +6,7 @@ use App\Material;
 use Illuminate\Http\Request;
 use App\Http\Requests\MaterialRequest;
 use App\Http\Resources\Material\MaterialResource;
+use App\Http\Resources\Material\MaterialDetailResource;
 use App\Http\Resources\Material\MaterialCollection;
 
 class MaterialController extends ApiController
@@ -33,8 +34,14 @@ class MaterialController extends ApiController
             });
         }
 
-    	$materials = $materials->with('category')->paginate($rowsPerPage);//TODO: mandar solo name en la relacion.
+    	$materials = $materials->with('material_type')->paginate($rowsPerPage);//TODO: mandar solo name en la relacion.
     	return new MaterialCollection($materials); 
+    }
+
+    public function detail($id)
+    {
+        $material = $this->material->findOrFail($id);
+        return new MaterialDetailResource($material); 
     }
 
     public function show($id)

@@ -3,7 +3,9 @@
     <v-layout>
       <v-flex d-flex xs12 sm12 md12>
         <v-card>
-          <modal-delete :message="message" :loader="loader" :dialog="dialog" @hide="hide" @deleted="deleted"></modal-delete>
+          <modal-delete :message="message" :loading="loading" :remove="remove" @hide="remove = !remove" @deleted="deleted"></modal-delete>
+          <modal-loader :loader="loader"></modal-loader>
+          <modal-material :modal="modal" @hide="modal = !modal" :data="material"></modal-material>
           <v-card-title primary-title>
             <h3 class="headline mb-0">Lista de Materiales</h3>
           </v-card-title>
@@ -22,7 +24,11 @@
                     </v-btn>
                     </v-btn>
                     <v-spacer></v-spacer>
+                    <v-btn flat icon color="red darken-3" @click="allData">
+                      <v-icon>cached</v-icon>
+                    </v-btn>
                     <v-text-field
+                      color="grey darken-2"
                       v-model="search"
                       @keypress.enter.prevent="filterData"
                       append-icon="search"
@@ -36,14 +42,19 @@
                     :items="items"
                     :pagination.sync="pagination"
                     :total-items="totalItems"
-                    :loading="loading"
+                    :loading="progress"
                     class="elevation-1"
                     rows-per-page-text="Items por página"
                   >
                     <v-progress-linear height="3" slot="progress" color="red darken-3" indeterminate></v-progress-linear>
                     <template slot="items" slot-scope="props">
+                      <td class="justify-center layout px-0">
+                        <v-btn icon class="mx-0" @click="getDetail(props.item.id)">
+                          <v-icon color="grey darken-1">visibility</v-icon>
+                        </v-btn>
+                      </td>
                       <td>{{ props.item.name }}</td>
-                      <td>{{ props.item.category }}</td>
+                      <td>{{ props.item.material_type }}</td>
                       <td>{{ props.item.unity }}</td>
                       <td>{{ props.item.created }}</td>
                       <td>
@@ -85,6 +96,8 @@
 </template>
 
 <script>
+  import ModalLoader from '../../components/ModalLoader.vue'
+  import ModalMaterial from '../../components/ModalMaterial.vue'
   import ModalDelete from '../../components/ModalDelete.vue'
   import MaterialService from '../../services/material.service'
 
@@ -92,12 +105,16 @@
     name: 'list-material',
     data () {
       return {
-        loader: false,
-        dialog: false,
-        message: '',
         search: '',
+        progress: false,
+        message: '',
+        remove: false,
         loading: false,
+        loader: false,
+        modal: false,
+        material: null,
         headers: [
+          { text: '', align: 'left', sortable: false},
           { text: 'Nombre', value: 'nombre', width: "200" },
           { text: 'Tipo de Material', value: 'tipo', width: "400" },
           { text: 'Unidad', sortable: false, value: 'unidad' },
@@ -113,7 +130,9 @@
     },
 
     components: {
-      'modal-delete' : ModalDelete,
+      'modal-loader' : ModalLoader,
+      'modal-material' : ModalMaterial,
+      'modal-delete' : ModalDelete
     },
     
     watch: {
@@ -140,25 +159,29 @@
 
       showModal(item) {
         this.setMessage(item)
-        this.dialog = true
+        this.remove = true
         this.id = item.id
       },
 
-      hide() {
-        this.dialog = false
-      },
-
       deleted:async function() {
-        this.loader = true
+        this.loading = true
         const response = await MaterialService.deleteMaterial(`materials/${this.id}`)
         if (response.status === 200) {
-          this.loader = false
-          this.dialog = false
+          this.loading = false
+          this.remove = false
           this.getDataFromApi()
           .then(data => {
             this.items = data.items
           })
         }
+      },
+
+      allData() {
+        this.search = ''
+        this.pagination.page = 1
+        this.getDataFromApi().then(data =>{
+          this.items = data.items
+        })
       },
 
       filterData() {
@@ -168,7 +191,7 @@
       },
 
       getDataFromApi() {
-        this.loading = true
+        this.progress = true
         return new Promise((resolve, reject) => {
           const { sortBy, descending, page } = this.pagination
           MaterialService.getMaterials(this.buildURL())
@@ -178,9 +201,19 @@
             resolve({
               items
             })
-            this.loading = false
+            this.progress = false
           })
         })
+      },
+
+      getDetail: async function(id) {
+        this.loader = true
+        const response = await MaterialService.getMaterials(`materials/${id}/detail`)
+        if (response.status === 200) {
+          this.material = response.data.data
+          this.loader = false
+          this.modal = true
+        }
       },
 
       buildURL() {

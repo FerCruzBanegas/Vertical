@@ -21,7 +21,7 @@ class MaterialCollection extends ResourceCollection
                     'name' => $material->name,
                     'unity' => $material->unity,
                     'created' => (string) $material->created_at,
-                    'category' => $material->category->name
+                    'material_type' => $material->material_type->name
                 ];
             }),
         ];

@@ -52,8 +52,10 @@
     </v-layout>
     <v-layout>
       <v-flex d-flex xs12 sm12 md12>
+        <modal-delete :message="message" :loading="loading" :remove="remove" @hide="remove = !remove" @deleted="deleted"></modal-delete>
+          <modal-loader :loader="loader"></modal-loader>
+          <modal-type :modal="modal" @hide="modal = !modal" :data="material_type"></modal-type>
         <v-card>
-          <modal-delete :message="message" :loader="loader" :dialog="dialog" @hide="hide" @deleted="deleted"></modal-delete>
           <v-card-title primary-title>
             <h3 class="headline mb-0">Lista Tipos de Material</h3>
           </v-card-title>
@@ -72,7 +74,11 @@
                     </v-btn>
                     </v-btn>
                     <v-spacer></v-spacer>
+                    <v-btn flat icon color="red darken-3" @click="allData">
+                      <v-icon>cached</v-icon>
+                    </v-btn>
                     <v-text-field
+                      color="grey darken-2"
                       v-model="search"
                       @keypress.enter.prevent="filterData"
                       append-icon="search"
@@ -86,12 +92,17 @@
                     :items="items"
                     :pagination.sync="pagination"
                     :total-items="totalItems"
-                    :loading="loading"
+                    :loading="progress"
                     class="elevation-1"
                     rows-per-page-text="Items por página"
                   >
                     <v-progress-linear height="3" slot="progress" color="red darken-3" indeterminate></v-progress-linear>
                     <template slot="items" slot-scope="props">
+                      <td class="justify-center layout px-0">
+                        <v-btn icon class="mx-0" @click="getDetail(props.item.id)">
+                          <v-icon color="grey darken-1">visibility</v-icon>
+                        </v-btn>
+                      </td>
                       <td>{{ props.item.name }}</td>
                       <td>{{ props.item.description }}</td>
                       <td>
@@ -141,19 +152,25 @@
 </template>
 
 <script>
+  import ModalLoader from '../../components/ModalLoader.vue'
+  import ModalType from '../../components/ModalType.vue'
   import ModalDelete from '../../components/ModalDelete.vue'
   import MaterialTypeService from '../../services/material.type.service'
 
   export default {
     name: 'list-material-types',
     data () {
-      return {
-        loader: false,
-        dialog: false,
-        message: '',
+      return {        
         search: '',
+        progress: false,
+        message: '',
+        remove: false,
         loading: false,
+        loader: false,
+        modal: false,
+        material_type: null,
         headers: [
+          { text: '', align: 'left', sortable: false},
           { text: 'Nombre', value: 'nombre', width: "200" },
           { text: 'Descripción', value: 'descripcion', width: "400" },
           { text: 'Materiales', sortable: false, value: 'materiales' },
@@ -169,7 +186,9 @@
     },
 
     components: {
-      'modal-delete' : ModalDelete,
+      'modal-loader' : ModalLoader,
+      'modal-type' : ModalType,
+      'modal-delete' : ModalDelete
     },
     
     watch: {
@@ -187,7 +206,7 @@
     methods: {
       setMessage (item) {
         const materials = item.materials
-        if( materials > 1) {
+        if( materials >= 1) {
           this.message = `Existen ${materials} materiales relacionados a esta categoría, si la elimina los materiales también se borrarán. Desea continuar?`
         } else {
           this.message = 'Realmente desea borrar los datos de este registro?'
@@ -196,25 +215,29 @@
 
       showModal(item) {
         this.setMessage(item)
-        this.dialog = true
+        this.remove = true
         this.id = item.id
       },
 
-      hide() {
-        this.dialog = false
-      },
-
       deleted:async function() {
-        this.loader = true
-        const response = await MaterialTypeService.deleteMaterialType(`categories/${this.id}`)
+        this.loading = true
+        const response = await MaterialTypeService.deleteMaterialType(`material-types/${this.id}`)
         if (response.status === 200) {
-          this.loader = false
-          this.dialog = false
+          this.loading = false
+          this.remove = false
           this.getDataFromApi()
           .then(data => {
             this.items = data.items
           })
         }
+      },
+
+      allData() {
+        this.search = ''
+        this.pagination.page = 1
+        this.getDataFromApi().then(data =>{
+          this.items = data.items
+        })
       },
 
       filterData() {
@@ -224,7 +247,7 @@
       },
 
       getDataFromApi() {
-        this.loading = true
+        this.progress = true
         return new Promise((resolve, reject) => {
           const { sortBy, descending, page } = this.pagination
           MaterialTypeService.getMaterialTypes(this.buildURL())
@@ -234,16 +257,26 @@
             resolve({
               items
             })
-            this.loading = false
+            this.progress = false
           })
         })
+      },
+
+      getDetail: async function(id) {
+        this.loader = true
+        const response = await MaterialTypeService.getMaterialTypes(`material-types/${id}`)
+        if (response.status === 200) {
+          this.material_type = response.data.data
+          this.loader = false
+          this.modal = true
+        }
       },
 
       buildURL() {
         let page = `?page=${this.pagination.page}`
         let rowsPerPage = `&rowsPerPage=${this.pagination.rowsPerPage}`
         let filter = this.search === '' ? '' : `&filter=${this.search}`
-        return `categories${page}${rowsPerPage}${filter}`
+        return `material-types${page}${rowsPerPage}${filter}`
       }
     }
   }

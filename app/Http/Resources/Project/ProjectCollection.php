@@ -23,7 +23,7 @@ class ProjectCollection extends ResourceCollection
                     'created' => (string) $project->created_at,
                     'project_type' => $project->project_type->name
                 ];
-            }),
+            })
         ];
     }
 }

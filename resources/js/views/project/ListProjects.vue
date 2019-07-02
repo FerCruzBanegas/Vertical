@@ -2,13 +2,14 @@
   <v-container fluid grid-list-md>
     <v-layout>
       <v-flex d-flex xs12 sm12 md12>
+        <modal-delete :message="message" :loading="loading" :remove="remove" @hide="remove = !remove" @deleted="deleted"></modal-delete>
         <v-card>
           <v-card-title primary-title>
             <h3 class="headline mb-0">Lista de Proyectos</h3>
           </v-card-title>
           <v-container fluid>
             <v-layout>
-              <v-flex xs12 sm12 md12 lg12>
+              <v-flex d-flex xs12 sm12 md12 lg12>
                 <v-card>
                   <v-card-title>
                     <v-btn
@@ -21,7 +22,11 @@
                     </v-btn>
                     </v-btn>
                     <v-spacer></v-spacer>
+                    <v-btn flat icon color="red darken-3" @click="allData">
+                      <v-icon>cached</v-icon>
+                    </v-btn>
                     <v-text-field
+                      color="grey darken-2"
                       v-model="search"
                       @keypress.enter.prevent="filterData"
                       append-icon="search"
@@ -35,7 +40,7 @@
                     :items="items"
                     :pagination.sync="pagination"
                     :total-items="totalItems"
-                    :loading="loading"
+                    :loading="progress"
                     class="elevation-1"
                     rows-per-page-text="Items por página"
                   >
@@ -84,6 +89,7 @@
                           flat 
                           icon class="mx-0" 
                           color="red"
+                          @click="showModal(props.item)"
                         >
                           <v-icon small color="red">delete</v-icon>
                         </v-btn>
@@ -107,6 +113,7 @@
 </template>
 
 <script>
+  import ModalDelete from '../../components/ModalDelete.vue'
   import ProjectService from '../../services/project.service'
 
   export default {
@@ -114,6 +121,9 @@
     data () {
       return {
         search: '',
+        progress: false,
+        message: 'Realmente desea borrar los datos de este registro?',
+        remove: false,
         loading: false,
         headers: [
           { text: '', align: 'left', sortable: false},
@@ -130,6 +140,10 @@
         }
       }
     },
+
+    components: {
+      'modal-delete' : ModalDelete
+    },
     
     watch: {
       pagination: {
@@ -144,6 +158,42 @@
     },
 
     methods: {
+      // setMessage (item) {
+      //   const materials = item.materials
+      //   if( materials > 1) {
+      //     this.message = `Existen ${materials} materiales relacionados a esta categoría, si la elimina los materiales también se borrarán. Desea continuar?`
+      //   } else {
+      //     this.message = 'Realmente desea borrar los datos de este registro?'
+      //   }
+      // },
+
+      showModal(item) {
+        // this.setMessage(item)
+        this.remove = true
+        this.id = item.id
+      },
+
+      deleted:async function() {
+        this.loading = true
+        const response = await ProjectService.deleteProject(`projects/${this.id}`)
+        if (response.status === 200) {
+          this.loading = false
+          this.remove = false
+          this.getDataFromApi()
+          .then(data => {
+            this.items = data.items
+          })
+        }
+      },
+
+      allData() {
+        this.search = ''
+        this.pagination.page = 1
+        this.getDataFromApi().then(data =>{
+          this.items = data.items
+        })
+      },
+      
       filterData() {
         this.getDataFromApi().then(data =>{
           this.items = data.items
@@ -151,7 +201,7 @@
       },
 
       getDataFromApi() {
-        this.loading = true
+        this.progress = true
         return new Promise((resolve, reject) => {
           const { sortBy, descending, page } = this.pagination
           ProjectService.getProjects(this.buildURL())
@@ -161,7 +211,7 @@
             resolve({
               items
             })
-            this.loading = false
+            this.progress = false
           })
         })
       },

@@ -3,10 +3,14 @@
 namespace App\Http\Controllers;
 
 use App\Project;
+use App\Expense;
+use App\Income;
 use Illuminate\Http\Request;
 use App\Http\Requests\ProjectRequest;
 use App\Http\Resources\Project\ProjectResource;
+use App\Http\Resources\Project\ProjectDetailResource;
 use App\Http\Resources\Project\ProjectCollection;
+use App\Http\Resources\Project\ProjectEventsCollection;
 
 class ProjectController extends ApiController
 {
@@ -33,8 +37,29 @@ class ProjectController extends ApiController
             });
         }
 
-    	$projects = $projects->with('project_type')->paginate($rowsPerPage);//TODO: mandar solo name en la relacion.
+    	$projects = $projects->with('project_type')->paginate($rowsPerPage);
     	return new ProjectCollection($projects); 
+    }
+
+    public function getEvents(Request $request, $id) 
+    {
+        if ($request->has('rowsPerPage')) {
+            $rowsPerPage = $request->input('rowsPerPage');
+        }
+
+        $project = $this->project->with(['expenses', 'incomes'])->findOrFail($id);
+        $events = collect($project->expenses)->merge($project->incomes)->sortByDesc('date')->paginate($rowsPerPage);
+
+        return new ProjectEventsCollection($events);
+    }
+
+    public function detail(Request $request, $id)
+    {
+        $project = $this->project->findOrFail($id);
+        return response()->json([
+            'projects' => new ProjectDetailResource($project),
+            'expenses' => $this->getExpenses($request, $id)
+        ]); 
     }
 
     public function show($id)

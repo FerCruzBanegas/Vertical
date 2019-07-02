@@ -2,7 +2,7 @@
   <v-container fluid grid-list-md id="theme">
     <v-layout row wrap>
       <v-flex d-flex xs12 sm12 md12>
-        <v-card>
+        <v-card v-show="success">
           <v-card-title primary-title>
             <h3 class="headline mb-0">{{ addSubtitle }}</h3>
           </v-card-title>
@@ -19,7 +19,7 @@
                               box
                               color="grey darken-2"
                               :items="material_types"
-                              v-model="material.category_id"
+                              v-model="material.material_type_id"
                               label="Tipo de Material *"
                               item-text="name"
                               item-value="id"
@@ -144,7 +144,7 @@
 
     methods: {
       listMaterialTypes: async function() {
-        const types = await MaterialTypeService.getMaterialTypes('categories/listing')
+        const types = await MaterialTypeService.getMaterialTypes('material-types/listing')
         if (types.status === 200) {
           this.material_types = types.data;
         }
@@ -154,22 +154,25 @@
         const response = await MaterialService.getMaterials(`materials/${this.id}`)
         if (response.status === 200) {
           this.material = response.data.data;
+          this.success = true
         }
       },
 
       submit: async function() {
-        this.loading = true
-        if(this.id) {
-          this._save = await MaterialService.updateMaterial(this.id, this.material)
+        const vm = this
+        vm.loading = true
+        if(vm.id) {
+          vm._save = await MaterialService.updateMaterial(vm.id, vm.material)
         } else {
-          this._save = await MaterialService.storeMaterial(this.material)
+          vm._save = await MaterialService.storeMaterial(vm.material)
         }
-        if (this._save.status === 201 || this._save.status === 200) {
-          this.loading = false
-          if (this.retry) {
-            this.material = new Material()
+        if (vm._save.status === 201 || vm._save.status === 200) {
+          vm.$snotify.simple(vm._save.data.message, 'Felicidades')
+          vm.loading = false
+          if (vm.retry) {
+            vm.material = new Material()
           } else {
-            this.$router.push('/materials')
+            vm.$router.push('/materials')
           }
         }
       }

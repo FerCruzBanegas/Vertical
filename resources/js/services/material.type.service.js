@@ -18,7 +18,25 @@ const MaterialTypeService = {
     } catch (error) {
       console.log(error)
     }
-  }
+  },
+
+  storeMaterialType: async function(data) {
+    try {
+      const response = await ApiService.post('/material-types', data)
+      return response
+    } catch (error) {
+      console.log(error)
+    }
+  },
+
+  updateMaterialType: async function(id, data) {
+    try {
+      const response = await ApiService.put(`material-types/${id}`, data)
+      return response
+    } catch (error) {
+      console.log(error)
+    }
+  },
 }
 
 export default MaterialTypeService
