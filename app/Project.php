@@ -13,13 +13,24 @@ class Project extends ApiModel
     protected $dates = ['deleted_at'];
 
     protected $fillable = [
-        'uuid', 'name', 'comments', 'start_date', 'end_date', 'project_type_id',
+        'uuid', 'name', 'location', 'comments', 'start_date', 'end_date', 'state', 'project_type_id',
     ];
 
     // public function getStartDateAttribute($date)
     // {
     //     return $this->getFormatDate($date);
     // }
+
+    public function getIncomeAttribute() 
+    { 
+        $total = 0; 
+
+        foreach($this->incomes as $income){ 
+           $total += $income->amount; 
+        } 
+
+        return $total;
+    }
 
     public function project_type()
     {

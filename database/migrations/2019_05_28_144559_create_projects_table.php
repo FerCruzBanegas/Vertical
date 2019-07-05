@@ -17,6 +17,7 @@ class CreateProjectsTable extends Migration
             $table->increments('id');
             $table->uuid('uuid');
             $table->string('name', 60);
+            $table->string('location', 100);
             $table->mediumText('comments')->nullable();
             $table->date('start_date');
             $table->date('end_date')->nullable();

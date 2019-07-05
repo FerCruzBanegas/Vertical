@@ -1,55 +1,5 @@
 <template>
   <v-container fluid grid-list-md>
-    <v-layout row child-flex wrap>
-      <v-flex d-flex xs12 sm3 md3 lg3 xl3>
-        <v-card class="mx-auto" color="grey" dark>
-          <v-card-title>
-            <v-icon x-large left>trending_up</v-icon>
-            <span class="title font-weight-light">En General</span>
-          </v-card-title>
-          <v-divider dark></v-divider>
-          <v-card-text class="headline font-weight-bold text-md-center">
-           Bs. 1,200.46
-          </v-card-text>
-        </v-card>
-      </v-flex>
-      <v-flex d-flex xs12 sm3 md3 lg3 xl3>
-        <v-card class="mx-auto" color="grey" dark>
-          <v-card-title>
-            <v-icon x-large left>trending_up</v-icon>
-            <span class="title font-weight-light">Este Mes</span>
-          </v-card-title>
-          <v-divider dark></v-divider>
-          <v-card-text class="headline font-weight-bold text-md-center">
-           Bs. 23,200,200.46
-          </v-card-text>
-        </v-card>
-      </v-flex>
-      <v-flex d-flex xs12 sm3 md3 lg3 xl3>
-        <v-card class="mx-auto" color="grey" dark>
-          <v-card-title>
-            <v-icon x-large left>trending_up</v-icon>
-            <span class="title font-weight-light">Esta Semana</span>
-          </v-card-title>
-          <v-divider dark></v-divider>
-          <v-card-text class="headline font-weight-bold text-md-center">
-           Bs. 1,200.46
-          </v-card-text>
-        </v-card>
-      </v-flex>
-      <v-flex d-flex xs12 sm3 md3 lg3 xl3>
-        <v-card class="mx-auto" color="grey" dark>
-          <v-card-title>
-            <v-icon x-large left>trending_up</v-icon>
-            <span class="title font-weight-light">Hoy</span>
-          </v-card-title>
-          <v-divider dark></v-divider>
-          <v-card-text class="headline font-weight-bold text-md-center">
-           Bs. 1,200.46
-          </v-card-text>
-        </v-card>
-      </v-flex>
-    </v-layout>
     <v-layout>
       <v-flex d-flex xs12 sm12 md12>
         <modal-delete :message="message" :loading="loading" :remove="remove" @hide="remove = !remove" @deleted="deleted"></modal-delete>

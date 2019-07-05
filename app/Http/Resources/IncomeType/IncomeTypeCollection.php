@@ -6,12 +6,6 @@ use Illuminate\Http\Resources\Json\ResourceCollection;
 
 class IncomeTypeCollection extends ResourceCollection
 {
-    /**
-     * Transform the resource collection into an array.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return array
-     */
     public function toArray($request)
     {
         return [
@@ -20,7 +14,8 @@ class IncomeTypeCollection extends ResourceCollection
                     'id' => $type->id,
                     'name' => $type->name,
                     'description' => $type->description,
-                    'created' => (string) $type->created_at
+                    'created' => (string) $type->created_at,
+                    'incomes' => $type->incomes->count()
                 ];
             }),
         ];

@@ -14,6 +14,18 @@ import FormMaterialType from '../views/material-type/FormMaterialType.vue'
 //material
 import ListMaterials from '../views/material/ListMaterials.vue'
 import FormMaterial from '../views/material/FormMaterial.vue'
+//income-type
+import ListIncomeTypes from '../views/income-type/ListIncomeTypes.vue'
+import FormIncomeType from '../views/income-type/FormIncomeType.vue'
+//income
+import ListIncomes from '../views/income/ListIncomes.vue'
+import FormIncome from '../views/income/FormIncome.vue'
+//expense-type
+import ListExpenseTypes from '../views/expense-type/ListExpenseTypes.vue'
+import FormExpenseType from '../views/expense-type/FormExpenseType.vue'
+//expense
+import ListExpenses from '../views/expense/ListExpenses.vue'
+import FormExpense from '../views/expense/FormExpense.vue'
 
 export default [
   {
@@ -130,6 +142,106 @@ export default [
             path: ':id/edit',
             name: 'EditMaterial',
             component: FormMaterial
+          }
+        ]
+      },
+      {
+        path: '/income-types',
+        name: 'IncomeTypes',
+        redirect: '/income-types',
+        component: {
+          render (c) { return c('router-view') }
+        },
+        children: [
+          {
+            path: '',
+            name: 'ListIncomeTypes',
+            component: ListIncomeTypes
+          },
+          {
+            path: 'create',
+            name: 'CreateIncomeType',
+            component: FormIncomeType
+          },
+          {
+            path: ':id/edit',
+            name: 'EditIncomeType',
+            component: FormIncomeType
+          }
+        ]
+      },
+      {
+        path: '/incomes',
+        name: 'Incomes',
+        redirect: '/incomes',
+        component: {
+          render (c) { return c('router-view') }
+        },
+        children: [
+          {
+            path: '',
+            name: 'ListIncomes',
+            component: ListIncomes
+          },
+          {
+            path: 'create',
+            name: 'CreateIncome',
+            component: FormIncome
+          },
+          {
+            path: ':id/edit',
+            name: 'EditIncome',
+            component: FormIncome
+          }
+        ]
+      },
+      {
+        path: '/expense-types',
+        name: 'ExpenseTypes',
+        redirect: '/expense-types',
+        component: {
+          render (c) { return c('router-view') }
+        },
+        children: [
+          {
+            path: '',
+            name: 'ListExpenseTypes',
+            component: ListExpenseTypes
+          },
+          {
+            path: 'create',
+            name: 'CreateExpenseType',
+            component: FormExpenseType
+          },
+          {
+            path: ':id/edit',
+            name: 'EditExpenseType',
+            component: FormExpenseType
+          }
+        ]
+      },
+      {
+        path: '/expenses',
+        name: 'Expenses',
+        redirect: '/expenses',
+        component: {
+          render (c) { return c('router-view') }
+        },
+        children: [
+          {
+            path: '',
+            name: 'ListExpenses',
+            component: ListExpenses
+          },
+          {
+            path: 'create',
+            name: 'CreateExpense',
+            component: FormExpense
+          },
+          {
+            path: ':id/edit',
+            name: 'EditExpense',
+            component: FormExpense
           }
         ]
       },

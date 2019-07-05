@@ -16,7 +16,7 @@ class CreateIncomesTable extends Migration
         Schema::create('incomes', function (Blueprint $table) {
             $table->increments('id');
             $table->string('title', 60);
-            $table->enum('unity', ['Tarjeta', 'Efectivo', 'Cheque', 'Credito', 'Transferencia']);
+            $table->enum('payment', ['Tarjeta', 'Efectivo', 'Cheque', 'Credito', 'Transferencia']);
             $table->date('date');
             $table->mediumText('note')->nullable();
             $table->float('amount', 9, 2);

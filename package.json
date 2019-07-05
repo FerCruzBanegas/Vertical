@@ -24,7 +24,7 @@
         "v-currency-field": "^1.0.6",
         "vue-router": "^3.0.6",
         "vue-snotify": "^3.2.1",
-        "vuetify": "^2.0.0-beta.5",
+        "vuetify": "^1.5.16",
         "vuex": "^3.1.1",
         "vuex-persistedstate": "^2.5.4",
         "webdatarocks": "^1.0.2"

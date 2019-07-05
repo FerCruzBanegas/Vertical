@@ -26,8 +26,8 @@ Route::get('/test', function() {
     // $expenses = \App\Expense::where('project_id', 53)->get();
     // $incomes = \App\Income::where('project_id', 53)->get();
 
-    $b = \App\Project::with(['expenses', 'incomes'])->findOrFail(53);
-    $events = $b->expenses->merge($b->incomes)->values()->paginate(2);
+    $project = \App\Project::with(['expenses', 'incomes'])->findOrFail(53);
+        $events = $project->expenses->merge($project->incomes)->sortByDesc('date')->paginate(3);
     return response()->json($events);
 });
 
@@ -60,6 +60,7 @@ Route::group(['middleware' => ['auth:api']], function () {//TODO Borre el midlew
     Route::get('projects/{id}', 'ProjectController@show');
     Route::get('projects/{id}/detail', 'ProjectController@detail');
     Route::get('projects/{id}/events', 'ProjectController@getEvents');
+    Route::get('projects/{id}/finish', 'ProjectController@finishProject');
     Route::post('projects', 'ProjectController@store')->name('projects.create');
     Route::put('projects/{id}', 'ProjectController@update')->name('projects.update');
     Route::delete('projects/{id}', 'ProjectController@destroy')->name('projects.destroy');

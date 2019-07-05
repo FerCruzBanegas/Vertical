@@ -15,13 +15,13 @@ class MaterialTypeCollection extends ResourceCollection
     public function toArray($request)
     {
         return [
-            'data' => $this->collection->transform(function($category){
+            'data' => $this->collection->transform(function($type){
                 return [
-                    'id' => $category->id,
-                    'name' => $category->name,
-                    'description' => $category->description,
-                    'created' => (string) $category->created_at,
-                    'materials' => $category->materials->count()
+                    'id' => $type->id,
+                    'name' => $type->name,
+                    'description' => $type->description,
+                    'created' => (string) $type->created_at,
+                    'materials' => $type->materials->count()
                 ];
             }),
         ];

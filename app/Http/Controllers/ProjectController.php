@@ -3,8 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Project;
-use App\Expense;
-use App\Income;
 use Illuminate\Http\Request;
 use App\Http\Requests\ProjectRequest;
 use App\Http\Resources\Project\ProjectResource;
@@ -37,7 +35,7 @@ class ProjectController extends ApiController
             });
         }
 
-    	$projects = $projects->with('project_type')->paginate($rowsPerPage);
+    	$projects = $projects->with('project_type')->paginate($rowsPerPage);//TODO: mandar solo name en la relacion.
     	return new ProjectCollection($projects); 
     }
 
@@ -46,20 +44,16 @@ class ProjectController extends ApiController
         if ($request->has('rowsPerPage')) {
             $rowsPerPage = $request->input('rowsPerPage');
         }
-
         $project = $this->project->with(['expenses', 'incomes'])->findOrFail($id);
+        $totals = array('totals' => ['expense' => $project->expenses->sum('amount'), 'income' => $project->incomes->sum('amount')]);
         $events = collect($project->expenses)->merge($project->incomes)->sortByDesc('date')->paginate($rowsPerPage);
 
-        return new ProjectEventsCollection($events);
+        return new ProjectEventsCollection($events, $totals); 
     }
-
     public function detail(Request $request, $id)
     {
         $project = $this->project->findOrFail($id);
-        return response()->json([
-            'projects' => new ProjectDetailResource($project),
-            'expenses' => $this->getExpenses($request, $id)
-        ]); 
+        return new ProjectDetailResource($project);
     }
 
     public function show($id)
@@ -111,6 +105,20 @@ class ProjectController extends ApiController
             return $this->respondInternalError();
         }
         return $this->respondDeleted();
+    }
+
+    public function finishProject($id)
+    {
+        try {
+            $project = $this->project->find($id);
+            $project->update([
+                'end_date' => date('Y-m-d'),
+                'state' => 0
+            ]);
+        } catch (\Exception $e) {
+            return $this->respondInternalError();
+        }
+        return $this->respond($project);
     }
 
     public function listing()
