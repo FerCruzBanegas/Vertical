@@ -157,7 +157,7 @@
       setMessage (item) {
         const expenses = item.expenses
         if( expenses >= 1) {
-          this.message = `Existen ${expenses} materiales relacionados a esta categoría, si la elimina los materiales también se borrarán. Desea continuar?`
+          this.message = `Existen ${expenses} egresos relacionados a esta categoría, si la elimina los egresos también se borrarán. Desea continuar?`
         } else {
           this.message = 'Realmente desea borrar los datos de este registro?'
         }

@@ -8,12 +8,16 @@ use Spatie\Activitylog\Traits\LogsActivity;
 
 class Material extends ApiModel
 {
-    use SoftDeletes, LogsActivity;
+    use SoftDeletes, LogsActivity, FullTextSearch;
 
     protected $dates = ['deleted_at'];
 
     protected $fillable = [
         'name', 'unity', 'description', 'price', 'material_type_id'
+    ];
+
+    protected $searchable = [
+        'name'
     ];
 
     public function material_type()

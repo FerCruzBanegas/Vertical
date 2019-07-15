@@ -13,6 +13,9 @@
 |
  */
 
+//informes de projectos, estado actual, ingreso y egresos actuales
+
+
 Route::get('/test', function() {
     // $expenses = \App\Expense::with([
     //     'expense_type',
@@ -26,9 +29,28 @@ Route::get('/test', function() {
     // $expenses = \App\Expense::where('project_id', 53)->get();
     // $incomes = \App\Income::where('project_id', 53)->get();
 
-    $project = \App\Project::with(['expenses', 'incomes'])->findOrFail(53);
-        $events = $project->expenses->merge($project->incomes)->sortByDesc('date')->paginate(3);
-    return response()->json($events);
+    // $project = \App\Project::with(['expenses', 'incomes'])->findOrFail(53);
+    // $events = $project->expenses->merge($project->incomes)->sortByDesc('date')->paginate(3);
+    // $mt = new DateTime();
+    // $mt->modify('first day of this month');
+    // $month = ['first' => $mt->format('Y-m-d'), 'second' => date("Y-m-d", strtotime($mt->format('Y-m-d')."+ 1 month"))];
+    // $week = ['first' => date("Y-m-d", strtotime('monday this week')), 'second' => date("Y-m-d", strtotime('sunday this week'))];
+
+    // $monthlyAmount = \App\Income::where(function($query) use ($month) {
+    //     $query->where('date', '>=', $month['first'])
+    //           ->where('date', '<', $month['second']);
+    // })->sum('amount');
+
+    // $weeklyAmount = \App\Income::where(function($query) use ($week) {
+    //     $query->where('date', '>=', $week['first'])
+    //           ->where('date', '<', $week['second']);
+    // })->sum('amount');
+
+    // $dailyAmount = \App\Income::where('date', date("Y-m-d"))->sum('amount');
+
+    // $data = ['month' => $monthlyAmount, 'week' => $weeklyAmount, 'day' => $dailyAmount];
+
+    // return response()->json($data);
 });
 
 // \DB::listen(function($query) {
@@ -76,6 +98,7 @@ Route::group(['middleware' => ['auth:api']], function () {//TODO Borre el midlew
     Route::get('materials', 'MaterialController@index')->name('materials.index');
     Route::get('materials/{id}', 'MaterialController@show');
     Route::get('materials/{id}/detail', 'MaterialController@detail');
+    Route::get('search-material/{name}', 'MaterialController@searchMaterial');
     Route::post('materials', 'MaterialController@store')->name('materials.create');
     Route::put('materials/{id}', 'MaterialController@update')->name('materials.update');
     Route::delete('materials/{id}', 'MaterialController@destroy')->name('materials.destroy');
@@ -88,11 +111,13 @@ Route::group(['middleware' => ['auth:api']], function () {//TODO Borre el midlew
     Route::delete('income-types/{id}', 'IncomeTypeController@destroy')->name('income-types.destroy');
 
     //Income
-    Route::get('income', 'IncomeController@index')->name('income.index');
-    Route::get('income/{id}', 'IncomeController@show');
-    Route::post('income', 'IncomeController@store')->name('income.create');
-    Route::put('income/{id}', 'IncomeController@update')->name('income.update');
-    Route::delete('income/{id}', 'IncomeController@destroy')->name('income.destroy');
+    Route::get('incomes', 'IncomeController@index')->name('income.index');
+    Route::get('incomes/amounts', 'IncomeController@amounts');
+    Route::get('incomes/{id}', 'IncomeController@show');
+    Route::get('incomes/{id}/detail', 'IncomeController@detail');
+    Route::post('incomes', 'IncomeController@store')->name('income.create');
+    Route::put('incomes/{id}', 'IncomeController@update')->name('income.update');
+    Route::delete('incomes/{id}', 'IncomeController@destroy')->name('income.destroy');
 
     //Expense-Types
     Route::get('expense-types', 'ExpenseTypeController@index')->name('expense-types.index');
@@ -102,10 +127,12 @@ Route::group(['middleware' => ['auth:api']], function () {//TODO Borre el midlew
     Route::delete('expense-types/{id}', 'ExpenseTypeController@destroy')->name('expense-types.destroy');
 
     //Expense
-    Route::get('expense', 'ExpenseController@index')->name('expense.index');
-    Route::get('expense/{id}', 'ExpenseController@show');
-    Route::post('expense', 'ExpenseController@store')->name('expense.create');
-    Route::put('expense/{id}', 'ExpenseController@update')->name('expense.update');
-    Route::delete('expense/{id}', 'ExpenseController@destroy')->name('expense.destroy');
+    Route::get('expenses', 'ExpenseController@index')->name('expense.index');
+    Route::get('expenses/amounts', 'ExpenseController@amounts');
+    Route::get('expenses/{id}', 'ExpenseController@show');
+    Route::get('expenses/{id}/detail', 'ExpenseController@detail');
+    Route::post('expenses', 'ExpenseController@store')->name('expense.create');
+    Route::put('expenses/{id}', 'ExpenseController@update')->name('expense.update');
+    Route::delete('expenses/{id}', 'ExpenseController@destroy')->name('expense.destroy');
 
 });

@@ -13,73 +13,79 @@
                   <v-card-text>
                     <v-layout row wrap>
                       <v-flex xs12 sm12 md6 lg6>
-                        <v-layout row wrap>
-                          <v-flex xs12 sm12 md12 lg12>
-                            <v-autocomplete
-                              box
-                              color="grey darken-2"
-                              :items="project_types"
-                              v-model="project.project_type_id"
-                              label="Tipo de Proyecto *"
-                              item-text="name"
-                              item-value="id"
-                            ></v-autocomplete>
-                          </v-flex>
-                        </v-layout>
-                        <v-layout row wrap>
-                          <v-flex xs12 sm12 md12 lg12>
+                        <v-autocomplete
+                          box
+                          color="grey darken-2"
+                          :items="project_types"
+                          v-model="project.project_type_id"
+                          label="Tipo de Proyecto *"
+                          item-text="name"
+                          item-value="id"
+                        ></v-autocomplete>
+                      </v-flex>
+                    </v-layout>
+                    <v-layout row wrap>
+                      <v-flex xs12 sm12 md6 lg6>
+                        <v-text-field
+                          box
+                          color="grey darken-2"
+                          label="Nombre *"
+                          v-model="project.name"
+                        ></v-text-field>
+                      </v-flex>
+                    </v-layout>
+                    <v-layout row wrap>
+                      <v-flex xs12 sm12 md6 lg6>
+                        <v-text-field
+                          box
+                          color="grey darken-2"
+                          label="Dirección *"
+                          v-model="project.location"
+                        ></v-text-field>
+                      </v-flex>
+                    </v-layout>
+                    <v-layout row wrap>
+                      <v-flex xs12 sm12 md6 lg6>
+                        <v-menu
+                          v-model="picker"
+                          :close-on-content-click="false"
+                          :nudge-right="40"
+                          lazy
+                          transition="scale-transition"
+                          offset-y
+                          full-width
+                          min-width="290px"
+                        >
+                          <template v-slot:activator="{ on }">
                             <v-text-field
                               box
                               color="grey darken-2"
-                              label="Nombre *"
-                              v-model="project.name"
+                              v-model="dateFormatted"
+                              label="Fecha de Inicio *"
+                              hint="DD/MM/YYYY format"
+                              prepend-icon="event"
+                              readonly
+                              v-on="on"
                             ></v-text-field>
-                          </v-flex>
-                        </v-layout>
-                        <v-layout row wrap>
-                          <v-flex xs12 sm12 md12 lg12>
-                            <v-menu
-                              v-model="picker"
-                              :close-on-content-click="false"
-                              :nudge-right="40"
-                              lazy
-                              transition="scale-transition"
-                              offset-y
-                              full-width
-                              min-width="290px"
-                            >
-                              <template v-slot:activator="{ on }">
-                                <v-text-field
-                                  box
-                                  color="grey darken-2"
-                                  v-model="dateFormatted"
-                                  label="Fecha de Inicio *"
-                                  hint="DD/MM/YYYY format"
-                                  prepend-icon="event"
-                                  readonly
-                                  v-on="on"
-                                ></v-text-field>
-                              </template>
-                              <v-date-picker 
-                                color="red darken-3" 
-                                v-model="project.start_date" 
-                                @input="picker = false"
-                                :first-day-of-week="0"
-                                locale="es-es"
-                              ></v-date-picker>
-                            </v-menu>
-                          </v-flex>
-                        </v-layout>
-                        <v-layout row wrap>
-                          <v-flex xs12 sm12 md12 lg12>
-                            <v-textarea
-                              box
-                              color="grey darken-2"
-                              label="Comentarios"
-                              v-model="project.comments"
-                            ></v-textarea>
-                          </v-flex>
-                        </v-layout>
+                          </template>
+                          <v-date-picker 
+                            color="red darken-3" 
+                            v-model="project.start_date" 
+                            @input="picker = false"
+                            :first-day-of-week="0"
+                            locale="es-es"
+                          ></v-date-picker>
+                        </v-menu>
+                      </v-flex>
+                    </v-layout>
+                    <v-layout row wrap>
+                      <v-flex xs12 sm12 md6 lg6>
+                        <v-textarea
+                          box
+                          color="grey darken-2"
+                          label="Comentarios"
+                          v-model="project.comments"
+                        ></v-textarea>
                       </v-flex>
                     </v-layout>
                     <small>Los campos con (*) son obligatorios.</small>

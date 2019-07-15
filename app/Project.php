@@ -49,6 +49,6 @@ class Project extends ApiModel
 
     public static function listProjects()
     {
-        return static::orderBy('name')->select('id', 'name');
+        return static::orderBy('name')->select('id', 'name')->get();
     }
 }

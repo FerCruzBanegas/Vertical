@@ -13,7 +13,7 @@ class Income extends ApiModel
     protected $dates = ['deleted_at'];
 
     protected $fillable = [
-        'title', 'date', 'note', 'amount', 'income_type_id', 'project_id'
+        'title', 'payment', 'date', 'note', 'amount', 'income_type_id', 'project_id'
     ];
 
     public function income_type()

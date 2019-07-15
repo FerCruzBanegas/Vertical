@@ -20,12 +20,14 @@ import FormIncomeType from '../views/income-type/FormIncomeType.vue'
 //income
 import ListIncomes from '../views/income/ListIncomes.vue'
 import FormIncome from '../views/income/FormIncome.vue'
+import ShowIncome from '../views/income/ShowIncome.vue'
 //expense-type
 import ListExpenseTypes from '../views/expense-type/ListExpenseTypes.vue'
 import FormExpenseType from '../views/expense-type/FormExpenseType.vue'
 //expense
 import ListExpenses from '../views/expense/ListExpenses.vue'
 import FormExpense from '../views/expense/FormExpense.vue'
+import ShowExpense from '../views/expense/ShowExpense.vue'
 
 export default [
   {
@@ -192,6 +194,11 @@ export default [
             path: ':id/edit',
             name: 'EditIncome',
             component: FormIncome
+          },
+          {
+            path: ':id/show',
+            name: 'ShowIncome',
+            component: ShowIncome
           }
         ]
       },
@@ -242,6 +249,11 @@ export default [
             path: ':id/edit',
             name: 'EditExpense',
             component: FormExpense
+          },
+          {
+            path: ':id/show',
+            name: 'ShowExpense',
+            component: ShowExpense
           }
         ]
       },

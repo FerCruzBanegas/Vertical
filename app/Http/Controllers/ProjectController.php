@@ -50,6 +50,7 @@ class ProjectController extends ApiController
 
         return new ProjectEventsCollection($events, $totals); 
     }
+    
     public function detail(Request $request, $id)
     {
         $project = $this->project->findOrFail($id);

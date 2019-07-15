@@ -30,6 +30,4 @@ class Expense extends ApiModel
     {
         return $this->belongsToMany(Material::class)->withPivot('price');
     }
-
-
 }

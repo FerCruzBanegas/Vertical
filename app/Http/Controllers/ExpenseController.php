@@ -37,6 +37,29 @@ class ExpenseController extends ApiController
     	return new ExpenseCollection($expenses); 
     }
 
+    public function amounts()
+    {
+        $mt = new \DateTime();
+        $mt->modify('first day of this month');
+        $month = ['first' => $mt->format('Y-m-d'), 'second' => date("Y-m-d", strtotime($mt->format('Y-m-d')."+ 1 month"))];
+        $week = ['first' => date("Y-m-d", strtotime('monday this week')), 'second' => date("Y-m-d", strtotime('sunday this week'))];
+
+        $monthlyAmount = $this->expense->where(function($query) use ($month) {
+            $query->where('date', '>=', $month['first'])
+                  ->where('date', '<', $month['second']);
+        })->sum('amount');
+
+        $weeklyAmount = $this->expense->where(function($query) use ($week) {
+            $query->where('date', '>=', $week['first'])
+                  ->where('date', '<', $week['second']);
+        })->sum('amount');
+
+        $dailyAmount = $this->expense->where('date', date("Y-m-d"))->sum('amount');
+
+        $data = ['month' => $monthlyAmount, 'week' => $weeklyAmount, 'day' => $dailyAmount];
+        return $this->respond($data);
+    }
+
     public function show($id)
     {
         $expense = $this->expense->findOrFail($id);

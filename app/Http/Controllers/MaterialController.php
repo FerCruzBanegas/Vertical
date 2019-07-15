@@ -29,12 +29,10 @@ class MaterialController extends ApiController
         if ($request->has('filter')) {
             $filter = $request->input('filter');
 
-            $materials = $materials->where(function ($query) use ($filter) {
-                $query->where('name', 'LIKE', "%" . $filter . "%");
-            });
+            $materials = $materials->search($filter);
         }
 
-    	$materials = $materials->with('material_type')->paginate($rowsPerPage);//TODO: mandar solo name en la relacion.
+    	$materials = $materials->with('material_type')->paginate($rowsPerPage);
     	return new MaterialCollection($materials); 
     }
 
@@ -86,5 +84,11 @@ class MaterialController extends ApiController
     {
     	$materials = $this->material->listMaterials();
         return $this->respond($materials);
+    }
+
+    public function searchMaterial($name) 
+    {
+        $material = $this->material->search($name)->get();
+        return $this->respond($material);
     }
 }
