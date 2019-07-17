@@ -8,11 +8,15 @@ use Spatie\Activitylog\Traits\LogsActivity;
 
 class ExpenseType extends ApiModel
 {
-    use SoftDeletes, LogsActivity;
+    use SoftDeletes, LogsActivity, FullTextSearch;
 
     protected $dates = ['deleted_at'];
 
     protected $fillable = [
+        'name', 'description',
+    ];
+
+    protected $searchable = [
         'name', 'description',
     ];
 

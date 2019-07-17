@@ -28,9 +28,7 @@ class ProjectTypeController extends ApiController
         if ($request->has('filter')) {
             $filter = $request->input('filter');
 
-            $projectTypes = $projectTypes->where(function ($query) use ($filter) {
-                $query->where('name', 'LIKE', "%" . $filter . "%");
-            });
+            $projectTypes = $projectTypes->search($filter);
         }
 
         $projectTypes = $projectTypes->with('projects')->paginate($rowsPerPage);

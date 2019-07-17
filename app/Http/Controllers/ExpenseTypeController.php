@@ -28,9 +28,7 @@ class ExpenseTypeController extends ApiController
         if ($request->has('filter')) {
             $filter = $request->input('filter');
 
-            $expenseTypes = $expenseTypes->where(function ($query) use ($filter) {
-                $query->where('name', 'LIKE', "%" . $filter . "%");
-            });
+            $expenseTypes = $expenseTypes->search($filter);
         }
 
         $expenseTypes = $expenseTypes->paginate($rowsPerPage);

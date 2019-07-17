@@ -28,13 +28,20 @@ class IncomeController extends ApiController
 
         if ($request->has('filter')) {
             $filter = $request->input('filter');
-
-            $incomes = $incomes->where(function ($query) use ($filter) {
-                $query->where('name', 'LIKE', "%" . $filter . "%");
-            });
+            $incomes = $incomes->search($filter);
         }
 
-    	$incomes = $incomes->with('income_type', 'project')->paginate($rowsPerPage);//TODO: mandar solo name en la relacion.
+        if ($request->has('date')) {
+            $date = $request->input('date');
+            $incomes = $incomes->where('date', $date);
+        }
+
+        if ($request->has('project')) {
+            $project = $request->input('project');
+            $incomes = $incomes->where('project_id', $project);
+        }
+
+    	$incomes = $incomes->with('income_type', 'project')->paginate($rowsPerPage);
     	return new IncomeCollection($incomes); 
     }
 

@@ -34,6 +34,7 @@
                       append-icon="search"
                       label="Buscar"
                       hide-details
+                      clearable
                     ></v-text-field>
                   </v-card-title>
                   <v-data-table

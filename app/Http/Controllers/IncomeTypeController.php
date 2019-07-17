@@ -28,9 +28,7 @@ class IncomeTypeController extends ApiController
         if ($request->has('filter')) {
             $filter = $request->input('filter');
 
-            $incometypes = $incometypes->where(function ($query) use ($filter) {
-                $query->where('name', 'LIKE', "%" . $filter . "%");
-            });
+            $incometypes = $incometypes->search($filter);
         }
 
         $incometypes = $incometypes->paginate($rowsPerPage);

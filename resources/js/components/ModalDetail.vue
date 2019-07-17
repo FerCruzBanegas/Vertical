@@ -3,44 +3,8 @@
     <v-card>
       <v-card-title class="headline grey lighten-2" primary-title>Detalles</v-card-title>
       <v-card-text>
-        <v-layout wrap>
-          <v-flex xs12 sm12 md12 lg12>
-            <v-toolbar dense dark color="grey darken-1">
-              <div class="title font-weight-light">MATERIALES</div>
-            </v-toolbar>
-            <v-data-table
-              :headers="headers"
-              :items="data"
-              :rows-per-page-items="[3,5,10]"
-              class="elevation-1"
-            >
-              <template v-slot:items="props">
-                <td>{{ props.item.name }}</td>
-                <td>{{ props.item.unity }}</td>
-                <td>{{ props.item.price }}</td>
-              </template>
-            </v-data-table>
-          </v-flex>
-        </v-layout>
-        <v-layout wrap>
-          <v-flex xs12 sm12 md12 lg12>
-            <v-toolbar dense dark color="grey darken-1">
-              <div class="title font-weight-light">PERSONAS</div>
-            </v-toolbar>
-            <v-data-table
-              :headers="headers"
-              :items="data"
-              :rows-per-page-items="[3,5,10]"
-              class="elevation-1"
-            >
-              <template v-slot:items="props">
-                <td>{{ props.item.name }}</td>
-                <td>{{ props.item.unity }}</td>
-                <td>{{ props.item.price }}</td>
-              </template>
-            </v-data-table>
-          </v-flex>
-        </v-layout>
+        <pivot-material :materials="materials"></pivot-material>
+        <pivot-people :people="people"></pivot-people>
       </v-card-text>
       <v-card-actions>
         <v-spacer></v-spacer>
@@ -50,24 +14,27 @@
   </v-dialog>
 </template>
 <script>
+  import PMaterial from './PMaterial.vue'
+  import PPeople from './PPeople.vue'
+
   export default {
     props: {
       dialog: {
         type: Boolean
       },
-      data: {
+
+      materials: {
         type: Array
       },
+
+      people: {
+        type: Array
+      }
     },
 
-    data () {
-      return {
-        headers: [
-          { text: 'Nombre', value: 'nombre' },
-          { text: 'Unidad', value: 'unidad' },
-          { text: 'Precio', value: 'precio' },
-        ]
-      }
+    components: {
+      'pivot-material' : PMaterial,
+      'pivot-people' : PPeople
     },
 
     methods: {

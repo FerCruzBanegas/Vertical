@@ -35,6 +35,7 @@
                       label="Buscar"
                       single-line
                       hide-details
+                      clearable
                     ></v-text-field>
                   </v-card-title>
                   <v-data-table

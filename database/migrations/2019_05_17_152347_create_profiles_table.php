@@ -3,6 +3,7 @@
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Facades\DB;
 
 class CreateProfilesTable extends Migration
 {
@@ -19,6 +20,9 @@ class CreateProfilesTable extends Migration
             $table->softDeletes();
             $table->timestamps();
         });
+
+        // Full Text Index
+        DB::statement('ALTER TABLE profiles ADD FULLTEXT idx_full_description (description)');
     }
 
     /**

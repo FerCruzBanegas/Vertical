@@ -1,6 +1,6 @@
 <template>
   <v-container fluid grid-list-md>
-    <info-events v-if="infoIncome" :data="infoIncome"></info-events>
+    <info-events v-if="infoIncome" :data="infoIncome" :icon="'trending_up'"></info-events>
     <v-layout>
       <v-flex xs12 sm12 md12 lg12>
         <v-card flat>
@@ -13,28 +13,40 @@
               <v-flex xs12 sm12 md12 lg12>
                 <v-card>
                   <v-card-title>
-                    <v-btn
-                      dark color="grey darken-1" 
-                      slot="activator" 
-                      class="mb-2" 
-                      to="incomes/create"
-                    >
-                      <v-icon dark>note_add</v-icon>
-                    </v-btn>
-                    </v-btn>
-                    <v-spacer></v-spacer>
-                    <v-btn flat icon color="red darken-3" @click="allData">
-                      <v-icon>cached</v-icon>
-                    </v-btn>
-                    <v-text-field
-                      color="grey darken-2"
-                      v-model="search"
-                      @keypress.enter.prevent="filterData"
-                      append-icon="search"
-                      label="Buscar"
-                      single-line
-                      hide-details
-                    ></v-text-field>
+                    <v-container fluid>
+                      <v-layout row wrap>
+                        <v-flex xs12 sm12 md4 lg4>
+                          <v-btn
+                            dark color="grey darken-1" 
+                            slot="activator" 
+                            class="mb-2" 
+                            to="incomes/create"
+                          >
+                            <v-icon dark>note_add</v-icon>
+                          </v-btn>
+                        </v-flex>
+                        <v-spacer></v-spacer>
+                        <v-flex xs12 sm12 md6 lg6>
+                          <v-text-field
+                            color="grey darken-2"
+                            v-model="search"
+                            @keypress.enter.prevent="filterData"
+                            append-icon="search"
+                            label="Buscar"
+                            single-line
+                            hide-details
+                            clearable
+                          >
+                            <template v-slot:prepend>
+                              <v-btn flat icon color="red darken-3" @click="allData">
+                                <v-icon>cached</v-icon>
+                              </v-btn>
+                            </template>
+                          </v-text-field>
+                        </v-flex>
+                      </v-layout>
+                      <filters @changeDate="dateFilter" @selectProject="projectFilter"></filters>
+                    </v-container>
                   </v-card-title>
                   <v-data-table
                     :headers="headers"
@@ -97,25 +109,28 @@
 <script>
   import InfoEvents from '../../components/InfoEvents.vue'
   import ModalDelete from '../../components/ModalDelete.vue'
+  import Filters from '../../components/Filters.vue'
   import IncomeService from '../../services/income.service'
 
   export default {
     name: 'list-income',
     data () {
       return {
-        search: '',
+        date: '',
+        project: null,
+        search: null,
         progress: false,
         message: 'Realmente desea borrar los datos de este registro?',
         remove: false,
         loading: false,
         infoIncome: null,
         headers: [
-          { text: '', align: 'left', sortable: false},
-          { text: 'Título', value: 'titulo', width: "300" },
-          { text: 'Fecha Ingreso', value: 'fecha ingreso', width: "50" },
-          { text: 'Monto', sortable: false, value: 'monto', width: "120" },
-          { text: 'Proyecto', sortable: false, value: 'proyecto', width: "200" },
-          { text: 'Acciones', sortable: false, value: 'acciones', width: "120" }
+          { text: '', align: 'left', sortable: false },
+          { text: 'Título', value: 'titulo', width: "250" },
+          { text: 'Fecha Ingreso', value: 'fecha ingreso' },
+          { text: 'Monto', sortable: false, value: 'monto', width: "150" },
+          { text: 'Proyecto', sortable: false, value: 'proyecto' },
+          { text: 'Acciones', sortable: false, value: 'acciones', width: "150" }
         ],
         items: [],
         totalItems: 0,
@@ -127,7 +142,8 @@
 
     components: {
       'info-events' : InfoEvents,
-      'modal-delete' : ModalDelete
+      'modal-delete' : ModalDelete,
+      'filters' : Filters
     },
     
     watch: {
@@ -147,6 +163,20 @@
     },
 
     methods: {
+      dateFilter(date) {
+        this.date = date
+        this.getDataFromApi().then(data =>{
+          this.items = data.items
+        })
+      },
+
+      projectFilter(project) {
+        this.project = project
+        this.getDataFromApi().then(data =>{
+          this.items = data.items
+        })
+      },
+
       getInfoIncome: async function() {
         const response = await IncomeService.getIncomes('incomes/amounts')
         if (response.status === 200) {
@@ -173,7 +203,10 @@
       },
 
       allData() {
-        this.search = ''
+        this.$bus.$emit('updatingData')
+        this.date = ''
+        this.project = null
+        this.search = null
         this.pagination.page = 1
         this.getDataFromApi().then(data =>{
           this.items = data.items
@@ -205,8 +238,10 @@
       buildURL() {
         let page = `?page=${this.pagination.page}`
         let rowsPerPage = `&rowsPerPage=${this.pagination.rowsPerPage}`
-        let filter = this.search === '' ? '' : `&filter=${this.search}`
-        return `incomes${page}${rowsPerPage}${filter}`
+        let filter = this.search === null ? '' : `&filter=${this.search}`
+        let project = this.project === null ? '' : `&project=${this.project}`
+        let date = this.date === '' ? '' : `&date=${this.date}`
+        return `incomes${page}${rowsPerPage}${filter}${date}${project}`
       }
     }
   }

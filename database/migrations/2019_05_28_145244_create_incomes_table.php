@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
+use Illuminate\Support\Facades\DB;
 
 class CreateIncomesTable extends Migration
 {
@@ -33,6 +34,10 @@ class CreateIncomesTable extends Migration
                 ->onDelete('cascade')
                 ->onUpdate('cascade');
         });
+
+        // Full Text Index
+        DB::statement('ALTER TABLE incomes ADD INDEX idx_date (date)');
+        DB::statement('ALTER TABLE incomes ADD FULLTEXT idx_full_title (title)');
     }
 
     /**

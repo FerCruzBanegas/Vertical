@@ -140,28 +140,3 @@
     }
   }
 </script>
-
-<style scoped>
-  .expense {
-    background-color: #FFF5A0;
-  }
-
-  .income {
-    background-color: #F0F6FF;
-  }
-
-  .total {
-    background-color: #6E6E6E;
-    color: #FFFFFF;
-  }
-
-  .ex {
-    background-color: #C69F01;
-    color: #FFFFFF;
-  }
-
-  .in {
-    background-color: #146AE4;
-    color: #FFFFFF;
-  }
-</style>

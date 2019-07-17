@@ -8,12 +8,16 @@ use Spatie\Activitylog\Traits\LogsActivity;
 
 class Expense extends ApiModel
 {
-    use SoftDeletes, LogsActivity;
+    use SoftDeletes, LogsActivity, FullTextSearch;
 
     protected $dates = ['deleted_at'];
 
     protected $fillable = [
         'title', 'payment', 'date', 'note', 'amount', 'expense_type_id', 'project_id'
+    ];
+
+    protected $searchable = [
+        'title'
     ];
 
     public function expense_type()
@@ -28,6 +32,6 @@ class Expense extends ApiModel
 
     public function materials()
     {
-        return $this->belongsToMany(Material::class)->withPivot('price');
+        return $this->belongsToMany(Material::class)->withPivot('quantity', 'price')->withTimestamps();
     }
 }

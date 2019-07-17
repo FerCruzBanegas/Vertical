@@ -30,12 +30,10 @@ class ProjectController extends ApiController
         if ($request->has('filter')) {
             $filter = $request->input('filter');
 
-            $projects = $projects->where(function ($query) use ($filter) {
-                $query->where('name', 'LIKE', "%" . $filter . "%");
-            });
+            $projects = $projects->search($filter);
         }
 
-    	$projects = $projects->with('project_type')->paginate($rowsPerPage);//TODO: mandar solo name en la relacion.
+    	$projects = $projects->with('project_type')->paginate($rowsPerPage);
     	return new ProjectCollection($projects); 
     }
 

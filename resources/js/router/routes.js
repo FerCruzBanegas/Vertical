@@ -28,6 +28,12 @@ import FormExpenseType from '../views/expense-type/FormExpenseType.vue'
 import ListExpenses from '../views/expense/ListExpenses.vue'
 import FormExpense from '../views/expense/FormExpense.vue'
 import ShowExpense from '../views/expense/ShowExpense.vue'
+//people
+import ListPeople from '../views/people/ListPeople.vue'
+import FormPeople from '../views/people/FormPeople.vue'
+//user
+import ListUsers from '../views/user/ListUsers.vue'
+import FormUser from '../views/user/FormUser.vue'
 
 export default [
   {
@@ -254,6 +260,56 @@ export default [
             path: ':id/show',
             name: 'ShowExpense',
             component: ShowExpense
+          }
+        ]
+      },
+      {
+        path: '/people',
+        name: 'People',
+        redirect: '/people',
+        component: {
+          render (c) { return c('router-view') }
+        },
+        children: [
+          {
+            path: '',
+            name: 'ListPeople',
+            component: ListPeople
+          },
+          {
+            path: 'create',
+            name: 'CreatePeople',
+            component: FormPeople
+          },
+          {
+            path: ':id/edit',
+            name: 'EditPeople',
+            component: FormPeople
+          }
+        ]
+      },
+      {
+        path: '/users',
+        name: 'Users',
+        redirect: '/users',
+        component: {
+          render (c) { return c('router-view') }
+        },
+        children: [
+          {
+            path: '',
+            name: 'ListUsers',
+            component: ListUsers
+          },
+          {
+            path: 'create',
+            name: 'CreateUser',
+            component: FormUser
+          },
+          {
+            path: ':id/edit',
+            name: 'EditUser',
+            component: FormUser
           }
         ]
       },

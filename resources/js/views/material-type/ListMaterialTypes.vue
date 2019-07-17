@@ -1,7 +1,7 @@
 <template>
   <v-container fluid grid-list-md>
     <v-layout>
-      <v-flex d-flex xs12 sm12 md12>
+      <v-flex xs12 sm12 md12>
         <modal-delete :message="message" :loading="loading" :remove="remove" @hide="remove = !remove" @deleted="deleted"></modal-delete>
           <modal-loader :loader="loader"></modal-loader>
           <modal-type :modal="modal" @hide="modal = !modal" :data="material_type"></modal-type>
@@ -35,6 +35,7 @@
                       label="Buscar"
                       single-line
                       hide-details
+                      clearable
                     ></v-text-field>
                   </v-card-title>
                   <v-data-table

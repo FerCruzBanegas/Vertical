@@ -18,6 +18,13 @@ class ExpenseDetailResource extends JsonResource
             'amount' => $this->amount,
             'expense_type' => $this->expense_type->name,
             'project' => $this->project->name,
+            'materials' => collect($this->materials)->transform(function($material){
+                return [
+                    'name' => $material->name,
+                    'quantity' => $material->pivot->quantity,
+                    'price' => $material->pivot->price
+                ];
+            }),
             'created' => new ActivityCreatedResource($this->activities),
             'updated' => new ActivityUpdatedResource($this->activities)
         ];

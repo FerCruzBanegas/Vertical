@@ -28,9 +28,7 @@ class MaterialTypeController extends ApiController
         if ($request->has('filter')) {
             $filter = $request->input('filter');
 
-            $materialTypes = $materialTypes->where(function ($query) use ($filter) {
-                $query->where('name', 'LIKE', "%" . $filter . "%");
-            });
+            $materialTypes = $materialTypes->search($filter);
         }
 
         $materialTypes = $materialTypes->paginate($rowsPerPage);

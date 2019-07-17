@@ -1,6 +1,7 @@
 <template>
   <v-container fluid grid-list-xl>
-    <modal-detail :data="details" :dialog="dialog" @hide="dialog = !dialog"></modal-detail>
+    <modal-detail :materials="materials" :peope="people" :dialog="dialog" @hide="dialog = !dialog">
+    </modal-detail>
     <v-layout wrap>
       <v-flex xs12 sm12 md12 lg12>
         <v-card v-if="project" flat>
@@ -174,7 +175,8 @@
       return {
         loading: false,
         dialog: false,
-        details: [],
+        materials: [],
+        people: [],
         progress: false,
         project: null,
         events: [],
@@ -235,7 +237,7 @@
 
       getDetails(item) {
         this.dialog = true
-        this.details = item.materials
+        this.materials = item.materials
       },
 
       getDataFromApi() {

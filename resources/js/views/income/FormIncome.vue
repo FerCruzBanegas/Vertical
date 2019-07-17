@@ -11,6 +11,7 @@
               <v-flex xs12 sm12 md12 lg12>
                 <v-card>
                   <v-card-text>
+                    <small>Los campos con (*) son obligatorios.</small>
                     <v-layout row wrap>
                       <v-flex xs12 sm12 md6 lg6>
                         <v-text-field
@@ -56,9 +57,6 @@
                     </v-layout>
                     <v-layout row wrap>
                       <v-flex xs12 sm12 md6 lg6>
-                        <v-currency-field label="Monto" v-bind="currency_config" :error-messages="errors.price" v-model="income.amount" box color="grey darken-2"></v-currency-field>
-                      </v-flex>
-                      <v-flex xs12 sm12 md6 lg6>
                         <v-menu
                           v-model="picker"
                           :close-on-content-click="false"
@@ -90,18 +88,20 @@
                           ></v-date-picker>
                         </v-menu>
                       </v-flex>
-                    </v-layout>
-                    <v-layout row wrap>
-                      <v-flex xs12 sm12 md12 lg12>
-                        <v-textarea
+                      <v-flex xs12 sm12 md6 lg6>
+                        <v-text-field
                           box
                           color="grey darken-2"
                           label="Nota"
                           v-model="income.note"
-                        ></v-textarea>
+                        ></v-text-field>
                       </v-flex>
                     </v-layout>
-                    <small>Los campos con (*) son obligatorios.</small>
+                    <v-layout row wrap>
+                      <v-flex xs12 sm12 offset-md6 offset-lg6>
+                        <v-currency-field label="Monto" v-bind="currency_config" :error-messages="errors.price" v-model="income.amount" box color="grey darken-2"></v-currency-field>
+                      </v-flex>
+                    </v-layout>
                     <v-switch
                       v-if="!id"
                       color="red"

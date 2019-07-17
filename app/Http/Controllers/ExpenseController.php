@@ -6,7 +6,9 @@ use App\Expense;
 use Illuminate\Http\Request;
 use App\Http\Requests\ExpenseRequest;
 use App\Http\Resources\Expense\ExpenseResource;
+use App\Http\Resources\Expense\ExpenseDetailResource;
 use App\Http\Resources\Expense\ExpenseCollection;
+use Illuminate\Support\Facades\DB;
 
 class ExpenseController extends ApiController
 {
@@ -27,13 +29,20 @@ class ExpenseController extends ApiController
 
         if ($request->has('filter')) {
             $filter = $request->input('filter');
-
-            $expenses = $expenses->where(function ($query) use ($filter) {
-                $query->where('name', 'LIKE', "%" . $filter . "%");
-            });
+            $expenses = $expenses->search($filter);
         }
 
-    	$expenses = $expenses->with(['expense_type', 'project', 'materials'])->paginate($rowsPerPage);//TODO: mandar solo name en la relacion.
+        if ($request->has('date')) {
+            $date = $request->input('date');
+            $expenses = $expenses->where('date', $date);
+        }
+
+        if ($request->has('project')) {
+            $project = $request->input('project');
+            $expenses = $expenses->where('project_id', $project);
+        }
+
+    	$expenses = $expenses->with(['expense_type', 'project', 'materials'])->paginate($rowsPerPage);
     	return new ExpenseCollection($expenses); 
     }
 
@@ -60,6 +69,12 @@ class ExpenseController extends ApiController
         return $this->respond($data);
     }
 
+    public function detail(Request $request, $id)
+    {
+        $expense = $this->expense->findOrFail($id);
+        return new ExpenseDetailResource($expense);
+    }
+
     public function show($id)
     {
         $expense = $this->expense->findOrFail($id);
@@ -68,9 +83,19 @@ class ExpenseController extends ApiController
 
     public function store(ExpenseRequest $request)
     {
+        DB::beginTransaction();
         try {
-            $this->expense->create($request->all());
+            $expense = $this->expense->create($request->expense);
+            if (!empty($request->materials)) {
+                $material = array();
+                foreach ($request->materials as $key => $value) {
+                    $material[$value['id']] = ['quantity' => $value['quantity'], 'price' => $value['price']];
+                }
+                $expense->materials()->attach($material);
+            } 
+            DB::commit();
         } catch (\Exception $e) {
+            DB::rollback();
             return $this->respondInternalError();
         }
         return $this->respondCreated();
@@ -78,10 +103,20 @@ class ExpenseController extends ApiController
 
     public function update(ExpenseRequest $request, $id)
     {
+        DB::beginTransaction();
         try {
             $expense = $this->expense->find($id);
-            $expense->update($request->all());
+            $expense->update($request->expense);
+            if (!empty($request->materials)) {
+                $material = array();
+                foreach ($request->materials as $key => $value) {
+                    $material[$value['id']] = ['quantity' => $value['quantity'], 'price' => $value['price']];
+                }
+                $expense->materials()->sync($material);
+            }
+            DB::commit();
         } catch (\Exception $e) {
+            DB::rollback();
             return $this->respondInternalError();
         }
         return $this->respondUpdated();

@@ -99,14 +99,13 @@
         drawer: true,
         miniVariant: false,
         items: [
-        { icon: 'home', text: 'Inicio', url: '/dashboard', name: 'home' },
+        { icon: 'home', text: 'Inicio', url: '/dashboard' },
         {
           icon: 'domain',
           'icon-alt': 'domain',
           text: 'Proyectos',
           model: false,
           children: [
-            { icon: 'description', text: 'Tipos De Proyecto', url: '/project-types' },
             { icon: 'create', text: 'Registrar Nuevo', url: '/projects/create' },
             { icon: 'list', text: 'Ver Lista', url: '/projects' }
           ]
@@ -117,9 +116,8 @@
           text: 'Materiales',
           model: false,
           children: [
-            { icon: 'description', text: 'Tipos De Material', url: '/material-types' },
-            { icon: 'create', text: 'Registrar Nuevo', url: '/materials/create', name: 'profile' },
-            { icon: 'list', text: 'Ver Lista', url: '/materials', name: 'alert' }
+            { icon: 'create', text: 'Registrar Nuevo', url: '/materials/create' },
+            { icon: 'list', text: 'Ver Lista', url: '/materials' }
           ]
         },
         {
@@ -128,8 +126,8 @@
           text: 'Ingresos',
           model: false,
           children: [
-            { icon: 'create', text: 'Registrar Nuevo', url: '/incomes/create', name: 'profile' },
-            { icon: 'list', text: 'Ver Lista', url: '/incomes', name: 'alert' }
+            { icon: 'create', text: 'Registrar Nuevo', url: '/incomes/create' },
+            { icon: 'list', text: 'Ver Lista', url: '/incomes' }
           ]
         },
         {
@@ -138,8 +136,20 @@
           text: 'Egresos',
           model: false,
           children: [
-            { icon: 'create', text: 'Registrar Nuevo', url: '/expenses/create', name: 'profile' },
-            { icon: 'list', text: 'Ver Todos', url: '/expenses', name: 'alert' }
+            { icon: 'create', text: 'Registrar Nuevo', url: '/expenses/create' },
+            { icon: 'list', text: 'Ver Todos', url: '/expenses' }
+          ]
+        },
+        {
+          icon: 'style',
+          'icon-alt': 'style',
+          text: 'Categorías',
+          model: false,
+          children: [
+            { icon: 'chevron_right', text: 'Tipos de Proyecto', url: '/project-types' },
+            { icon: 'chevron_right', text: 'Tipos de Material', url: '/material-types' },
+            { icon: 'chevron_right', text: 'Tipos de Ingreso', url: '/income-types' },
+            { icon: 'chevron_right', text: 'Tipos de Egreso', url: '/expense-types' }
           ]
         },
         {
@@ -148,8 +158,7 @@
           text: 'Configuración',
           model: false,
           children: [
-            { icon: 'person', text: 'Perfil', url: '/profile', name: 'profile' },
-            { icon: 'notifications_active', text: 'Alerta', url: '/alert/edit', name: 'alert' }
+            { icon: 'people', text: 'Personas', url: '/people' }
           ]
         }
       ],

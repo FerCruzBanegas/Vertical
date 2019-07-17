@@ -8,12 +8,16 @@ use Spatie\Activitylog\Traits\LogsActivity;
 
 class Income extends ApiModel
 {
-    use SoftDeletes, LogsActivity;
+    use SoftDeletes, LogsActivity, FullTextSearch;
 
     protected $dates = ['deleted_at'];
 
     protected $fillable = [
         'title', 'payment', 'date', 'note', 'amount', 'income_type_id', 'project_id'
+    ];
+
+    protected $searchable = [
+        'title'
     ];
 
     public function income_type()

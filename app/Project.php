@@ -8,7 +8,7 @@ use Spatie\Activitylog\Traits\LogsActivity;
 
 class Project extends ApiModel
 {
-	use SoftDeletes, LogsActivity;
+	use SoftDeletes, LogsActivity, FullTextSearch;
 
     protected $dates = ['deleted_at'];
 
@@ -16,21 +16,14 @@ class Project extends ApiModel
         'uuid', 'name', 'location', 'comments', 'start_date', 'end_date', 'state', 'project_type_id',
     ];
 
+    protected $searchable = [
+        'name', 'location',
+    ];
+
     // public function getStartDateAttribute($date)
     // {
     //     return $this->getFormatDate($date);
     // }
-
-    public function getIncomeAttribute() 
-    { 
-        $total = 0; 
-
-        foreach($this->incomes as $income){ 
-           $total += $income->amount; 
-        } 
-
-        return $total;
-    }
 
     public function project_type()
     {

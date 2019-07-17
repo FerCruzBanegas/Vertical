@@ -21,9 +21,20 @@ Vue.filter('currency', require('./filters/currency'));
 //   ApiService.setHeader()
 // }
 
+const EventBus = new Vue()
+
+Object.defineProperties(Vue.prototype, {
+  $bus: {
+    get: function () {
+      return EventBus
+    }
+  }
+})
+
 const app = new Vue({
     el: '#app',
     router,
     store,
     render: h => h(App)
 });
+

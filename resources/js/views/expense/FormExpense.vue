@@ -309,8 +309,8 @@
 
       cleanData() {
         if (!this.checkMaterial) {
+          if (this.materials.length > 0) this.materials = []
           this.itemsMaterial = []
-          this.materials = []
         }
       },
 
@@ -355,6 +355,10 @@
       showExpense:async function() {
         const response = await ExpenseService.getExpenses(`expenses/${this.id}`)
         if (response.status === 200) {
+          if (response.data.data.materials.length > 0) {
+            this.checkMaterial = true
+            this.materials = response.data.data.materials;
+          }
           this.expense = response.data.data;
           this.success = true
         }
@@ -362,20 +366,22 @@
 
       submit: async function() {
         const vm = this
-        vm.loading = true
+        const data = {expense: vm.expense, materials: vm.materials}
+        // vm.loading = true
         if(vm.id) {
-          vm._save = await ExpenseService.updateExpense(vm.id, vm.expense)
+          vm._save = await ExpenseService.updateExpense(vm.id, data)
         } else {
-          vm._save = await ExpenseService.storeExpense(vm.expense)
+          vm._save = await ExpenseService.storeExpense(data)
         }
         if (vm._save.status === 201 || vm._save.status === 200) {
-          vm.$snotify.simple(vm._save.data.message, 'Felicidades')
-          vm.loading = false
-          if (vm.retry) {
-            vm.expense = new Expense()
-          } else {
-            vm.$router.push('/expenses')
-          }
+          console.log(vm._save.data)
+          // vm.$snotify.simple(vm._save.data.message, 'Felicidades')
+          // vm.loading = false
+          // if (vm.retry) {
+          //   vm.expense = new Expense()
+          // } else {
+          //   vm.$router.push('/expenses')
+          // }
         }
       }
     }

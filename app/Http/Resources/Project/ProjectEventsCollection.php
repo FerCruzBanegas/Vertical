@@ -36,7 +36,7 @@ class ProjectEventsCollection extends ResourceCollection
                     'materials' => collect($event->materials)->transform(function($material){
                         return [
                             'name' => $material->name,
-                            'unity' => $material->unity,
+                            'quantity' => $material->pivot->quantity,
                             'price' => $material->pivot->price
                         ];
                     })

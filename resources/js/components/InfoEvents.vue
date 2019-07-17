@@ -3,7 +3,7 @@
     <v-flex d-flex xs12 sm12 md4 lg4 xl4>
       <v-card class="mx-auto" color="grey" dark>
         <v-card-title>
-          <v-icon x-large left>trending_up</v-icon>
+          <v-icon x-large left>{{ icon }}</v-icon>
           <span class="title font-weight-light">Este Mes</span>
         </v-card-title>
         <v-divider dark></v-divider>
@@ -15,7 +15,7 @@
     <v-flex d-flex xs12 sm12 md4 lg4 xl4>
       <v-card class="mx-auto" color="grey" dark>
         <v-card-title>
-          <v-icon x-large left>trending_up</v-icon>
+          <v-icon x-large left>{{ icon }}</v-icon>
           <span class="title font-weight-light">Esta Semana</span>
         </v-card-title>
         <v-divider dark></v-divider>
@@ -27,7 +27,7 @@
     <v-flex d-flex xs12 sm12 md4 lg4 xl4>
       <v-card class="mx-auto" color="grey" dark>
         <v-card-title>
-          <v-icon x-large left>trending_up</v-icon>
+          <v-icon x-large left>{{ icon }}</v-icon>
           <span class="title font-weight-light">Hoy</span>
         </v-card-title>
         <v-divider dark></v-divider>
@@ -43,12 +43,10 @@
     props: {
       data: {
         type: Object
-      }
-    },
+      },
 
-    methods: {
-      hide () {
-        this.$emit('hide')      
+      icon: {
+        type: String
       }
     }
   }

@@ -17,13 +17,13 @@ class ExpenseRequest extends FormRequest
     public function rules()
     {
         $rules = [
-            'title' => 'required|min:3|max:60',
-            'payment' => ['required', Rule::in($this->payments)],
-            'date' => 'required|date_format:Y-m-d',
-            'note' => 'nullable|min:5|max:120',
-            'amount' => 'required|max:9|regex:/^-?[0-9]+(?:\.[0-9]{1,2})?$/',
-            'expense_type_id' => 'required|integer',
-            'project_id' => 'required|integer'
+            'expense.title' => 'required|min:3|max:60',
+            'expense.payment' => ['required', Rule::in($this->payments)],
+            'expense.date' => 'required|date_format:Y-m-d',
+            'expense.note' => 'nullable|min:5|max:120',
+            'expense.amount' => 'required|max:9|regex:/^-?[0-9]+(?:\.[0-9]{1,2})?$/',
+            'expense.expense_type_id' => 'required|integer',
+            'expense.project_id' => 'required|integer'
         ];
 
         // if($this->method() == 'PATCH' || $this->method() == 'PUT') {

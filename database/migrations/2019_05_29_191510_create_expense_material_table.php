@@ -17,9 +17,10 @@ class CreateExpenseMaterialTable extends Migration
             $table->increments('id');
             $table->integer('expense_id')->unsigned();
             $table->integer('material_id')->unsigned();
+            $table->integer('quantity')->unsigned();
             $table->float('price', 9, 2);
             $table->softDeletes();
-            $table->timestamps();
+            // $table->timestamps();
 
             $table->foreign('expense_id')->references('id')->on('expenses')
                 ->onDelete('cascade')

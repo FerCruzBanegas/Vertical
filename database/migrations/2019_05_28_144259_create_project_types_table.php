@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
+use Illuminate\Support\Facades\DB;
 
 class CreateProjectTypesTable extends Migration
 {
@@ -20,6 +21,9 @@ class CreateProjectTypesTable extends Migration
             $table->softDeletes();
             $table->timestamps();
         });
+
+        // Full Text Index
+        DB::statement('ALTER TABLE project_types ADD FULLTEXT idx_full_text (name, description)');
     }
 
     /**

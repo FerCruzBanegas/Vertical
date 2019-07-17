@@ -3,6 +3,7 @@
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Facades\DB;
 
 class CreateUsersTable extends Migration
 {
@@ -22,6 +23,7 @@ class CreateUsersTable extends Migration
             $table->rememberToken();
             $table->boolean('active');
             $table->integer('profile_id')->unsigned();
+            $table->integer('people_id')->unsigned();
             $table->softDeletes();
             $table->timestamps();
 
@@ -29,6 +31,9 @@ class CreateUsersTable extends Migration
                 ->onDelete('cascade')
                 ->onUpdate('cascade');
         });
+
+        // Full Text Index
+        DB::statement('ALTER TABLE users ADD FULLTEXT idx_full_text (name, email)');
     }
 
     /**
