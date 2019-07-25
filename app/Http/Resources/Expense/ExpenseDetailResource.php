@@ -25,6 +25,13 @@ class ExpenseDetailResource extends JsonResource
                     'price' => $material->pivot->price
                 ];
             }),
+            'people' => collect($this->people)->transform(function($person){
+                return [
+                    'name' => $person->name,
+                    'surnames' => $person->surnames,
+                    'phone' => $person->phone
+                ];
+            }),
             'created' => new ActivityCreatedResource($this->activities),
             'updated' => new ActivityUpdatedResource($this->activities)
         ];

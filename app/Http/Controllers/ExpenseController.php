@@ -93,6 +93,13 @@ class ExpenseController extends ApiController
                 }
                 $expense->materials()->attach($material);
             } 
+            if (!empty($request->people)) {
+                $person = array();
+                foreach ($request->people as $value) {
+                    $person[] = $value['id'];
+                }
+                $expense->people()->attach($person);
+            } 
             DB::commit();
         } catch (\Exception $e) {
             DB::rollback();

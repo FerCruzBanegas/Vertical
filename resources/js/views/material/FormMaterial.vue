@@ -1,5 +1,5 @@
 <template>
-  <v-container fluid grid-list-md id="theme">
+  <v-container fluid grid-list-md>
     <v-layout row wrap>
       <v-flex d-flex xs12 sm12 md12>
         <v-card v-show="success">
@@ -11,6 +11,7 @@
               <v-flex xs12 sm12 md12 lg12>
                 <v-card>
                   <v-card-text>
+                    <small>Los campos con (*) son obligatorios.</small>
                     <v-layout row wrap>
                       <v-flex xs12 sm12 md6 lg6>
                         <v-layout row wrap>
@@ -20,6 +21,10 @@
                               color="grey darken-2"
                               :items="material_types"
                               v-model="material.material_type_id"
+                              data-vv-name="material_type_id"
+                              data-vv-as="tipo de material"
+                              v-validate="'required'"
+                              :error-messages="errors.collect('material_type_id')"
                               label="Tipo de Material *"
                               item-text="name"
                               item-value="id"
@@ -33,6 +38,10 @@
                               color="grey darken-2"
                               label="Nombre *"
                               v-model="material.name"
+                              data-vv-name="name"
+                              data-vv-as="nombre"
+                              v-validate="'required|min:3|max:60'"
+                              :error-messages="errors.collect('name')"
                             ></v-text-field>
                           </v-flex>
                         </v-layout>
@@ -42,14 +51,28 @@
                               box
                               color="grey darken-2"
                               :items="units"
-                              v-model="material.unity"
                               label="Unidad de medida *"
+                              v-model="material.unity"
+                              data-vv-name="unity"
+                              data-vv-as="unidad"
+                              v-validate="'required'"
+                              :error-messages="errors.collect('unity')"
                             ></v-autocomplete>
                           </v-flex>
                         </v-layout>
                         <v-layout row wrap>
                           <v-flex xs12 sm12 md12 lg12>
-                            <v-currency-field label="Precio de Referencia" v-bind="currency_config" :error-messages="errors.price" v-model="material.price" box color="grey darken-2"></v-currency-field>
+                            <v-currency-field 
+                              box 
+                              color="grey darken-2"
+                              label="Precio de Referencia" 
+                              v-bind="currency_config" 
+                              v-model="material.price"
+                              data-vv-name="price"
+                              data-vv-as="precio"
+                              v-validate="'required|max:9'"
+                              :error-messages="errors.collect('price')" 
+                            ></v-currency-field>
                           </v-flex>
                         </v-layout>
                         <v-layout row wrap>
@@ -59,12 +82,15 @@
                               color="grey darken-2"
                               label="Descripción"
                               v-model="material.description"
+                              data-vv-name="description"
+                              data-vv-as="descripción"
+                              v-validate="'min:5|max:120'"
+                              :error-messages="errors.collect('description')"
                             ></v-textarea>
                           </v-flex>
                         </v-layout>
                       </v-flex>
                     </v-layout>
-                    <small>Los campos con (*) son obligatorios.</small>
                     <v-switch
                       v-if="!id"
                       color="red"
@@ -98,10 +124,13 @@
   import MaterialService from '../../services/material.service'
 
   export default {
+    $_veeValidate: {
+      validator: 'new'
+    },
+
     name: 'form-material',
     data() {
       return {
-        errors: {},
         currency_config: {
           decimal: '.',
           thousands: ',',
@@ -159,21 +188,27 @@
       },
 
       submit: async function() {
+        this.$validator.errors.clear();
         const vm = this
         vm.loading = true
-        if(vm.id) {
-          vm._save = await MaterialService.updateMaterial(vm.id, vm.material)
-        } else {
-          vm._save = await MaterialService.storeMaterial(vm.material)
-        }
-        if (vm._save.status === 201 || vm._save.status === 200) {
-          vm.$snotify.simple(vm._save.data.message, 'Felicidades')
-          vm.loading = false
-          if (vm.retry) {
-            vm.material = new Material()
+        try {
+          if(vm.id) {
+            vm._save = await MaterialService.updateMaterial(vm.id, vm.material)
           } else {
-            vm.$router.push('/materials')
+            vm._save = await MaterialService.storeMaterial(vm.material)
           }
+          if (vm._save.status === 201 || vm._save.status === 200) {
+            vm.$snotify.simple(vm._save.data.message, 'Felicidades')
+            vm.loading = false
+            if (vm.retry) {
+              vm.material = new Material()
+            } else {
+              vm.$router.push('/materials')
+            }
+          }
+        } catch (err) {
+          this.$setErrorsFromResponse(err.response.data);
+          vm.loading = false
         }
       }
     }

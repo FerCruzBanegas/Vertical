@@ -32,4 +32,17 @@ class ExpenseRequest extends FormRequest
 
         return $rules;
     }
+
+    public function attributes()
+    {
+        return [
+            'expense.title' => 'título',
+            'expense.payment' => 'pago',
+            'expense.date' => 'fecha',
+            'expense.note' => 'nota',
+            'expense.amount' => 'monto',
+            'expense.expense_type_id' => 'tipo de egreso',
+            'expense.project_id' => 'proyecto'
+        ];
+    }
 }

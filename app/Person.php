@@ -15,4 +15,18 @@ class Person extends ApiModel
     protected $fillable = [
         'name', 'surnames', 'phone', 'address'
     ];
+
+    protected $searchable = [
+        'name', 'surnames',
+    ];
+
+    public function expenses()
+    {
+        return $this->belongsToMany(Expense::class);
+    }
+
+    public static function listPeople()
+    {
+        return static::orderBy('id', 'DESC')->select('id', 'name')->get();
+    }
 }

@@ -13,8 +13,8 @@
       >
         <template v-slot:items="props">
           <td>{{ props.item.name }}</td>
-          <td>{{ props.item.unity }}</td>
-          <td>{{ props.item.price }}</td>
+          <td>{{ props.item.surnames }}</td>
+          <td>{{ props.item.phone }}</td>
         </template>
         <template slot="no-data">
           <center>Sin Datos</center>
@@ -38,8 +38,8 @@
       return {
         headerPeople: [
           { text: 'Nombre', value: 'nombre' },
-          { text: 'Unidad', value: 'unidad' },
-          { text: 'Precio', value: 'precio' },
+          { text: 'Apellidos', value: 'apellidos' },
+          { text: 'Teléfono', value: 'telefono' },
         ]
       }
     }

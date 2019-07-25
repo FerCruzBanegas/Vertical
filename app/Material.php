@@ -34,5 +34,4 @@ class Material extends ApiModel
     {
         return $this->belongsToMany(Expense::class);
     }
-
 }

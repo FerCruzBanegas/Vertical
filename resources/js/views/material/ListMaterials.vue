@@ -1,7 +1,7 @@
 <template>
   <v-container fluid grid-list-md>
     <v-layout>
-      <v-flex d-flex xs12 sm12 md12>
+      <v-flex xs12 sm12 md12 xl12>
         <v-card>
           <modal-delete :message="message" :loading="loading" :remove="remove" @hide="remove = !remove" @deleted="deleted"></modal-delete>
           <modal-loader :loader="loader"></modal-loader>

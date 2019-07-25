@@ -19,10 +19,37 @@ const UserService = {
      * @throws AuthenticationError 
     **/
     
-    getUsers: async function() {
+    getUsers: async function(url) {
       try {
-        const response = await ApiService.get('/users')
-        return response.data
+        const response = await ApiService.get(url)
+        return response
+      } catch (error) {
+        console.log(error)
+      }
+    },
+
+    deleteUser: async function(url) {
+      try {
+        const response = await ApiService.delete(url)
+        return response
+      } catch (error) {
+        console.log(error)
+      }
+    },
+
+    storeUser: async function(data) {
+      try {
+        const response = await ApiService.post('/users', data)
+        return response
+      } catch (error) {
+        console.log(error)
+      }
+    },
+
+    updateUser: async function(id, data) {
+      try {
+        const response = await ApiService.put(`users/${id}`, data)
+        return response
       } catch (error) {
         console.log(error)
       }

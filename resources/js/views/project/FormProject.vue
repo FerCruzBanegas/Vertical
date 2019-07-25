@@ -1,5 +1,5 @@
 <template>
-  <v-container fluid grid-list-md id="theme">
+  <v-container fluid grid-list-md>
     <v-layout row wrap>
       <v-flex d-flex xs12 sm12 md12>
         <v-card v-show="success">
@@ -11,6 +11,7 @@
               <v-flex xs12 sm12 md12 lg12>
                 <v-card>
                   <v-card-text>
+                    <small>Los campos con (*) son obligatorios.</small>
                     <v-layout row wrap>
                       <v-flex xs12 sm12 md6 lg6>
                         <v-autocomplete
@@ -18,6 +19,10 @@
                           color="grey darken-2"
                           :items="project_types"
                           v-model="project.project_type_id"
+                          data-vv-name="project_type_id"
+                          data-vv-as="tipo de proyecto"
+                          v-validate="'required'"
+                          :error-messages="errors.collect('project_type_id')"
                           label="Tipo de Proyecto *"
                           item-text="name"
                           item-value="id"
@@ -31,6 +36,11 @@
                           color="grey darken-2"
                           label="Nombre *"
                           v-model="project.name"
+                          data-vv-name="name"
+                          data-vv-as="nombre"
+                          v-validate="'required|min:3|max:60'"
+                          :error-messages="errors.collect('name')"
+                          clearable
                         ></v-text-field>
                       </v-flex>
                     </v-layout>
@@ -41,6 +51,11 @@
                           color="grey darken-2"
                           label="Dirección *"
                           v-model="project.location"
+                          data-vv-name="location"
+                          data-vv-as="dirección"
+                          v-validate="'required|min:5|max:100'"
+                          :error-messages="errors.collect('location')"
+                          clearable
                         ></v-text-field>
                       </v-flex>
                     </v-layout>
@@ -66,6 +81,10 @@
                               prepend-icon="event"
                               readonly
                               v-on="on"
+                              data-vv-name="start_date"
+                              data-vv-as="fecha inicio"
+                              v-validate="'required'"
+                              :error-messages="errors.collect('start_date')"
                             ></v-text-field>
                           </template>
                           <v-date-picker 
@@ -85,10 +104,13 @@
                           color="grey darken-2"
                           label="Comentarios"
                           v-model="project.comments"
+                          data-vv-name="comments"
+                          data-vv-as="comentarios"
+                          v-validate="'min:5|max:120'"
+                          :error-messages="errors.collect('comments')"
                         ></v-textarea>
                       </v-flex>
                     </v-layout>
-                    <small>Los campos con (*) son obligatorios.</small>
                     <v-switch
                       v-if="!id"
                       color="red"
@@ -122,6 +144,10 @@
   import ProjectService from '../../services/project.service'
 
   export default {
+    $_veeValidate: {
+      validator: 'new'
+    },
+
     name: 'form-project',
     data() {
       return {
@@ -146,11 +172,8 @@
     },
 
     watch: {
-      project: {
-        handler (val) {
-          this.dateFormatted = this.formatDate(this.project.start_date)
-        },
-        deep: true
+      'project.start_date': function (newVal, oldVal){
+        this.dateFormatted = this.formatDate(this.project.start_date)
       }
     },
 
@@ -188,21 +211,27 @@
       },
 
       submit: async function() {
+        this.$validator.errors.clear();
         const vm = this
         vm.loading = true
-        if(vm.id) {
-          vm._save = await ProjectService.updateProject(vm.id, vm.project)
-        } else {
-          vm._save = await ProjectService.storeProject(vm.project)
-        }
-        if (vm._save.status === 201 || vm._save.status === 200) {
-          vm.$snotify.simple(vm._save.data.message, 'Felicidades')
-          vm.loading = false
-          if (vm.retry) {
-            vm.project = new Project()
+        try {
+          if(vm.id) {
+            vm._save = await ProjectService.updateProject(vm.id, vm.project)
           } else {
-            vm.$router.push('/projects')
+            vm._save = await ProjectService.storeProject(vm.project)
           }
+          if (vm._save.status === 201 || vm._save.status === 200) {
+            vm.$snotify.simple(vm._save.data.message, 'Felicidades')
+            vm.loading = false
+            if (vm.retry) {
+              vm.project = new Project()
+            } else {
+              vm.$router.push('/projects')
+            }
+          }
+        } catch (err) {
+          this.$setErrorsFromResponse(err.response.data);
+          vm.loading = false
         }
       }
     }

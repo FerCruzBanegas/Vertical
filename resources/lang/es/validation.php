@@ -50,7 +50,7 @@ return [
     'max'                  => [
         'numeric' => ':attribute no debe ser mayor a :max.',
         'file'    => ':attribute no debe ser mayor que :max kilobytes.',
-        'string'  => ':attribute no debe ser mayor que :max caracteres.',
+        'string'  => 'El campo :attribute no debe ser mayor a :max caracteres.',
         'array'   => ':attribute no debe tener más de :max elementos.',
     ],
     'mimes'                => ':attribute debe ser un archivo con formato: :values.',
@@ -58,7 +58,7 @@ return [
     'min'                  => [
         'numeric' => 'El tamaño de :attribute debe ser de al menos :min.',
         'file'    => 'El tamaño de :attribute debe ser de al menos :min kilobytes.',
-        'string'  => ':attribute debe contener al menos :min caracteres.',
+        'string'  => 'El campo :attribute debe tener al menos :min caracteres.',
         'array'   => ':attribute debe tener al menos :min elementos.',
     ],
     'not_in'               => ':attribute es inválido.',
@@ -144,9 +144,19 @@ return [
         'subject'               => 'asunto',
         'message'               => 'mensaje',
         //added
+        'project_id'            => 'proyecto',
+        'project_type_id'       => 'tipo de proyecto',
+        'material_type_id'      => 'tipo de material',
+        'income_type_id'        => 'tipo de ingreso',
+        'expense_type_id'       => 'tipo de egreso',
         'comments'              => 'comentarios',
         'start_date'            => 'fecha de inicio',
         'unity'                 => 'unidad',
         'price'                 => 'precio',
+        'location'              => 'dirección',
+        'start_date'            => 'fecha inicio',
+        'payment'               => 'pago',
+        'note'                  => 'nota',
+        'amount'                => 'monto',
     ],
 ];

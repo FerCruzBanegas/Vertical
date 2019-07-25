@@ -6,25 +6,22 @@ use Illuminate\Foundation\Http\FormRequest;
 
 class ProfileRequest extends FormRequest
 {
-    /**
-     * Determine if the user is authorized to make this request.
-     *
-     * @return bool
-     */
     public function authorize()
     {
-        return false;
+        return true;
     }
 
-    /**
-     * Get the validation rules that apply to the request.
-     *
-     * @return array
-     */
     public function rules()
     {
-        return [
-            //
+        $rules = [
+            'description' => 'required|min:3|max:60|unique:profiles,description',
+            'action_list' => 'required|array|min:1',
         ];
+
+        if($this->method() == 'PATCH' || $this->method() == 'PUT') {
+            $rules['description'] .= ',' . $this->id;
+        }
+
+        return $rules;
     }
 }

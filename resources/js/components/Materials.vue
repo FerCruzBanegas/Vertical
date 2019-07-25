@@ -22,7 +22,6 @@
       <td class="text-xs-right">
         <v-currency-field 
           v-bind="currency_config" 
-          :error-messages="errors.price" 
           v-model="props.item.price"
           :rules="max25chars"
           single-line 
@@ -72,7 +71,6 @@
           { text: 'Sub Total', value: 'total', sortable: false, align: 'center'},
           { text: '', value: '', sortable: false, align: 'center', width: "50"}
         ],
-        errors: {},
         currency_config: {
           decimal: '.',
           thousands: ',',

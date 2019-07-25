@@ -2,16 +2,21 @@
 
 namespace App;
 
-use Illuminate\Database\Eloquent\Model;
+// use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Spatie\Activitylog\Traits\LogsActivity;
 
-class Profile extends Model
+class Profile extends ApiModel
 {
-    use SoftDeletes;
+    use SoftDeletes, LogsActivity, FullTextSearch;
 
     protected $dates    = ['deleted_at'];
     protected $fillable = ['description'];
     protected $appends  = ['action_list'];
+
+    protected $searchable = [
+        'description'
+    ];
 
     public function users()
     {
@@ -25,6 +30,11 @@ class Profile extends Model
 
     public function getActionListAttribute()
     {
-        return array_map('strval', $this->actions->pluck('id')->toArray());
+        return $this->actions->pluck('id')->toArray();
+    }
+
+    public static function listProfiles()
+    {
+        return static::orderBy('id', 'DESC')->select('id', 'description')->get();
     }
 }

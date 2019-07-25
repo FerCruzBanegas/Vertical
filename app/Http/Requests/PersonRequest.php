@@ -6,25 +6,24 @@ use Illuminate\Foundation\Http\FormRequest;
 
 class PersonRequest extends FormRequest
 {
-    /**
-     * Determine if the user is authorized to make this request.
-     *
-     * @return bool
-     */
     public function authorize()
     {
-        return false;
+        return true;
     }
 
-    /**
-     * Get the validation rules that apply to the request.
-     *
-     * @return array
-     */
     public function rules()
     {
-        return [
-            //
+        $rules = [
+            'name' => 'required|max:32|unique:people,name',
+            'surnames' => 'nullable|max:32',
+            'phone' => 'required|max:10',
+            'address' => 'nullable|max:64'
         ];
+
+        if($this->method() == 'PATCH' || $this->method() == 'PUT') {
+            $rules['name'] .= ',' . $this->id;
+        }
+
+        return $rules;
     }
 }

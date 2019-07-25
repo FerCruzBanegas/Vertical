@@ -100,6 +100,7 @@
         miniVariant: false,
         items: [
         { icon: 'home', text: 'Inicio', url: '/dashboard' },
+        { icon: 'find_in_page', text: 'Informes', url: '/reports' },
         {
           icon: 'domain',
           'icon-alt': 'domain',
@@ -146,10 +147,10 @@
           text: 'Categorías',
           model: false,
           children: [
-            { icon: 'chevron_right', text: 'Tipos de Proyecto', url: '/project-types' },
-            { icon: 'chevron_right', text: 'Tipos de Material', url: '/material-types' },
-            { icon: 'chevron_right', text: 'Tipos de Ingreso', url: '/income-types' },
-            { icon: 'chevron_right', text: 'Tipos de Egreso', url: '/expense-types' }
+            { icon: 'remove', text: 'Tipos de Proyecto', url: '/project-types' },
+            { icon: 'remove', text: 'Tipos de Material', url: '/material-types' },
+            { icon: 'remove', text: 'Tipos de Ingreso', url: '/income-types' },
+            { icon: 'remove', text: 'Tipos de Egreso', url: '/expense-types' }
           ]
         },
         {
@@ -158,7 +159,9 @@
           text: 'Configuración',
           model: false,
           children: [
-            { icon: 'people', text: 'Personas', url: '/people' }
+            { icon: 'remove', text: 'Personas', url: '/people' },
+            { icon: 'remove', text: 'Usuarios', url: '/users' },
+            { icon: 'remove', text: 'Perfil y Permisos', url: '/profiles' }
           ]
         }
       ],

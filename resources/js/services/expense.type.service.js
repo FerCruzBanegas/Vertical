@@ -25,7 +25,7 @@ const ExpenseTypeService = {
       const response = await ApiService.post('/expense-types', data)
       return response
     } catch (error) {
-      console.log(error)
+      throw error
     }
   },
 
@@ -34,7 +34,7 @@ const ExpenseTypeService = {
       const response = await ApiService.put(`expense-types/${id}`, data)
       return response
     } catch (error) {
-      console.log(error)
+      throw error
     }
   },
 }

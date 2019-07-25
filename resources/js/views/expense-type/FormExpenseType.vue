@@ -1,5 +1,5 @@
 <template>
-  <v-container fluid grid-list-md id="theme">
+  <v-container fluid grid-list-xl>
     <v-layout row wrap>
       <v-flex d-flex xs12 sm12 md12>
         <v-card v-show="success">
@@ -11,29 +11,40 @@
               <v-flex xs12 sm12 md12 lg12>
                 <v-card>
                   <v-card-text>
+                    <small>Los campos con (*) son obligatorios.</small>
                     <v-layout row wrap>
                       <v-flex xs12 sm12 md6 lg6>
                         <v-layout row wrap>
                           <v-flex xs12 sm12 md12 lg12>
                             <v-text-field
+                              box
                               color="grey darken-2"
                               label="Nombre *"
                               v-model="expense_type.name"
+                              data-vv-name="name"
+                              data-vv-as="nombre"
+                              v-validate="'required|min:3|max:60'"
+                              :error-messages="errors.collect('name')"
+                              clearable
                             ></v-text-field>
                           </v-flex>
                         </v-layout>
                         <v-layout row wrap>
                           <v-flex xs12 sm12 md12 lg12>
                             <v-textarea
+                              box
                               color="grey darken-2"
                               label="Descripción"
                               v-model="expense_type.description"
+                              data-vv-name="description"
+                              data-vv-as="descripción"
+                              v-validate="'min:5|max:120'"
+                              :error-messages="errors.collect('description')"
                             ></v-textarea>
                           </v-flex>
                         </v-layout>
                       </v-flex>
                     </v-layout>
-                    <small>Los campos con (*) son obligatorios.</small>
                     <v-switch
                       v-if="!id"
                       color="red"
@@ -66,6 +77,10 @@
   import ExpenseTypeService from '../../services/expense.type.service'
 
   export default {
+    $_veeValidate: {
+      validator: 'new'
+    },
+
     name: 'form-expense-type',
     data() {
       return {
@@ -104,21 +119,27 @@
       },
 
       submit: async function() {
+        this.$validator.errors.clear();
         const vm = this
         vm.loading = true
-        if(vm.id) {
-          vm._save = await ExpenseTypeService.updateExpenseType(vm.id, vm.expense_type)
-        } else {
-          vm._save = await ExpenseTypeService.storeExpenseType(vm.expense_type)
-        }
-        if (vm._save.status === 201 || vm._save.status === 200) {
-          vm.$snotify.simple(vm._save.data.message, 'Felicidades')
-          vm.loading = false
-          if (vm.retry) {
-            vm.expense_type = new ExpenseType()
+        try {
+          if(vm.id) {
+            vm._save = await ExpenseTypeService.updateExpenseType(vm.id, vm.expense_type)
           } else {
-            vm.$router.push('/expense-types')
+            vm._save = await ExpenseTypeService.storeExpenseType(vm.expense_type)
           }
+          if (vm._save.status === 201 || vm._save.status === 200) {
+            vm.$snotify.simple(vm._save.data.message, 'Felicidades')
+            vm.loading = false
+            if (vm.retry) {
+              vm.expense_type = new ExpenseType()
+            } else {
+              vm.$router.push('/expense-types')
+            }
+          }
+        } catch (err) {
+          this.$setErrorsFromResponse(err.response.data);
+          vm.loading = false
         }
       }
     }

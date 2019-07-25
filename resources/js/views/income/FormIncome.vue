@@ -1,5 +1,5 @@
 <template>
-  <v-container fluid grid-list-xl>
+  <v-container fluid grid-list-md>
     <v-layout row wrap>
       <v-flex d-flex xs12 sm12 md12>
         <v-card v-show="success">
@@ -19,6 +19,11 @@
                           color="grey darken-2"
                           label="Título *"
                           v-model="income.title"
+                          data-vv-name="title"
+                          data-vv-as="título"
+                          v-validate="'required|min:3|max:60'"
+                          :error-messages="errors.collect('title')"
+                          clearable
                         ></v-text-field>
                       </v-flex>
                       <v-flex xs12 sm12 md6 lg6>
@@ -27,6 +32,10 @@
                           color="grey darken-2"
                           :items="income_types"
                           v-model="income.income_type_id"
+                          data-vv-name="income_type_id"
+                          data-vv-as="tipo de ingreso"
+                          v-validate="'required'"
+                          :error-messages="errors.collect('income_type_id')"
                           label="Tipo de Ingreso *"
                           item-text="name"
                           item-value="id"
@@ -40,6 +49,10 @@
                           color="grey darken-2"
                           :items="projects"
                           v-model="income.project_id"
+                          data-vv-name="project_id"
+                          data-vv-as="proyecto"
+                          v-validate="'required'"
+                          :error-messages="errors.collect('project_id')"
                           label="Proyecto *"
                           item-text="name"
                           item-value="id"
@@ -50,8 +63,12 @@
                           box
                           color="grey darken-2"
                           :items="payment"
-                          v-model="income.payment"
                           label="Método de Pago *"
+                          v-model="income.payment"
+                          data-vv-name="payment"
+                          data-vv-as="pago"
+                          v-validate="'required'"
+                          :error-messages="errors.collect('payment')"
                         ></v-autocomplete>
                       </v-flex>
                     </v-layout>
@@ -77,6 +94,10 @@
                               prepend-icon="event"
                               readonly
                               v-on="on"
+                              data-vv-name="date"
+                              data-vv-as="fecha"
+                              v-validate="'required'"
+                              :error-messages="errors.collect('date')"
                             ></v-text-field>
                           </template>
                           <v-date-picker 
@@ -94,12 +115,27 @@
                           color="grey darken-2"
                           label="Nota"
                           v-model="income.note"
+                          data-vv-name="note"
+                          data-vv-as="nota"
+                          v-validate="'min:5|max:120'"
+                          :error-messages="errors.collect('note')"
+                          clearable
                         ></v-text-field>
                       </v-flex>
                     </v-layout>
                     <v-layout row wrap>
                       <v-flex xs12 sm12 offset-md6 offset-lg6>
-                        <v-currency-field label="Monto" v-bind="currency_config" :error-messages="errors.price" v-model="income.amount" box color="grey darken-2"></v-currency-field>
+                        <v-currency-field 
+                          box 
+                          color="grey darken-2"
+                          label="Monto *" 
+                          v-bind="currency_config" 
+                          v-model="income.amount"
+                          data-vv-name="amount"
+                          data-vv-as="monto"
+                          v-validate="'required|max:9|decimal:2'"
+                          :error-messages="errors.collect('amount')" 
+                        ></v-currency-field>
                       </v-flex>
                     </v-layout>
                     <v-switch
@@ -136,12 +172,15 @@
   import ProjectService from '../../services/project.service'
 
   export default {
+    $_veeValidate: {
+      validator: 'new'
+    },
+
     name: 'form-income',
     data() {
       return {
         success: false,
         loading: false,
-        errors: {},
         currency_config: {
           decimal: '.',
           thousands: ',',
@@ -174,11 +213,8 @@
     },
 
     watch: {
-      income: {
-        handler (val) {
-          this.dateFormatted = this.formatDate(this.income.date)
-        },
-        deep: true
+      'income.date': function (newVal, oldVal){
+        this.dateFormatted = this.formatDate(this.income.date)
       }
     },
 
@@ -224,21 +260,27 @@
       },
 
       submit: async function() {
+        this.$validator.errors.clear();
         const vm = this
         vm.loading = true
-        if(vm.id) {
-          vm._save = await IncomeService.updateIncome(vm.id, vm.income)
-        } else {
-          vm._save = await IncomeService.storeIncome(vm.income)
-        }
-        if (vm._save.status === 201 || vm._save.status === 200) {
-          vm.$snotify.simple(vm._save.data.message, 'Felicidades')
-          vm.loading = false
-          if (vm.retry) {
-            vm.income = new Income()
+        try {
+          if(vm.id) {
+            vm._save = await IncomeService.updateIncome(vm.id, vm.income)
           } else {
-            vm.$router.push('/incomes')
+            vm._save = await IncomeService.storeIncome(vm.income)
           }
+          if (vm._save.status === 201 || vm._save.status === 200) {
+            vm.$snotify.simple(vm._save.data.message, 'Felicidades')
+            vm.loading = false
+            if (vm.retry) {
+              vm.income = new Income()
+            } else {
+              vm.$router.push('/incomes')
+            }
+          }
+        } catch (err) {
+          this.$setErrorsFromResponse(err.response.data);
+          vm.loading = false
         }
       }
     }

@@ -31,6 +31,9 @@ import ShowExpense from '../views/expense/ShowExpense.vue'
 //people
 import ListPeople from '../views/people/ListPeople.vue'
 import FormPeople from '../views/people/FormPeople.vue'
+//profile
+import ListProfiles from '../views/profile/ListProfiles.vue'
+import FormProfile from '../views/profile/FormProfile.vue'
 //user
 import ListUsers from '../views/user/ListUsers.vue'
 import FormUser from '../views/user/FormUser.vue'
@@ -285,6 +288,31 @@ export default [
             path: ':id/edit',
             name: 'EditPeople',
             component: FormPeople
+          }
+        ]
+      },
+      {
+        path: '/profiles',
+        name: 'Profiles',
+        redirect: '/profiles',
+        component: {
+          render (c) { return c('router-view') }
+        },
+        children: [
+          {
+            path: '',
+            name: 'ListProfiles',
+            component: ListProfiles
+          },
+          {
+            path: 'create',
+            name: 'CreateProfile',
+            component: FormProfile
+          },
+          {
+            path: ':id/edit',
+            name: 'EditProfile',
+            component: FormProfile
           }
         ]
       },

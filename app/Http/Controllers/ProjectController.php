@@ -69,6 +69,7 @@ class ProjectController extends ApiController
             $this->project->create([
             	'uuid'            => $uuid,
                 'name'            => $request->name,
+                'location'        => $request->location,
                 'comments'        => $request->comments,
                 'start_date'      => $request->start_date,
                 'project_type_id' => $request->project_type_id,
@@ -85,6 +86,7 @@ class ProjectController extends ApiController
             $project = $this->project->find($id);
             $project->update([
             	'name'            => $request->name,
+                'location'        => $request->location,
                 'comments'        => $request->comments,
                 'start_date'      => $request->start_date,
                 'project_type_id' => $request->project_type_id,

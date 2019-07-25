@@ -25,7 +25,7 @@ const MaterialService = {
       const response = await ApiService.post('/materials', data)
       return response
     } catch (error) {
-      console.log(error)
+      throw error
     }
   },
 
@@ -34,7 +34,7 @@ const MaterialService = {
       const response = await ApiService.put(`materials/${id}`, data)
       return response
     } catch (error) {
-      console.log(error)
+      throw error
     }
   },
 }

@@ -2,15 +2,19 @@
 
 namespace App\Http\Controllers;
 
+use App\Person;
 use Illuminate\Http\Request;
+use App\Http\Requests\PersonRequest;
+use App\Http\Resources\Person\PersonResource;
+use App\Http\Resources\Person\PersonCollection;
 
-class PersonController extends Controller
+class PersonController extends ApiController
 {
-    private $materialType;
+    private $person;
 
-    public function __construct(MaterialType $materialType)
+    public function __construct(Person $person)
     {
-        $this->materialType = $materialType;
+        $this->person = $person;
     }
 
     public function index(Request $request) 
@@ -19,41 +23,39 @@ class PersonController extends Controller
             $rowsPerPage = $request->input('rowsPerPage');
         }
 
-        $materialTypes = $this->materialType->orderBy('id', 'DESC');
+        $people = $this->person->orderBy('id', 'DESC');
 
         if ($request->has('filter')) {
             $filter = $request->input('filter');
 
-            $materialTypes = $materialTypes->where(function ($query) use ($filter) {
-                $query->where('name', 'LIKE', "%" . $filter . "%");
-            });
+            $people = $people->search($filter);
         }
 
-        $materialTypes = $materialTypes->paginate($rowsPerPage);
-    	return new MaterialTypeCollection($materialTypes); 
+        $people = $people->paginate($rowsPerPage);
+    	return new PersonCollection($people); 
     }
 
     public function show($id)
     {
-        $materialType = $this->materialType->findOrFail($id);
-        return new MaterialTypeResource($materialType); 
+        $person = $this->person->findOrFail($id);
+        return new PersonResource($person); 
     }
 
-    public function store(MaterialTypeRequest $request)
+    public function store(PersonRequest $request)
     {
         try {
-            $this->materialType->create($request->all());
+            $this->person->create($request->all());
         } catch (\Exception $e) {
             return $this->respondInternalError();
         }
         return $this->respondCreated();
     }
 
-    public function update(MaterialTypeRequest $request, $id)
+    public function update(PersonRequest $request, $id)
     {
         try {
-            $materialType = $this->materialType->find($id);
-            $materialType->update($request->all());
+            $person = $this->person->find($id);
+            $person->update($request->all());
         } catch (\Exception $e) {
             return $this->respondInternalError();
         }
@@ -63,17 +65,17 @@ class PersonController extends Controller
     public function destroy($id)
     {
         try {
-            $materialType = $this->materialType::find($id);
-            $materialType->delete();
+            $person = $this->person::find($id);
+            $person->delete();
         } catch (\Exception $e) {
             return $this->respondInternalError();
         }
         return $this->respondDeleted();
     }
 
-    public function listing()
+    public function searchPerson($name) 
     {
-    	$materialTypes = $this->materialType->listMaterialTypes();
-        return $this->respond($materialTypes);
+        $person = $this->person->search($name)->get();
+        return $this->respond($person);
     }
 }

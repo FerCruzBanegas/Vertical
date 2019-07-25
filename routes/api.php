@@ -17,6 +17,49 @@
 
 
 Route::get('/test', function() {
+
+    $actions = \App\Action::select('title', 'name', 'id')->get();
+    $test = array(
+            ['title' => 'Sistema', 'permissions' => array(['id' => 1, 'name' => 'Acceso Total'])],
+            ['title' => 'Egresos', 'permissions' => array(['id' => 2, 'name' => 'Ver Lista'],['id' => 3, 'name' => 'Ver Detalle'],['id' => 4, 'name' => 'Registrar'],['id' => 5, 'name' => 'Actualizar'],['id' => 6, 'name' => 'Actualizar'])],
+            ['title' => 'Ingresos', 'permissions' => array(['id' => 7, 'name' => 'Ver Lista'],['id' => 8, 'name' => 'Ver Detalle'],['id' => 9, 'name' => 'Registrar'],['id' => 10, 'name' => 'Actualizar'],['id' => 11, 'name' => 'Actualizar'])]
+        );
+        // foreach ($actions as $key => $value) {
+        //     $data[$key]['title'] = $value->title;
+        // }
+        
+        $data = array();
+        $actions->each(function ($item, $key) use(&$data) {
+            $data[$key]['title'] = $item->title;
+        });
+        $data = collect($data)->unique()->values()->toArray();
+        // $data->each(function ($i, $key) use($actions) {
+        //     $actions->each(function ($j, $key) use($i, &$transform){
+        //         if ($i['title'] == $j->title) {
+        //             $transform->put('permissions', ['id' => $j->id, 'name' => $j->name]);
+        //         }
+        //     });
+        // });
+
+        // foreach ($data as $i) {
+        //     foreach ($actions as $key => $j) {
+        //         if ($i['title'] == $j->title) {
+        //             $data[$key]['permissions'] = ['id' => $j->id, 'name' => $j->name];
+        //         }
+        //     }
+        // }
+        // $data = $data->map(function ($item, $key) {
+        //     $object['permissions'] = 'ddd';
+        // }); 
+        $grouped = $actions->groupBy('title')->values()->transform(function ($item) {
+            return [
+                'title' => $item->first()->only(['title']),
+                'permissions' => $item
+            ];
+        });
+        
+        return response()->json($grouped);
+
     // $expenses = \App\Expense::with([
     //     'expense_type',
     //     'materials'
@@ -64,10 +107,19 @@ Route::get('projects/listing', 'ProjectController@listing');
 Route::get('material-types/listing', 'MaterialTypeController@listing');
 Route::get('income-types/listing', 'IncomeTypeController@listing');
 Route::get('expense-types/listing', 'ExpenseTypeController@listing');
+Route::get('people/listing', 'PersonController@listing');
+Route::get('profiles/listing', 'ProfileController@listing');
+Route::get('actions/listing', 'ActionController@listing');
 
 Route::group(['middleware' => ['auth:api']], function () {//TODO Borre el midleware 'acl:api'
     Route::post('logout', 'Auth\AuthController@logout');
+
+    //User
     Route::get('users', 'UserController@index')->name('users.index');
+    Route::get('users/{id}', 'UserController@show');
+    Route::post('users', 'UserController@store')->name('users.create');
+    Route::put('users/{id}', 'UserController@update')->name('users.update');
+    Route::delete('users/{id}', 'UserController@destroy')->name('users.destroy');
 
     //Project-Types
     Route::get('project-types', 'ProjectTypeController@index')->name('project-types.index');
@@ -111,13 +163,13 @@ Route::group(['middleware' => ['auth:api']], function () {//TODO Borre el midlew
     Route::delete('income-types/{id}', 'IncomeTypeController@destroy')->name('income-types.destroy');
 
     //Income
-    Route::get('incomes', 'IncomeController@index')->name('income.index');
+    Route::get('incomes', 'IncomeController@index')->name('incomes.index');
     Route::get('incomes/amounts', 'IncomeController@amounts');
     Route::get('incomes/{id}', 'IncomeController@show');
     Route::get('incomes/{id}/detail', 'IncomeController@detail');
-    Route::post('incomes', 'IncomeController@store')->name('income.create');
-    Route::put('incomes/{id}', 'IncomeController@update')->name('income.update');
-    Route::delete('incomes/{id}', 'IncomeController@destroy')->name('income.destroy');
+    Route::post('incomes', 'IncomeController@store')->name('incomes.create');
+    Route::put('incomes/{id}', 'IncomeController@update')->name('incomes.update');
+    Route::delete('incomes/{id}', 'IncomeController@destroy')->name('incomes.destroy');
 
     //Expense-Types
     Route::get('expense-types', 'ExpenseTypeController@index')->name('expense-types.index');
@@ -127,12 +179,31 @@ Route::group(['middleware' => ['auth:api']], function () {//TODO Borre el midlew
     Route::delete('expense-types/{id}', 'ExpenseTypeController@destroy')->name('expense-types.destroy');
 
     //Expense
-    Route::get('expenses', 'ExpenseController@index')->name('expense.index');
+    Route::get('expenses', 'ExpenseController@index')->name('expenses.index');
     Route::get('expenses/amounts', 'ExpenseController@amounts');
     Route::get('expenses/{id}', 'ExpenseController@show');
     Route::get('expenses/{id}/detail', 'ExpenseController@detail');
-    Route::post('expenses', 'ExpenseController@store')->name('expense.create');
-    Route::put('expenses/{id}', 'ExpenseController@update')->name('expense.update');
-    Route::delete('expenses/{id}', 'ExpenseController@destroy')->name('expense.destroy');
+    Route::post('expenses', 'ExpenseController@store')->name('expenses.create');
+    Route::put('expenses/{id}', 'ExpenseController@update')->name('expenses.update');
+    Route::delete('expenses/{id}', 'ExpenseController@destroy')->name('expenses.destroy');
+
+    //People
+    Route::get('people', 'PersonController@index')->name('people.index');
+    Route::get('people/{id}', 'PersonController@show');
+    Route::get('search-person/{name}', 'PersonController@searchPerson');
+    Route::post('people', 'PersonController@store')->name('people.create');
+    Route::put('people/{id}', 'PersonController@update')->name('people.update');
+    Route::delete('people/{id}', 'PersonController@destroy')->name('people.destroy');
+
+    //Profiles
+    Route::get('profiles', 'ProfileController@index')->name('profiles.index');
+    Route::get('profiles/{id}', 'ProfileController@show');
+    Route::post('profiles', 'ProfileController@store')->name('profiles.create');
+    Route::put('profiles/{id}', 'ProfileController@update')->name('profiles.update');
+    Route::delete('profiles/{id}', 'ProfileController@destroy')->name('profiles.destroy');
 
 });
+
+//LEER
+// 1.- Validar que los proyectos no se puedan finalizar sin ningun evento de ingresos o egresos.
+// 2.- Validar que los proeyectos finalisados no aparescan para ser seleccionados.

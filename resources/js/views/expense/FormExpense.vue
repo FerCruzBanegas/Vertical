@@ -1,5 +1,5 @@
 <template>
-  <v-container fluid grid-list-xl>
+  <v-container fluid grid-list-md>
     <v-layout row wrap>
       <v-flex d-flex xs12 sm12 md12>
         <v-card v-show="success">
@@ -19,6 +19,11 @@
                           color="grey darken-2"
                           label="Título *"
                           v-model="expense.title"
+                          data-vv-name="expense.title"
+                          data-vv-as="título"
+                          v-validate="'required|min:3|max:60'"
+                          :error-messages="errors.collect('expense.title')"
+                          clearable
                         ></v-text-field>
                       </v-flex>
                       <v-flex xs12 sm12 md6 lg6>
@@ -28,6 +33,10 @@
                           :items="expense_types"
                           v-model="expense.expense_type_id"
                           label="Tipo de Egreso *"
+                          data-vv-name="expense.expense_type_id"
+                          data-vv-as="tipo de egreso"
+                          v-validate="'required'"
+                          :error-messages="errors.collect('expense.expense_type_id')"
                           item-text="name"
                           item-value="id"
                         ></v-autocomplete>
@@ -41,6 +50,10 @@
                           :items="projects"
                           v-model="expense.project_id"
                           label="Proyecto *"
+                          data-vv-name="expense.project_id"
+                          data-vv-as="proyecto"
+                          v-validate="'required'"
+                          :error-messages="errors.collect('expense.project_id')"
                           item-text="name"
                           item-value="id"
                         ></v-autocomplete>
@@ -52,6 +65,10 @@
                           :items="payment"
                           v-model="expense.payment"
                           label="Método de Pago *"
+                          data-vv-name="expense.payment"
+                          data-vv-as="pago"
+                          v-validate="'required'"
+                          :error-messages="errors.collect('expense.payment')"
                         ></v-autocomplete>
                       </v-flex>
                     </v-layout>
@@ -72,11 +89,15 @@
                               box
                               color="grey darken-2"
                               v-model="dateFormatted"
-                              label="Fecha de Egreso *"
+                              label="Fecha de Ingreso *"
                               hint="DD/MM/YYYY format"
                               prepend-icon="event"
                               readonly
                               v-on="on"
+                              data-vv-name="expense.date"
+                              data-vv-as="fecha"
+                              v-validate="'required'"
+                              :error-messages="errors.collect('expense.date')"
                             ></v-text-field>
                           </template>
                           <v-date-picker 
@@ -94,6 +115,11 @@
                           color="grey darken-2"
                           label="Nota"
                           v-model="expense.note"
+                          data-vv-name="expense.note"
+                          data-vv-as="nota"
+                          v-validate="'min:5|max:120'"
+                          :error-messages="errors.collect('expense.note')"
+                          clearable
                         ></v-text-field>
                       </v-flex>
                     </v-layout>
@@ -147,9 +173,11 @@
                           hide-no-data
                           hide-details
                           label="Buscar personas"
+                          item-text="name"
+                          return-object
                         >
                           <template v-slot:append-outer>
-                            <v-btn @click="" flat icon color="red darken-3">
+                            <v-btn @click="addPeople" flat icon color="red darken-3">
                               <v-icon>add_circle</v-icon>
                             </v-btn>
                           </template>
@@ -158,13 +186,28 @@
                     </v-layout>
                     <v-layout row wrap>
                       <v-flex xs12 sm12 md12 lg12>
-                        <table-material v-if="checkMaterial" :data="materials" @removeIt="remove"></table-material>
+                        <table-people v-if="checkPeople" :data="people" @removeIt="removePeople"></table-people>
+                      </v-flex>
+                    </v-layout>
+                    <v-layout row wrap>
+                      <v-flex xs12 sm12 md12 lg12>
+                        <table-material v-if="checkMaterial" :data="materials" @removeIt="removeMaterial"></table-material>
                       </v-flex>
                     </v-layout>
                     <v-layout row wrap>
                       <v-flex xs12 sm12 offset-md6 offset-lg6>
-                        <v-currency-field :disabled="checkMaterial" label="Monto *" v-bind="currency_config" :error-messages="errors.price" v-model="expense.amount" box color="grey darken-2" reverse>
-                        </v-currency-field>
+                        <v-currency-field 
+                          :disabled="checkMaterial"
+                          box 
+                          color="grey darken-2"
+                          label="Monto *" 
+                          v-bind="currency_config" 
+                          v-model="expense.amount"
+                          data-vv-name="expense.amount"
+                          data-vv-as="monto"
+                          v-validate="'required|max:9|decimal:2'"
+                          :error-messages="errors.collect('expense.amount')" 
+                        ></v-currency-field>
                         <v-btn @click="test">
                          show
                         </v-btn>
@@ -199,13 +242,19 @@
 
 <script>
   import TableMaterials from '../../components/Materials.vue'
+  import TablePeople from '../../components/People.vue'
   import Expense from '../../models/Expense'
   import ExpenseTypeService from '../../services/expense.type.service'
   import ExpenseService from '../../services/expense.service'
   import MaterialService from '../../services/material.service'
   import ProjectService from '../../services/project.service'
+  import PeopleService from '../../services/people.service'
 
   export default {
+    $_veeValidate: {
+      validator: 'new'
+    },
+
     name: 'form-expense',
     data() {
       return {
@@ -226,7 +275,6 @@
 
         success: false,
         loading: false,
-        errors: {},
         currency_config: {
           decimal: '.',
           thousands: ',',
@@ -250,7 +298,8 @@
     },
 
     components: {
-      'table-material' : TableMaterials
+      'table-material' : TableMaterials,
+      'table-people' : TablePeople
     },
 
     computed: {
@@ -263,11 +312,8 @@
     },
 
     watch: {
-      expense: {
-        handler (val) {
-          this.dateFormatted = this.formatDate(this.expense.date)
-        },
-        deep: true
+      'expense.date': function (newVal, oldVal){
+        this.dateFormatted = this.formatDate(this.expense.date)
       },
 
       materials: {
@@ -282,7 +328,11 @@
       },
 
       searchMaterial (val) {
-        val && val !== this.selectMaterial && this.querySelections(val)
+        val && val !== this.selectMaterial && this.queryMaterial(val)
+      },
+
+      searchPeople (val) {
+        val && val !== this.selectPeople && this.queryPeople(val)
       }
     },
 
@@ -302,9 +352,14 @@
         console.log(this.materials)
       },
 
-      remove(id){
+      removeMaterial(id){
         const index = this.materials.findIndex(x => x.id == id)
         if (index > -1) this.materials.splice(index, 1)
+      },
+
+      removePeople(id){
+        const index = this.people.findIndex(x => x.id == id)
+        if (index > -1) this.people.splice(index, 1)
       },
 
       cleanData() {
@@ -314,7 +369,7 @@
         }
       },
 
-      querySelections: async function(v) {
+      queryMaterial: async function(v) {
         this.comboMaterial = true
         const material = await MaterialService.getMaterials(`search-material/${v}`)
         if (material.status === 200) {
@@ -323,11 +378,28 @@
         }
       },
 
+      queryPeople: async function(v) {
+        this.comboPeople = true
+        const people = await PeopleService.getPeople(`search-person/${v}`)
+        if (people.status === 200) {
+          this.itemsPeople = people.data;
+          this.comboPeople = false
+        }
+      },
+
       addMaterial() {
         if (this.selectMaterial) {
           let obj = { id: this.selectMaterial.id, name: this.selectMaterial.name, quantity: 0, price: 0 }
           const flag = this.materials.some(item => item.id === obj.id)
           if (!flag) this.materials.push(obj)
+        }
+      },
+
+      addPeople() {
+        if (this.selectPeople) {
+          let obj = { id: this.selectPeople.id, name: this.selectPeople.name, surnames: this.selectPeople.surnames, phone: this.selectPeople.phone }
+          const flag = this.people.some(item => item.id === obj.id)
+          if (!flag) this.people.push(obj)
         }
       },
 
@@ -365,23 +437,28 @@
       },
 
       submit: async function() {
+        this.$validator.errors.clear();
         const vm = this
-        const data = {expense: vm.expense, materials: vm.materials}
-        // vm.loading = true
-        if(vm.id) {
-          vm._save = await ExpenseService.updateExpense(vm.id, data)
-        } else {
-          vm._save = await ExpenseService.storeExpense(data)
-        }
-        if (vm._save.status === 201 || vm._save.status === 200) {
-          console.log(vm._save.data)
-          // vm.$snotify.simple(vm._save.data.message, 'Felicidades')
-          // vm.loading = false
-          // if (vm.retry) {
-          //   vm.expense = new Expense()
-          // } else {
-          //   vm.$router.push('/expenses')
-          // }
+        const data = {expense: vm.expense, materials: vm.materials, people: vm.people}
+        vm.loading = true
+        try {
+          if(vm.id) {
+            vm._save = await ExpenseService.updateExpense(vm.id, data)
+          } else {
+            vm._save = await ExpenseService.storeExpense(data)
+          }
+          if (vm._save.status === 201 || vm._save.status === 200) {
+            vm.$snotify.simple(vm._save.data.message, 'Felicidades')
+            vm.loading = false
+            if (vm.retry) {
+              vm.expense = new Expense()
+            } else {
+              vm.$router.push('/expenses')
+            }
+          }
+        } catch (err) {
+          if(err.response.status === 422) this.$setErrorsFromResponse(err.response.data);
+          vm.loading = false
         }
       }
     }

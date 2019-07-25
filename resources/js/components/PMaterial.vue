@@ -14,7 +14,7 @@
         <template v-slot:items="props">
           <td>{{ props.item.name }}</td>
           <td>{{ props.item.quantity }}</td>
-          <td>{{ props.item.price }}</td>
+          <td>Bs. {{ props.item.price | currency }}</td>
         </template>
         <template slot="no-data">
           <center>Sin Datos</center>

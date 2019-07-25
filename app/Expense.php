@@ -34,4 +34,9 @@ class Expense extends ApiModel
     {
         return $this->belongsToMany(Material::class)->withPivot('quantity', 'price')->withTimestamps();
     }
+
+    public function people()
+    {
+        return $this->belongsToMany(Person::class)->withTimestamps();
+    }
 }

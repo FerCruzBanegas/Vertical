@@ -6,14 +6,19 @@ use Illuminate\Http\Resources\Json\ResourceCollection;
 
 class PersonCollection extends ResourceCollection
 {
-    /**
-     * Transform the resource collection into an array.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return array
-     */
     public function toArray($request)
     {
-        return parent::toArray($request);
+        return [
+            'data' => $this->collection->transform(function($person){
+                return [
+                    'id' => $person->id,
+                    'name' => $person->name,
+                    'surnames' => $person->surnames,
+                    'phone' => $person->phone,
+                    'address' => $person->address,
+                    'created' => (string) $person->created_at,
+                ];
+            }),
+        ];
     }
 }

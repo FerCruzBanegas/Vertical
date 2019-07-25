@@ -94,7 +94,7 @@
             <v-layout wrap>
               <v-flex xs12 sm12 md12 lg12>
                 <pivot-material v-if="expense.materials.length > 0" :materials="expense.materials"></pivot-material>
-                <pivot-people v-if="people.length > 0" :people="people"></pivot-people>
+                <pivot-people v-if="expense.people.length > 0" :people="expense.people"></pivot-people>
               </v-flex>
             </v-layout>
           </v-container>
@@ -114,7 +114,6 @@
     data () {
       return {
         expense: null,
-        people: [], //para probrar
         id: this.$route.params.id,
         items: [
           {

@@ -25,7 +25,7 @@ const ProjectTypeService = {
       const response = await ApiService.post('/project-types', data)
       return response
     } catch (error) {
-      console.log(error)
+      throw error
     }
   },
 
@@ -34,7 +34,7 @@ const ProjectTypeService = {
       const response = await ApiService.put(`project-types/${id}`, data)
       return response
     } catch (error) {
-      console.log(error)
+      throw error
     }
   },
 }
