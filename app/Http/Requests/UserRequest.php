@@ -6,25 +6,27 @@ use Illuminate\Foundation\Http\FormRequest;
 
 class UserRequest extends FormRequest
 {
-    /**
-     * Determine if the user is authorized to make this request.
-     *
-     * @return bool
-     */
     public function authorize()
     {
-        return false;
+        return true;
     }
 
-    /**
-     * Get the validation rules that apply to the request.
-     *
-     * @return array
-     */
     public function rules()
     {
-        return [
-            //
+        $rules = [
+            'name' => 'required|min:3|max:60|unique:users,name',
+            'email' => 'required|email|max:60|unique:users,email',
+            'password' => 'required|min:5',
+            'password_confirmation' => 'required|min:5|same:password',
+            'state' => 'required|integer',
+            'profile_id' => 'required|integer'
         ];
+
+        if($this->method() == 'PATCH' || $this->method() == 'PUT') {
+            $rules['name'] .= ',' . $this->id;
+            $rules['email'] .= ',' . $this->id;
+        }
+
+        return $rules;
     }
 }

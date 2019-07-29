@@ -5,7 +5,9 @@ namespace App\Http\Controllers;
 use App\User;
 use Illuminate\Http\Request;
 use App\Http\Requests\UserRequest;
+use App\Http\Requests\UserPasswordRequest;
 use App\Http\Resources\User\UserResource;
+use App\Http\Resources\User\UserDetailResource;
 use App\Http\Resources\User\UserCollection;
 
 class UserController extends ApiController
@@ -35,6 +37,12 @@ class UserController extends ApiController
     	return new UserCollection($users); 
     }
 
+    public function detail(Request $request, $id)
+    {
+        $user = $this->user->findOrFail($id);
+        return new UserDetailResource($user);
+    }
+
     public function show($id)
     {
         $user = $this->user->findOrFail($id);
@@ -51,11 +59,22 @@ class UserController extends ApiController
         return $this->respondCreated();
     }
 
-    public function update(Request $request, $id)
+    public function update(UserRequest $request, $id)
     {
         try {
             $user = $this->user->find($id);
             $user->update($request->all());
+        } catch (\Exception $e) {
+            return $this->respondInternalError();
+        }
+        return $this->respondUpdated();
+    }
+
+    public function password(UserPasswordRequest $request, $id)
+    {
+        try {
+            $user = $this->user->find($id);
+            $user->update(['password' => $request->password]);
         } catch (\Exception $e) {
             return $this->respondInternalError();
         }
@@ -71,30 +90,5 @@ class UserController extends ApiController
             return $this->respondInternalError();
         }
         return $this->respondDeleted();
-    }
-
-    public function password(Request $request, $id)
-    {
-        try {
-            $inputs = $request->all();
-            $query  = User::where('id', $id);
-            $user   = User::find($id);
-            if (Hash::check($inputs['pass'], $user->password)) {
-                if (isset($inputs['password'])) {
-                    $inputs['password'] = bcrypt($inputs['password']);
-                }
-                $query->update(['password' => $inputs['password']]);
-                return response()->json([
-                    'success' => true,
-                    'message' => message('MSG002'),
-                ]);
-            } else {
-                return response()->json([
-                    'success' => false,
-                ]);
-            }
-        } catch (\Exception $e) {
-            return response()->json(['message' => message('MSG010')], 500);
-        }
     }
 }

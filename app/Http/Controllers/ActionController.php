@@ -25,7 +25,8 @@ class ActionController extends ApiController
                         'id' => $t->id, 
                         'name' => $t->name
                     ];
-                })
+                }),
+                'flag' => false
             ];
         });
         return $this->respond($grouped);

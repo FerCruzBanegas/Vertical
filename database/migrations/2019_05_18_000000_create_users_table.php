@@ -7,21 +7,16 @@ use Illuminate\Support\Facades\DB;
 
 class CreateUsersTable extends Migration
 {
-    /**
-     * Run the migrations.
-     *
-     * @return void
-     */
     public function up()
     {
         Schema::create('users', function (Blueprint $table) {
             $table->increments('id');
-            $table->string('name');
+            $table->string('name', 64);
             $table->string('email', 128)->unique();
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
             $table->rememberToken();
-            $table->boolean('active');
+            $table->boolean('state');
             $table->integer('profile_id')->unsigned();
             $table->integer('people_id')->unsigned();
             $table->softDeletes();
@@ -36,11 +31,6 @@ class CreateUsersTable extends Migration
         DB::statement('ALTER TABLE users ADD FULLTEXT idx_full_text (name, email)');
     }
 
-    /**
-     * Reverse the migrations.
-     *
-     * @return void
-     */
     public function down()
     {
         Schema::dropIfExists('users');

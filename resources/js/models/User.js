@@ -1,10 +1,11 @@
 export default class User {
-    constructor(name = '', email = '', pass = '', password = '', password_confirmation ="" , profile_id = '', active='') {
+    constructor(name = '', email = '', password_current, password = '', password_confirmation ="" , state = '', profile_id='') {
         this.name = name;
         this.email = email;
-        this.pass = pass;
+        this.password_current = password_current;
         this.password = password;
+        this.password_confirmation = password_confirmation;
+        this.state = state;
         this.profile_id = profile_id;
-        this.active = active;
     }
 }

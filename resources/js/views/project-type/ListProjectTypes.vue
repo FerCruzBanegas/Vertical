@@ -1,17 +1,17 @@
 <template>
   <v-container fluid grid-list-md>
     <v-layout row wrap>
-      <v-flex d-flex xs12 sm12 md12>
+      <v-flex xs12 sm12 md12 lg12 xl12>
         <modal-delete :message="message" :loading="loading" :remove="remove" @hide="remove = !remove" @deleted="deleted"></modal-delete>
         <modal-loader :loader="loader"></modal-loader>
         <modal-type :modal="modal" @hide="modal = !modal" :data="project_type"></modal-type>
-        <v-card>
+        <v-card flat>
           <v-card-title primary-title>
             <h3 class="headline mb-0">Lista Tipos de Proyecto</h3>
           </v-card-title>
           <v-container fluid>
             <v-layout>
-              <v-flex xs12 sm12 md12 lg12>
+              <v-flex xs12 sm12 md12 lg12 xl12>
                 <v-card>
                   <v-card-title>
                     <v-btn
@@ -120,11 +120,11 @@
         modal: false,
         project_type: null,
         headers: [
-          { text: '', align: 'left', sortable: false},
+          { text: '', align: 'left', sortable: false, width: "50" },
           { text: 'Nombre', value: 'nombre', width: "200" },
           { text: 'Descripción', value: 'descripcion', width: "400" },
-          { text: 'Proyectos', sortable: false, value: 'proyectos' },
-          { text: 'Registrado', value: 'registrado' },
+          { text: 'Proyectos', sortable: false, value: 'proyectos', width: "50" },
+          { text: 'Registrado', value: 'registrado', width: "50" },
           { text: 'Acciones', sortable: false, value: 'acciones', width: "150" }
         ],
         items: [],

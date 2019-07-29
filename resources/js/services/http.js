@@ -31,35 +31,35 @@ instance.interceptors.request.use((config) => {
   return Promise.reject(error)
 })
 
-instance.interceptors.response.use(
-  (response) => {
-    return response
-  },
-  async (error) => {
-	if (error.request.status == 401) {
-	  if (error.config.url.includes('/login')) {
-	    // El token de actualización ha fallado. Cerrar sesión del usuario
-	    store.dispatch('logout')
-	    throw error
-	  } else {
-	    // Actualizar el token de acceso
-	    try{
-	      await store.dispatch('refreshToken')
-	      // Vuelva a intentar la solicitud original
-	      return instance({
-            method: error.config.method,
-            url: error.config.url,
-            data: error.config.data
-	      })
-	    } catch (e) {
-	      // La actualización ha fallado - rechace la solicitud original
-	      throw error
-	    }
-	  }
-	}
-	// Si el error no fue 401 solo rechazar como está
-	throw error
-})
+// instance.interceptors.response.use(
+//   (response) => {
+//     return response
+//   },
+//   async (error) => {
+// 	if (error.request.status == 401) {
+// 	  if (error.config.url.includes('/login')) {
+// 	    // El token de actualización ha fallado. Cerrar sesión del usuario
+// 	    store.dispatch('logout')
+// 	    throw error
+// 	  } else {
+// 	    // Actualizar el token de acceso
+// 	    try{
+// 	      await store.dispatch('refreshToken')
+// 	      // Vuelva a intentar la solicitud original
+// 	      return instance({
+//             method: error.config.method,
+//             url: error.config.url,
+//             data: error.config.data
+// 	      })
+// 	    } catch (e) {
+// 	      // La actualización ha fallado - rechace la solicitud original
+// 	      throw error
+// 	    }
+// 	  }
+// 	}
+// 	// Si el error no fue 401 solo rechazar como está
+// 	throw error
+// })
 
 // // response parse
 // instance.interceptors.response.use((response) => {

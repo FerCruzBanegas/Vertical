@@ -37,6 +37,7 @@ import FormProfile from '../views/profile/FormProfile.vue'
 //user
 import ListUsers from '../views/user/ListUsers.vue'
 import FormUser from '../views/user/FormUser.vue'
+import Password from '../views/user/Password.vue'
 
 export default [
   {
@@ -338,6 +339,11 @@ export default [
             path: ':id/edit',
             name: 'EditUser',
             component: FormUser
+          },
+          {
+            path: ':id/password',
+            name: 'Password',
+            component: Password
           }
         ]
       },

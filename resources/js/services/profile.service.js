@@ -25,7 +25,7 @@ const ProfileService = {
       const response = await ApiService.post('/profiles', data)
       return response
     } catch (error) {
-      console.log(error)
+      throw error
     }
   },
 
@@ -34,7 +34,7 @@ const ProfileService = {
       const response = await ApiService.put(`profiles/${id}`, data)
       return response
     } catch (error) {
-      console.log(error)
+      throw error
     }
   },
 }

@@ -117,9 +117,11 @@ Route::group(['middleware' => ['auth:api']], function () {//TODO Borre el midlew
     //User
     Route::get('users', 'UserController@index')->name('users.index');
     Route::get('users/{id}', 'UserController@show');
+    Route::get('users/{id}/detail', 'UserController@detail');
     Route::post('users', 'UserController@store')->name('users.create');
     Route::put('users/{id}', 'UserController@update')->name('users.update');
     Route::delete('users/{id}', 'UserController@destroy')->name('users.destroy');
+    Route::put('users/{id}/password', 'UserController@password')->name('users.update');
 
     //Project-Types
     Route::get('project-types', 'ProjectTypeController@index')->name('project-types.index');
@@ -201,7 +203,6 @@ Route::group(['middleware' => ['auth:api']], function () {//TODO Borre el midlew
     Route::post('profiles', 'ProfileController@store')->name('profiles.create');
     Route::put('profiles/{id}', 'ProfileController@update')->name('profiles.update');
     Route::delete('profiles/{id}', 'ProfileController@destroy')->name('profiles.destroy');
-
 });
 
 //LEER

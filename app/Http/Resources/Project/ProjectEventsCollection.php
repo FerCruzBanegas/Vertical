@@ -10,18 +10,12 @@ class ProjectEventsCollection extends ResourceCollection
 
     public function __construct($collection, $totals)
     {
-        // Ensure you call the parent constructor
         parent::__construct($collection);
         $this->collection = $collection;
         
         $this->totals = $totals;
     }
-    /**
-     * Transform the resource collection into an array.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return array
-     */
+
     public function toArray($request)
     {
         return [

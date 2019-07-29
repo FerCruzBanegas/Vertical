@@ -1,15 +1,15 @@
 <template>
   <v-container fluid grid-list-md>
-    <v-layout>
-      <v-flex d-flex xs12 sm12 md12>
-        <v-card>
+    <v-layout row wrap>
+      <v-flex xs12 sm12 md12 lg12 xl12>
+        <v-card flat>
           <modal-delete :message="message" :loading="loading" :remove="remove" @hide="remove = !remove" @deleted="deleted"></modal-delete>
           <v-card-title primary-title>
             <h3 class="headline mb-0">Perfiles</h3>
           </v-card-title>
           <v-container fluid>
             <v-layout>
-              <v-flex xs12 sm12 md12 lg12>
+              <v-flex xs12 sm12 md12 lg12 xl12>
                 <v-card>
                   <v-card-title>
                     <v-btn 
@@ -105,10 +105,10 @@
         remove: false,
         loading: false,
         headers: [
-          { text: 'Descripción', value: 'descripcion' },
-          { text: 'Registrado', value: 'registrado' },
-          { text: 'Actualizado', value: 'actualizado' },
-          { text: 'Acciones', value: 'acciones' }
+          { text: 'Descripción', value: 'descripcion', width: "150" },
+          { text: 'Registrado', value: 'registrado', sortable: false, width: "75" },
+          { text: 'Actualizado', value: 'actualizado', sortable: false, width: "75" },
+          { text: 'Acciones', value: 'acciones', sortable: false, width: "75" }
         ],
         items: [],
         totalItems: 0,

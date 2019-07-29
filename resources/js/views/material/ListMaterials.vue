@@ -1,8 +1,8 @@
 <template>
   <v-container fluid grid-list-md>
-    <v-layout>
-      <v-flex xs12 sm12 md12 xl12>
-        <v-card>
+    <v-layout row wrap>
+      <v-flex xs12 sm12 md12 lg12 xl12>
+        <v-card flat>
           <modal-delete :message="message" :loading="loading" :remove="remove" @hide="remove = !remove" @deleted="deleted"></modal-delete>
           <modal-loader :loader="loader"></modal-loader>
           <modal-material :modal="modal" @hide="modal = !modal" :data="material"></modal-material>
@@ -11,7 +11,7 @@
           </v-card-title>
           <v-container fluid>
             <v-layout>
-              <v-flex xs12 sm12 md12 lg12>
+              <v-flex xs12 sm12 md12 lg12 xl12>
                 <v-card>
                   <v-card-title>
                     <v-btn
@@ -115,11 +115,11 @@
         modal: false,
         material: null,
         headers: [
-          { text: '', align: 'left', sortable: false},
-          { text: 'Nombre', value: 'nombre', width: "200" },
-          { text: 'Tipo de Material', value: 'tipo', width: "400" },
-          { text: 'Unidad', sortable: false, value: 'unidad' },
-          { text: 'Registrado', value: 'registrado' },
+          { text: '', align: 'left', sortable: false, width: "50" },
+          { text: 'Nombre', value: 'nombre', width: "250" },
+          { text: 'Tipo de Material', value: 'tipo', width: "200" },
+          { text: 'Unidad', sortable: false, value: 'unidad', width: "70" },
+          { text: 'Registrado', value: 'registrado', width: "100" },
           { text: 'Acciones', sortable: false, value: 'acciones', width: "150" }
         ],
         items: [],

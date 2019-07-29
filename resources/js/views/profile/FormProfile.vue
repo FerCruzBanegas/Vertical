@@ -16,6 +16,11 @@
                       color="grey darken-2"
                       label="Descripción *"
                       v-model="profile.description"
+                      data-vv-name="description"
+                      data-vv-as="descripción"
+                      v-validate="'min:3|max:60'"
+                      :error-messages="errors.collect('description')"
+                      clearable
                     ></v-text-field>
                   </v-flex>
                 </v-layout>
@@ -33,9 +38,18 @@
                     <small>Por favor, seleccione uno o más permisos a los que tendrá acceso este perfil.</small>
                     <v-layout row wrap v-for="(action,index) in actions" :key="index">
                       <v-flex xs12 sm12 md12 lg12>
-                        <v-toolbar color="grey darken-2" dark dense>
+                        <v-toolbar color="grey darken-1" dark dense>
                           <v-toolbar-title>{{ action.title.title }}</v-toolbar-title>
                           <v-spacer></v-spacer>
+                          <v-flex shrink>
+                            <v-checkbox
+                              v-model="action.flag"
+                              color="red darken-3"
+                              hide-details
+                              @change="toggleAll(action)"
+                              :indeterminate="action.flag"
+                            ></v-checkbox>
+                          </v-flex>
                         </v-toolbar>
                         <v-card>
                           <v-container>
@@ -86,6 +100,10 @@
   import ActionsService from '../../services/action.service'
 
   export default {
+    $_veeValidate: {
+      validator: 'new'
+    },
+
     name: 'form-profile',
     data () {
       return {
@@ -117,6 +135,22 @@
     },
 
     methods: {
+      toggleAll(item) {
+        const values = item.permissions.map(i => i.id)
+        if (item.flag) {
+          values.forEach( element => {
+            if (!this.profile.action_list.includes(element)) {
+              this.profile.action_list.push(element)
+            }
+          });
+        } else {
+          values.forEach( element => {
+            const index = this.profile.action_list.findIndex(x => x == element)
+            if (index > -1) this.profile.action_list.splice(index, 1)
+          });
+        }
+      },
+
       listActions: async function() {
         const actions = await ActionsService.getActions('actions/listing')
         if (actions.status === 200) {
@@ -133,21 +167,27 @@
       },
 
       submit: async function() {
+        this.$validator.errors.clear();
         const vm = this
         vm.loading = true
-        if(vm.id) {
-          vm._save = await ProfileService.updateProfile(vm.id, vm.profile)
-        } else {
-          vm._save = await ProfileService.storeProfile(vm.profile)
-        }
-        if (vm._save.status === 201 || vm._save.status === 200) {
-          vm.$snotify.simple(vm._save.data.message, 'Felicidades')
-          vm.loading = false
-          if (vm.retry) {
-            vm.profile = new Profile()
+        try {
+          if(vm.id) {
+            vm._save = await ProfileService.updateProfile(vm.id, vm.profile)
           } else {
-            vm.$router.push('/profiles')
+            vm._save = await ProfileService.storeProfile(vm.profile)
           }
+          if (vm._save.status === 201 || vm._save.status === 200) {
+            vm.$snotify.simple(vm._save.data.message, 'Felicidades')
+            vm.loading = false
+            if (vm.retry) {
+              vm.profile = new Profile()
+            } else {
+              vm.$router.push('/profiles')
+            }
+          }
+        } catch (err) {
+          this.$setErrorsFromResponse(err.response.data);
+          vm.loading = false
         }
       }
     }

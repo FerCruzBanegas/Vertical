@@ -1,17 +1,17 @@
 <template>
   <v-container fluid grid-list-md>
-    <v-layout>
-      <v-flex xs12 sm12 md12 xl12>
-        <v-card>
-          <modal-delete :message="message" :loading="loading" :remove="remove" @hide="remove = !remove" @deleted="deleted"></modal-delete>
-          <modal-loader :loader="loader"></modal-loader>
-          <modal-people :modal="modal" @hide="modal = !modal" :data="people"></modal-people>
+    <v-layout row wrap>
+      <v-flex xs12 sm12 md12 lg12 xl12>
+        <modal-delete :message="message" :loading="loading" :remove="remove" @hide="remove = !remove" @deleted="deleted"></modal-delete>
+        <modal-loader :loader="loader"></modal-loader>
+        <modal-people :modal="modal" @hide="modal = !modal" :data="people"></modal-people>
+        <v-card flat>
           <v-card-title primary-title>
             <h3 class="headline mb-0">Lista de Personas</h3>
           </v-card-title>
           <v-container fluid>
             <v-layout>
-              <v-flex xs12 sm12 md12 lg12>
+              <v-flex xs12 sm12 md12 lg12 xl12>
                 <v-card>
                   <v-card-title>
                     <v-btn
@@ -115,10 +115,10 @@
         modal: false,
         people: null,
         headers: [
-          { text: '', align: 'left', sortable: false},
+          { text: '', align: 'left', sortable: false, width: "50" },
           { text: 'Nombre', value: 'nombre', width: "200" },
           { text: 'Apellidos', value: 'apellidos', width: "300" },
-          { text: 'Teléfono', sortable: false, value: 'telefono' },
+          { text: 'Teléfono', sortable: false, value: 'telefono', width: "50" },
           { text: 'Dirección', value: 'direccion', width: "300" },
           { text: 'Acciones', sortable: false, value: 'acciones', width: "150" }
         ],

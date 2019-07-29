@@ -10,11 +10,11 @@
     </v-btn>
     
     <v-spacer></v-spacer>
-    <v-toolbar-title class="white--text"></v-toolbar-title>
+    <v-toolbar-title class="white--text" v-if="currentUser" v-text="currentUser.name"></v-toolbar-title>
     <v-menu offset-y>
       <v-btn dark icon slot="activator"><v-icon>menu</v-icon></v-btn>
       <v-list>
-        <v-list-tile @click="">
+        <v-list-tile @click="logout">
           <v-list-tile-action>
             <v-icon>exit_to_app</v-icon>
           </v-list-tile-action>
@@ -30,6 +30,8 @@
 </template>
 
 <script>
+  import { mapGetters } from 'vuex'
+
   export default {
     name: 'apptoolbar',
 
@@ -44,7 +46,7 @@
       }
     },
 
-    data () {
+    data() {
       return {
         clipped: false,
         loader: false,
@@ -55,7 +57,19 @@
       }
     },
 
+    computed: {
+      ...mapGetters([
+        'currentUser',
+        'authenticated'
+      ])
+    },
+
     methods: {
+      async logout() {
+        const response = await this.$store.dispatch('logout')
+        if (response) this.$router.push({ name: 'login' })
+      },
+
       toggleDrawer () {
         this.$emit('toggleDrawer')
       },

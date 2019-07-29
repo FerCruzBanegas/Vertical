@@ -144,6 +144,7 @@ return [
         'subject'               => 'asunto',
         'message'               => 'mensaje',
         //added
+        'profile_id'            => 'perfil',
         'project_id'            => 'proyecto',
         'project_type_id'       => 'tipo de proyecto',
         'material_type_id'      => 'tipo de material',
@@ -158,5 +159,7 @@ return [
         'payment'               => 'pago',
         'note'                  => 'nota',
         'amount'                => 'monto',
+        'state'                 => 'estado',
+        'password_current'      => 'contraseña actual',
     ],
 ];

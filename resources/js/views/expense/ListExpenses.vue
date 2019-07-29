@@ -1,8 +1,8 @@
 <template>
   <v-container fluid grid-list-md>
     <info-events v-if="infoExpense" :data="infoExpense" :icon="'trending_down'"></info-events>
-    <v-layout>
-      <v-flex xs12 sm12 md12 lg12>
+    <v-layout row wrap>
+      <v-flex xs12 sm12 md12 lg12 xl12>
         <v-card flat>
           <modal-delete :message="message" :loading="loading" :remove="remove" @hide="remove = !remove" @deleted="deleted"></modal-delete>
           <v-card-title primary-title>
@@ -10,7 +10,7 @@
           </v-card-title>
           <v-container fluid>
             <v-layout>
-              <v-flex xs12 sm12 md12 lg12>
+              <v-flex xs12 sm12 md12 lg12 xl12>
                 <v-card>
                   <v-card-title>
                     <v-container fluid>
@@ -125,11 +125,11 @@
         loading: false,
         infoExpense: null,
         headers: [
-          { text: '', align: 'left', sortable: false },
+          { text: '', align: 'left', sortable: false, width: "50" },
           { text: 'Título', value: 'titulo', width: "250" },
-          { text: 'Fecha Egreso', value: 'fecha egreso' },
-          { text: 'Monto', sortable: false, value: 'monto', width: "150" },
-          { text: 'Proyecto', sortable: false, value: 'proyecto' },
+          { text: 'Fecha Egreso', value: 'fecha egreso', width: "60" },
+          { text: 'Monto', sortable: false, value: 'monto', width: "130" },
+          { text: 'Proyecto', sortable: false, value: 'proyecto', width: "190" },
           { text: 'Acciones', sortable: false, value: 'acciones', width: "150" }
         ],
         items: [],

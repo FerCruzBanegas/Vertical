@@ -26,8 +26,11 @@
     },
     methods: {
       async getUsers () {
-        const users = await UserService.getUsers()
-        console.log(users)
+        try {
+            throw new Error("Whoops!");
+        } catch (e) {
+            console.log(e.name + ": " + e.message);
+        }
       }
     }
   }

@@ -17,57 +17,32 @@ class AuthController extends Controller
             ->where('password_client', true)
             ->first();
 
+
+        $user = User::where('email', '=', request('username'))
+        ->orWhere('name', request('username'))
+        ->first();
+
+        if (!$user) {
+            return response()->json([
+                'message' => message('MSG006'),
+                'status'  => 422,
+            ], 422);
+        }
+
+        if (!Hash::check(request('password'), $user->password)) {
+            return response()->json([
+                'message' => message('MSG006'),
+                'status'  => 422,
+            ], 422);
+        }
+
         $data = [
-            'client_id'     => $client->id,
+            'grant_type' => 'password',
+            'client_id' => $client->id,
             'client_secret' => $client->secret,
+            'username' => request('username'),
+            'password' => request('password'),
         ];
-
-        if (request('refresh_token')) {
-            $data['grant_type'] = 'refresh_token';
-            $data['refresh_token'] = request('refresh_token');
-
-        } else {
-            $user = User::where('email', '=', request('username'))
-            ->orWhere('name', request('username'))
-            ->first();
-
-            if (!$user) {
-                return response()->json([
-                    'message' => '1',
-                    'status'  => 422,
-                ], 422);
-            }
-
-            if ($user->state === 0) {
-                return response()->json([
-                    'message' => message('MSG007'),
-                    'status'  => 422,
-                ], 422);
-            }
-
-            if (!Hash::check(request('password'), $user->password)) {
-                return response()->json([
-                    'message' => '2',
-                    'status'  => 422,
-                ], 422);
-            }
-
-            $data['grant_type'] = 'password';
-            $data['username'] = $user->email;
-            $data['password'] = request('password');
-
-            foreach ($user->profile->actions as $action) {
-                if (strpos($action->method, '|') !== false) {
-                    $pipe      = explode('|', $action->method);
-                    $actions[] = $pipe[0];
-                    $actions[] = $pipe[1];
-                } else {
-                    $actions[] = $action->method;
-                }
-            }
-
-            Cache::add('actions_' . $user->id, $actions, 120);
-        }     
 
         $request = Request::create('/oauth/token', 'POST', $data);
 
@@ -83,26 +58,31 @@ class AuthController extends Controller
 
         $data = json_decode($response->getContent());
 
-        $user = User::where('email', '=', 'nano.fer777@gmail.com')
-            ->first();
-
         foreach ($user->profile->actions as $action) {
-                if (strpos($action->method, '|') !== false) {
-                    $pipe      = explode('|', $action->method);
-                    $actions[] = $pipe[0];
-                    $actions[] = $pipe[1];
-                } else {
-                    $actions[] = $action->method;
-                }
+            if (strpos($action->method, '|') !== false) {
+                $pipe      = explode('|', $action->method);
+                $actions[] = $pipe[0];
+                $actions[] = $pipe[1];
+            } else {
+                $actions[] = $action->method;
             }
+        }
 
-            Cache::add('actions_' . $user->id, $actions, 120);
+        $auth = [
+            'id' => $user->id,
+            'perfil_id' => $user->profile_id,
+            'email' => $user->email,
+            'acl' => $actions
+        ];
 
+        Cache::add('actions_' . $user->id, $actions, now()->addHours(1));
 
         return response()->json([
             'access_token'  => $data->access_token,
             'refresh_token' => $data->refresh_token,
-        ], 200);
+            'user' => $auth,
+            'status' => 200
+        ]);
     }
 
     public function logout()
