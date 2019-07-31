@@ -5,13 +5,14 @@ namespace App\Http\Controllers\Auth;
 use App\Http\Controllers\Controller;
 use App\User;
 use Illuminate\Http\Request;
+use App\Http\Requests\LoginRequest;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 
 class AuthController extends Controller
 {
-    public function login()
+    public function login(LoginRequest $request)
     {
         $client = DB::table('oauth_clients')
             ->where('password_client', true)
@@ -25,14 +26,18 @@ class AuthController extends Controller
         if (!$user) {
             return response()->json([
                 'message' => message('MSG006'),
-                'status'  => 422,
+            ], 422);
+        }
+
+        if ($user->state === 0) {
+            return response()->json([
+                'message' => message('MSG007'),
             ], 422);
         }
 
         if (!Hash::check(request('password'), $user->password)) {
             return response()->json([
                 'message' => message('MSG006'),
-                'status'  => 422,
             ], 422);
         }
 
@@ -50,9 +55,7 @@ class AuthController extends Controller
 
         if ($response->getStatusCode() != 200) {
             return response()->json([
-                'message' => '3',
-                'status'  => 422,
-                'data' => $data
+                'message' => message('MSG006'),
             ], 422);
         }
 
@@ -70,12 +73,13 @@ class AuthController extends Controller
 
         $auth = [
             'id' => $user->id,
+            'name' => $user->name,
             'perfil_id' => $user->profile_id,
             'email' => $user->email,
             'acl' => $actions
         ];
 
-        Cache::add('actions_' . $user->id, $actions, now()->addHours(1));
+        Cache::add('actions_' . $user->id, $actions);
 
         return response()->json([
             'access_token'  => $data->access_token,

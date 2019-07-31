@@ -1,5 +1,5 @@
 <?php
-
+use Carbon\Carbon;
 //use Illuminate\Http\Request;
 
 /*
@@ -57,8 +57,8 @@ Route::get('/test', function() {
                 'permissions' => $item
             ];
         });
-        
-        return response()->json($grouped);
+        $expiresAt = Carbon::now()->addMinutes(10);
+        return response()->json($expiresAt);
 
     // $expenses = \App\Expense::with([
     //     'expense_type',
@@ -111,7 +111,7 @@ Route::get('people/listing', 'PersonController@listing');
 Route::get('profiles/listing', 'ProfileController@listing');
 Route::get('actions/listing', 'ActionController@listing');
 
-Route::group(['middleware' => ['auth:api']], function () {//TODO Borre el midleware 'acl:api'
+Route::group(['middleware' => ['auth:api', 'acl:api']], function () {
     Route::post('logout', 'Auth\AuthController@logout');
 
     //User

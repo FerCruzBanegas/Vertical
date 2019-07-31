@@ -44,18 +44,22 @@ const mutations = {
 
 const actions = {
   async login({ commit }, data) {
-    commit('loginRequest');
-
+    // commit('loginRequest');
     try {
       const res = await UserService.login(data);
-      commit('loginSuccess', res)
-      return true
-    } catch (e) {
-      if (e instanceof AuthenticationError) {
-        commit('loginError', {errorCode: e.errorCode, errorMessage: e.message})
+      if (res.status === 200) {
+        commit('loginSuccess', res)
+        return true
       }
-      return false
-    }
+    } catch (e) { throw e }
+  },
+
+  async cleanSession ({ commit }) {
+    try {
+      commit('logoutSuccess')
+      TokenService.removeToken()
+      TokenService.removeRefreshToken()
+    } catch (e) { }
   },
 
   async logout ({ commit }) {

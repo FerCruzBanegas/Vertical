@@ -55,7 +55,6 @@
                   color="grey darken-2"
                   label="Confirmación de contraseña *"
                   target= "password"
-                  name="password"
                   v-model="user.password_confirmation"
                   prepend-icon="lock"
                   :append-icon="isPasswordVisible2 ? 'visibility' : 'visibility_off'"
@@ -105,8 +104,19 @@
         isPassVisible: false,
         isPasswordVisible: false,
         isPasswordVisible2: false,
+        dictionary: {
+          custom: {
+            password_confirmation: {
+              confirmed: 'confirmación de la contraseña y contraseña deben coincidir.'
+            }
+          }
+        }
       }
     },
+
+    mounted () {
+      this.$validator.localize('es', this.dictionary)
+    }, 
 
     methods: {
       submit: async function() {

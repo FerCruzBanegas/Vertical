@@ -105,7 +105,6 @@
                                 color="grey darken-2"
                                 label="Confirmación de contraseña *"
                                 target= "password"
-                                name="password"
                                 v-model="user.password_confirmation"
                                 prepend-icon="lock"
                                 :append-icon="isPasswordVisible2 ? 'visibility' : 'visibility_off'"
@@ -208,7 +207,7 @@
     }, 
 
     mounted () {
-      this.$validator.localize(this.dictionary)
+      this.$validator.localize('es', this.dictionary)
     }, 
 
     methods: {

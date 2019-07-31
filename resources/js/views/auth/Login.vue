@@ -19,25 +19,33 @@
               >
                 {{ message }}
               </v-alert>
-              <v-form ref="form" lazy-validation>
-                <v-text-field 
+              <v-form ref="form">
+                <v-text-field
+                  color="grey darken-2"
                   label="Usuario / Correo Electrónico"
                   prepend-icon="person" 
                   name="username"  
-                  type="text"
-                  :rules="nameRules"
                   v-model="form.username"
+                  data-vv-name="username"
+                  data-vv-as="usuario"
+                  v-validate="'required'"
+                  :error-messages="errors.collect('username')"
+                  clearable
                 ></v-text-field>
                 <v-text-field 
+                  color="grey darken-2"
                   label="Contraseña" 
                   prepend-icon="lock" 
                   name="password" 
-                  :counter="30"
                   :append-icon="visible ? 'visibility' : 'visibility_off'"
                   @click:append="visible = !visible"
                   :type="visible ? 'password' : 'text'"
-                  :rules="passwordRules"
                   v-model="form.password"
+                  data-vv-name="password"
+                  data-vv-as="contraseña"
+                  v-validate="'required'"
+                  :error-messages="errors.collect('password')"
+                  clearable
                 ></v-text-field>
                 <v-checkbox
                   label="Recuérdame"
@@ -46,9 +54,9 @@
                   v-model="remember"
                   value="true"
                 ></v-checkbox>
-                <v-btn block large color="error" @click="loginSubmit" :disabled="!busy">
-                  <div v-show="busy"><v-icon>input</v-icon> INGRESAR</div>
-                  <v-progress-circular v-show="!busy" indeterminate :width="5"></v-progress-circular> 
+                <v-btn block large color="error" @click="loginSubmit" :disabled="busy">
+                  <div v-show="!busy"><v-icon>input</v-icon> INGRESAR</div>
+                  <v-progress-circular v-show="busy" indeterminate :width="5"></v-progress-circular>
                 </v-btn>
               </v-form>
             </v-card-text>
@@ -61,6 +69,10 @@
 
 <script>
   export default {
+    $_veeValidate: {
+      validator: 'new'
+    },
+
     name: 'Login',
     data () {
       return {
@@ -70,24 +82,26 @@
         },
         visible: true,
         remember: false,
-        busy: true,
+        busy: false,
         alert: false,
-        nameRules: [
-          (v) => !!v || 'El usuario es requerido',
-          (v) => v && v.length <= 50 || 'usuario debe tener menos de 10 caracteres'
-        ],
-        passwordRules: [
-          (v) => !!v || 'La contraseña es requerida',
-          (v) => v && v.length <= 30 || 'contraseña debe tener menos de 30 caracteres'
-        ],
         message: ''
       }
     },
     methods: {
       async loginSubmit () {
-        const auth = await this.$store.dispatch('login', this.form)
-        if (auth) {
-          this.$router.push({ name: 'home' })
+        this.$validator.errors.clear();
+        this.alert = false
+        this.busy = true
+        try {
+          const auth = await this.$store.dispatch('login', this.form)
+          if (auth) {
+            this.$router.push({ name: 'home' })
+          }
+        } catch (err) {
+          this.alert = true
+          this.message = err.response.data.message
+          this.$setErrorsFromResponse(err.response.data);
+          this.busy = false
         }
       }
     }
