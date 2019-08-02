@@ -26,10 +26,9 @@
     },
     methods: {
       async getUsers () {
-        try {
-            throw new Error("Whoops!");
-        } catch (e) {
-            console.log(e.name + ": " + e.message);
+        const response = await UserService.getUsers(`test`)
+        if (response.status === 200) {
+          console.log(response)
         }
       }
     }

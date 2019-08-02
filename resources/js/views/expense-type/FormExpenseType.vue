@@ -111,7 +111,7 @@
 
     methods: {
       showExpenseType:async function() {
-        const response = await ExpenseTypeService.getExpenseTypes(`expense-types/${this.id}`)
+        const response = await ExpenseTypeService.getExpenseTypes(`expense-types/${this.id}/edit`)
         if (response.status === 200) {
           this.expense_type = response.data.data
           this.success = true

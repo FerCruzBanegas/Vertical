@@ -1,6 +1,6 @@
 <template>
   <v-app light>
-  	<vue-snotify/>
+    <vue-snotify/>
     <router-view></router-view>
     <feedback-message></feedback-message>
   </v-app>

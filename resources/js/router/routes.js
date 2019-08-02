@@ -39,10 +39,13 @@ import ListUsers from '../views/user/ListUsers.vue'
 import FormUser from '../views/user/FormUser.vue'
 import Password from '../views/user/Password.vue'
 
+import NotFoundComponent  from '../components/404.vue'
+import DeniedComponent  from '../components/403.vue'
+
 export default [
   {
     path: '/',
-    name: 'home',
+    name: 'Home',
     component: Layout,
     redirect: '/dashboard',
     meta: { requiresAuth: true },
@@ -50,7 +53,7 @@ export default [
       {
         path: '/dashboard',
         name: 'Dashboard',
-        component: Dashboard
+        component: Dashboard,
       },
       {
         path: '/project-types',
@@ -63,17 +66,26 @@ export default [
           {
             path: '',
             name: 'ListProjectTypes',
-            component: ListProjectTypes
+            component: ListProjectTypes,
+            meta: {
+              AccessControlList: 'project-types.index',
+            }
           },
           {
             path: 'create',
             name: 'CreateProjectType',
-            component: FormProjectType
+            component: FormProjectType,
+            meta: {
+              AccessControlList: 'project-types.create',
+            }
           },
           {
             path: ':id/edit',
             name: 'EditProjectType',
-            component: FormProjectType
+            component: FormProjectType,
+            meta: {
+              AccessControlList: 'project-types.update',
+            }
           }
         ]
       },
@@ -88,22 +100,34 @@ export default [
           {
             path: '',
             name: 'ListProjects',
-            component: ListProjects
+            component: ListProjects,
+            meta: {
+              AccessControlList: 'projects.index',
+            }
           },
           {
             path: 'create',
             name: 'CreateProject',
-            component: FormProject
+            component: FormProject,
+            meta: {
+              AccessControlList: 'projects.create',
+            }
           },
           {
             path: ':id/edit',
             name: 'EditProject',
-            component: FormProject
+            component: FormProject,
+            meta: {
+              AccessControlList: 'projects.update',
+            }
           },
           {
             path: ':id/show',
             name: 'ShowProject',
-            component: ShowProject
+            component: ShowProject,
+            meta: {
+              AccessControlList: 'projects.show',
+            }
           }
         ]
       },
@@ -118,17 +142,26 @@ export default [
           {
             path: '',
             name: 'ListMaterialTypes',
-            component: ListMaterialTypes
+            component: ListMaterialTypes,
+            meta: {
+              AccessControlList: 'material-types.index',
+            }
           },
           {
             path: 'create',
             name: 'CreateMaterialType',
-            component: FormMaterialType
+            component: FormMaterialType,
+            meta: {
+              AccessControlList: 'material-types.create',
+            }
           },
           {
             path: ':id/edit',
             name: 'EditMaterialType',
-            component: FormMaterialType
+            component: FormMaterialType,
+            meta: {
+              AccessControlList: 'material-types.update',
+            }
           }
         ]
       },
@@ -143,17 +176,26 @@ export default [
           {
             path: '',
             name: 'ListMaterials',
-            component: ListMaterials
+            component: ListMaterials,
+            meta: {
+              AccessControlList: 'materials.index',
+            }
           },
           {
             path: 'create',
             name: 'CreateMaterial',
-            component: FormMaterial
+            component: FormMaterial,
+            meta: {
+              AccessControlList: 'materials.create',
+            }
           },
           {
             path: ':id/edit',
             name: 'EditMaterial',
-            component: FormMaterial
+            component: FormMaterial,
+            meta: {
+              AccessControlList: 'materials.update',
+            }
           }
         ]
       },
@@ -168,17 +210,26 @@ export default [
           {
             path: '',
             name: 'ListIncomeTypes',
-            component: ListIncomeTypes
+            component: ListIncomeTypes,
+            meta: {
+              AccessControlList: 'income-types.index',
+            }
           },
           {
             path: 'create',
             name: 'CreateIncomeType',
-            component: FormIncomeType
+            component: FormIncomeType,
+            meta: {
+              AccessControlList: 'income-types.create',
+            }
           },
           {
             path: ':id/edit',
             name: 'EditIncomeType',
-            component: FormIncomeType
+            component: FormIncomeType,
+            meta: {
+              AccessControlList: 'income-types.update',
+            }
           }
         ]
       },
@@ -193,22 +244,34 @@ export default [
           {
             path: '',
             name: 'ListIncomes',
-            component: ListIncomes
+            component: ListIncomes,
+            meta: {
+              AccessControlList: 'incomes.index',
+            }
           },
           {
             path: 'create',
             name: 'CreateIncome',
-            component: FormIncome
+            component: FormIncome,
+            meta: {
+              AccessControlList: 'incomes.create',
+            }
           },
           {
             path: ':id/edit',
             name: 'EditIncome',
-            component: FormIncome
+            component: FormIncome,
+            meta: {
+              AccessControlList: 'incomes.update',
+            }
           },
           {
             path: ':id/show',
             name: 'ShowIncome',
-            component: ShowIncome
+            component: ShowIncome,
+            meta: {
+              AccessControlList: 'incomes.show',
+            }
           }
         ]
       },
@@ -223,17 +286,26 @@ export default [
           {
             path: '',
             name: 'ListExpenseTypes',
-            component: ListExpenseTypes
+            component: ListExpenseTypes,
+            meta: {
+              AccessControlList: 'expense-types.index',
+            }
           },
           {
             path: 'create',
             name: 'CreateExpenseType',
-            component: FormExpenseType
+            component: FormExpenseType,
+            meta: {
+              AccessControlList: 'expense-types.create',
+            }
           },
           {
             path: ':id/edit',
             name: 'EditExpenseType',
-            component: FormExpenseType
+            component: FormExpenseType,
+            meta: {
+              AccessControlList: 'expense-types.update',
+            }
           }
         ]
       },
@@ -248,22 +320,34 @@ export default [
           {
             path: '',
             name: 'ListExpenses',
-            component: ListExpenses
+            component: ListExpenses,
+            meta: {
+              AccessControlList: 'expenses.index',
+            }
           },
           {
             path: 'create',
             name: 'CreateExpense',
-            component: FormExpense
+            component: FormExpense,
+            meta: {
+              AccessControlList: 'expenses.create',
+            }
           },
           {
             path: ':id/edit',
             name: 'EditExpense',
-            component: FormExpense
+            component: FormExpense,
+            meta: {
+              AccessControlList: 'expenses.update',
+            }
           },
           {
             path: ':id/show',
             name: 'ShowExpense',
-            component: ShowExpense
+            component: ShowExpense,
+            meta: {
+              AccessControlList: 'expenses.show',
+            }
           }
         ]
       },
@@ -278,17 +362,26 @@ export default [
           {
             path: '',
             name: 'ListPeople',
-            component: ListPeople
+            component: ListPeople,
+            meta: {
+              AccessControlList: 'people.index',
+            }
           },
           {
             path: 'create',
             name: 'CreatePeople',
-            component: FormPeople
+            component: FormPeople,
+            meta: {
+              AccessControlList: 'people.create',
+            }
           },
           {
             path: ':id/edit',
             name: 'EditPeople',
-            component: FormPeople
+            component: FormPeople,
+            meta: {
+              AccessControlList: 'people.update',
+            }
           }
         ]
       },
@@ -303,17 +396,26 @@ export default [
           {
             path: '',
             name: 'ListProfiles',
-            component: ListProfiles
+            component: ListProfiles,
+            meta: {
+              AccessControlList: 'profiles.index',
+            }
           },
           {
             path: 'create',
             name: 'CreateProfile',
-            component: FormProfile
+            component: FormProfile,
+            meta: {
+              AccessControlList: 'profiles.create',
+            }
           },
           {
             path: ':id/edit',
             name: 'EditProfile',
-            component: FormProfile
+            component: FormProfile,
+            meta: {
+              AccessControlList: 'profiles.update',
+            }
           }
         ]
       },
@@ -328,34 +430,47 @@ export default [
           {
             path: '',
             name: 'ListUsers',
-            component: ListUsers
+            component: ListUsers,
+            meta: {
+              AccessControlList: 'users.index',
+            }
           },
           {
             path: 'create',
             name: 'CreateUser',
-            component: FormUser
+            component: FormUser,
+            meta: {
+              AccessControlList: 'users.create',
+            }
           },
           {
             path: ':id/edit',
             name: 'EditUser',
-            component: FormUser
+            component: FormUser,
+            meta: {
+              AccessControlList: 'users.update',
+            }
           },
           {
             path: ':id/password',
             name: 'Password',
-            component: Password
+            component: Password,
+            meta: {
+              AccessControlList: 'users.update',
+            }
           }
         ]
       },
     ]
   },
-
   {
     path: '/login', 
-    name: 'login', 
+    name: 'Login', 
     component: Login, 
     meta: { 
       redirectIfLogged: true 
     } 
-  }
+  },
+  { path: '*', component: NotFoundComponent  },
+  { path: '/unauthorized', name: 'Unauthorized', component: DeniedComponent }
 ]

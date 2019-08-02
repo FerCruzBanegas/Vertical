@@ -15,6 +15,7 @@
                 <v-card>
                   <v-card-title>
                     <v-btn
+                      v-if="permission('people.create')"
                       dark color="grey darken-1" 
                       slot="activator" 
                       class="mb-2" 
@@ -50,7 +51,7 @@
                     <v-progress-linear height="3" slot="progress" color="red darken-3" indeterminate></v-progress-linear>
                     <template slot="items" slot-scope="props">
                       <td class="justify-center layout px-0">
-                        <v-btn icon class="mx-0" @click="getDetail(props.item.id)">
+                        <v-btn v-if="permission('people.show')" icon class="mx-0" @click="getDetail(props.item.id)">
                           <v-icon color="grey darken-1">visibility</v-icon>
                         </v-btn>
                       </td>
@@ -60,6 +61,7 @@
                       <td>{{ props.item.address }}</td>
                       <td>
                         <v-btn
+                          v-if="permission('people.update')"
                           small 
                           flat 
                           icon class="mx-0" 
@@ -69,6 +71,7 @@
                           <v-icon small color="grey">edit</v-icon>
                         </v-btn>
                         <v-btn 
+                          v-if="permission('people.destroy')"
                           small
                           flat 
                           icon class="mx-0" 
@@ -97,6 +100,7 @@
 </template>
 
 <script>
+  import permission from '../../mixins/permission'
   import ModalLoader from '../../components/ModalLoader.vue'
   import ModalPeople from '../../components/ModalPeople.vue'
   import ModalDelete from '../../components/ModalDelete.vue'
@@ -129,6 +133,8 @@
         }
       }
     },
+
+    mixins: [permission],
 
     components: {
       'modal-loader' : ModalLoader,

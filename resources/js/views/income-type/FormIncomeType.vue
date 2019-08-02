@@ -111,7 +111,7 @@
 
     methods: {
       showIncomeType:async function() {
-        const response = await IncomeTypeService.getIncomeTypes(`income-types/${this.id}`)
+        const response = await IncomeTypeService.getIncomeTypes(`income-types/${this.id}/edit`)
         if (response.status === 200) {
           this.income_type = response.data.data
           this.success = true

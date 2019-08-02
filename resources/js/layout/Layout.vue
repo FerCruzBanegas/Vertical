@@ -138,7 +138,7 @@
           model: false,
           children: [
             { icon: 'create', text: 'Registrar Nuevo', url: '/expenses/create' },
-            { icon: 'list', text: 'Ver Todos', url: '/expenses' }
+            { icon: 'list', text: 'Ver Lista', url: '/expenses' }
           ]
         },
         {

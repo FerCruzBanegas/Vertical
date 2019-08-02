@@ -9,17 +9,28 @@ const router = new VueRouter({
 })
 
 router.beforeEach((to, from, next) => {
-  if (to.matched.some(record => record.meta.requiresAuth)) {
-    if (!store.getters.authenticating) {
+  const requiresAuth = to.matched.some( record => record.meta.requiresAuth);
+  const redirectIfLogged = to.matched.some(record => record.meta.redirectIfLogged);
+  const authenticating = store.getters.authenticating;
+  if (requiresAuth) {
+    if (!authenticating) {
       next({
         path: '/login',
         query: { redirect: to.fullPath }
       })
-    } else {
-      next()
     }
-  } else if (to.matched.some(record => record.meta.redirectIfLogged)) {
-    if (store.getters.authenticating) {
+    if (to.name == 'Dashboard') {
+      return next()
+    }
+    if ((store.getters.currentUser.acl !== null && store.getters.currentUser.acl.includes(to.meta.AccessControlList)) || store.getters.currentUser.acl.includes('*')) {
+      next()
+    } else {
+      next({
+        path: '/unauthorized'
+      })
+    }
+  } else if (redirectIfLogged) {
+    if (authenticating) {
       next({
         path: '/'
       })

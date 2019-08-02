@@ -28,22 +28,22 @@ Vue.prototype.$setErrorsFromResponse = function(errorResponse) {
   }
     
   function addErrorToChildComponents(vm,field,errorString) {
-  	if(vm && vm.$validator && vm.$validator.errors){
-  	  const inputfield = vm.$validator.fields.find({ name: field });
-  	  if(inputfield){
-  	  vm.$validator.errors.add({
-  	    field,
-  	    msg:errorString
-  	  });
-  	    return;
-  	  }
-  	}
-  	if(vm.$children){
-  	  vm.$children.map(async ($cvm) => {
-  	    addErrorToChildComponents($cvm,field,errorString);
-  	  });
-  	}
-  	return;
+    if(vm && vm.$validator && vm.$validator.errors){
+      const inputfield = vm.$validator.fields.find({ name: field });
+      if(inputfield){
+      vm.$validator.errors.add({
+        field,
+        msg:errorString
+      });
+        return;
+      }
+    }
+    if(vm.$children){
+      vm.$children.map(async ($cvm) => {
+        addErrorToChildComponents($cvm,field,errorString);
+      });
+    }
+    return;
   }
 
   this.$validator.errors.clear();
@@ -76,4 +76,3 @@ const app = new Vue({
     store,
     render: h => h(App)
 });
-

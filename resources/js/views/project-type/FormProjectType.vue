@@ -111,7 +111,7 @@
 
     methods: {
       showProjectType:async function() {
-        const response = await ProjectTypeService.getProjectTypes(`project-types/${this.id}`)
+        const response = await ProjectTypeService.getProjectTypes(`project-types/${this.id}/edit`)
         if (response.status === 200) {
           this.project_type = response.data.data
           this.success = true

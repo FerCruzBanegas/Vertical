@@ -95,7 +95,7 @@
         try {
           const auth = await this.$store.dispatch('login', this.form)
           if (auth) {
-            this.$router.push({ name: 'home' })
+            this.$router.push({ name: 'Home' })
           }
         } catch (err) {
           this.alert = true

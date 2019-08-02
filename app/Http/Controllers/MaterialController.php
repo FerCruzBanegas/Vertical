@@ -80,12 +80,6 @@ class MaterialController extends ApiController
         return $this->respondDeleted();
     }
 
-    public function listing()
-    {
-    	$materials = $this->material->listMaterials();
-        return $this->respond($materials);
-    }
-
     public function searchMaterial($name) 
     {
         $material = $this->material->search($name)->get();

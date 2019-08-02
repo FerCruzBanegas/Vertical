@@ -67,7 +67,7 @@
     methods: {
       async logout() {
         const response = await this.$store.dispatch('logout')
-        if (response) this.$router.push({ name: 'login' })
+        if (response) this.$router.push({ name: 'Login' })
       },
 
       toggleDrawer () {

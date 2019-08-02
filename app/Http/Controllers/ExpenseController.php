@@ -121,6 +121,13 @@ class ExpenseController extends ApiController
                 }
                 $expense->materials()->sync($material);
             }
+            if (!empty($request->people)) {
+                $person = array();
+                foreach ($request->people as $value) {
+                    $person[] = $value['id'];
+                }
+                $expense->people()->sync($person);
+            } 
             DB::commit();
         } catch (\Exception $e) {
             DB::rollback();

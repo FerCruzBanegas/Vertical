@@ -25,13 +25,13 @@ class Material extends ApiModel
         return $this->belongsTo(MaterialType::class);
     }
 
-    public static function listMaterials()
-    {
-        return static::orderBy('id', 'DESC')->select('id', 'name')->get();
-    }
-
     public function expenses()
     {
         return $this->belongsToMany(Expense::class);
+    }
+
+    public static function listMaterials()
+    {
+        return static::orderBy('id', 'DESC')->select('id', 'name')->get();
     }
 }

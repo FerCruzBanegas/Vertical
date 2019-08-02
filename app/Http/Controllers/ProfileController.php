@@ -74,7 +74,7 @@ class ProfileController extends ApiController
     {
         try {
             $profile = $this->profile::find($id);
-            $profile->users()->update(['active' => 0]);
+            $profile->users()->update(['state' => 0]);
             $profile->delete();
         } catch (\Exception $e) {
             return $this->respondInternalError();

@@ -34,8 +34,7 @@ instance.interceptors.request.use((config) => {
 instance.interceptors.response.use(
   (response) => {
     return response
-  },
-  async (error) => {
+  }, error => {
     if (error.response.status === 401 && error.response.data.message == "Unauthenticated.") {
       store.dispatch('responseMessage', {
         type: 'warning',
@@ -48,8 +47,9 @@ instance.interceptors.response.use(
         router.push({ name: 'login' })
       })
     }
+    
+    return Promise.reject(error)
 })
-
 // instance.interceptors.response.use(
 //   (response) => {
 //     return response

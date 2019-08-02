@@ -13,6 +13,7 @@
                 <v-card>
                   <v-card-title>
                     <v-btn 
+                      v-if="permission('profiles.create')"
                       dark color="grey darken-1" 
                       slot="activator" 
                       class="mb-2"
@@ -54,7 +55,8 @@
                       <td>{{ props.item.created }}</td>
                       <td>{{ props.item.updated }}</td>
                       <td>
-                        <v-btn 
+                        <v-btn
+                          v-if="permission('profiles.update')" 
                           small 
                           flat 
                           icon class="mx-0" 
@@ -63,7 +65,8 @@
                         >
                           <v-icon small color="grey">edit</v-icon>
                         </v-btn>
-                        <v-btn 
+                        <v-btn
+                          v-if="permission('profiles.destroy')" 
                           small
                           flat 
                           icon class="mx-0" 
@@ -92,6 +95,7 @@
 </template>
 
 <script>
+  import permission from '../../mixins/permission'
   import ModalDelete from '../../components/ModalDelete.vue'
   import ProfileService from '../../services/profile.service'
 
@@ -101,7 +105,7 @@
       return {
         search: '',
         progress: false,
-        message: 'Realmente desea borrar los datos de este registro?',
+        message: 'Si elimina el registro, también se eliminarán todos los usuarios que tengan este perfil. Desea continuar?',
         remove: false,
         loading: false,
         headers: [
@@ -118,11 +122,11 @@
       }
     },
 
+    mixins: [permission],
+
     components: {
       'modal-delete' : ModalDelete
     },
-
-    // mixins: [permission],
 
     watch: {
       pagination: {

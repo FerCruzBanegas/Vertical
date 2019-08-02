@@ -1,6 +1,6 @@
 <template>
   <v-container fluid grid-list-xl>
-    <modal-detail :materials="materials" :peope="people" :dialog="dialog" @hide="dialog = !dialog">
+    <modal-detail :materials="materials" :people="people" :dialog="dialog" @hide="dialog = !dialog">
     </modal-detail>
     <v-layout wrap>
       <v-flex xs12 sm12 md12 lg12>
@@ -10,7 +10,7 @@
             <v-spacer></v-spacer>
             <v-tooltip left>
               <template v-slot:activator="{ on }">
-                <v-btn icon v-on="on" @click="finishProject()" :disabled="loading" :loading="loading"><v-icon>event</v-icon></v-btn>
+                <v-btn v-if="permission('projects.update')" icon v-on="on" @click="finishProject()" :disabled="loading" :loading="loading"><v-icon>event</v-icon></v-btn>
               </template>
               <span>Finalizar Proyecto</span>
             </v-tooltip>
@@ -112,7 +112,7 @@
     </v-layout>
     <v-layout wrap>
       <v-flex xs12 sm12 md12 lg12>
-        <v-card>
+        <v-card v-if="project">
           <v-card-title primary-title>
             <div><h3 class="headline mb-0">Lista de Ingresos y Egresos</h3></div>
           </v-card-title>
@@ -135,6 +135,7 @@
                 <td v-else colspan="2" class="text-xs-right"><strong>{{ props.item.amount | currency }}</strong></td>
                 <td>
                   <v-btn 
+                    v-if="props.item.type == 'expense'"
                     small
                     flat 
                     icon class="mx-0" 
@@ -166,6 +167,7 @@
 </template>
 
 <script>
+  import permission from '../../mixins/permission'
   import ModalDetail from '../../components/ModalDetail.vue'
   import ProjectService from '../../services/project.service'
 
@@ -196,6 +198,8 @@
         }
       }
     },
+
+    mixins: [permission],
 
     components: {
       'modal-detail' : ModalDetail
@@ -238,6 +242,7 @@
       getDetails(item) {
         this.dialog = true
         this.materials = item.materials
+        this.people = item.people
       },
 
       getDataFromApi() {

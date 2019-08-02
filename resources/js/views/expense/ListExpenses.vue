@@ -17,6 +17,7 @@
                       <v-layout row wrap>
                         <v-flex xs12 sm12 md4 lg4>
                           <v-btn
+                            v-if="permission('expenses.create')"
                             dark color="grey darken-1" 
                             slot="activator" 
                             class="mb-2" 
@@ -60,7 +61,7 @@
                     <v-progress-linear height="3" slot="progress" color="red darken-3" indeterminate></v-progress-linear>
                     <template slot="items" slot-scope="props">
                       <td class="justify-center layout px-0">
-                        <v-btn icon class="mx-0" :to="{ name: 'ShowExpense', params: { id: props.item.id }}">
+                        <v-btn v-if="permission('expenses.show')" icon class="mx-0" :to="{ name: 'ShowExpense', params: { id: props.item.id }}">
                           <v-icon color="grey darken-1">visibility</v-icon>
                         </v-btn>
                       </td>
@@ -70,6 +71,7 @@
                       <td>{{ props.item.project }}</td>
                       <td>
                         <v-btn
+                          v-if="permission('expenses.update')"
                           small 
                           flat 
                           icon class="mx-0" 
@@ -78,7 +80,8 @@
                         >
                           <v-icon small color="grey">edit</v-icon>
                         </v-btn>
-                        <v-btn 
+                        <v-btn
+                          v-if="permission('expenses.destroy')" 
                           small
                           flat 
                           icon class="mx-0" 
@@ -107,6 +110,7 @@
 </template>
 
 <script>
+  import permission from '../../mixins/permission'
   import InfoEvents from '../../components/InfoEvents.vue'
   import ModalDelete from '../../components/ModalDelete.vue'
   import Filters from '../../components/Filters.vue'
@@ -139,6 +143,8 @@
         }
       }
     },
+
+    mixins: [permission],
 
     components: {
       'info-events' : InfoEvents,

@@ -118,7 +118,7 @@
 
     methods: {
       showPeople:async function() {
-        const response = await PeopleService.getPeople(`people/${this.id}`)
+        const response = await PeopleService.getPeople(`people/${this.id}/edit`)
         if (response.status === 200) {
           this.people = response.data.data;
           this.success = true

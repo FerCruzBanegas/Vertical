@@ -4,11 +4,14 @@ namespace App;
 
 // use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Iatstuti\Database\Support\CascadeSoftDeletes;
 use Spatie\Activitylog\Traits\LogsActivity;
 
 class MaterialType extends ApiModel
 {
-    use SoftDeletes, LogsActivity, FullTextSearch;
+    use SoftDeletes, LogsActivity, FullTextSearch, CascadeSoftDeletes;
+
+    protected $cascadeDeletes = ['materials'];
 
     protected $dates = ['deleted_at'];
 

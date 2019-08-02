@@ -89,7 +89,7 @@
                               box
                               color="grey darken-2"
                               v-model="dateFormatted"
-                              label="Fecha de Ingreso *"
+                              label="Fecha de Egreso *"
                               hint="DD/MM/YYYY format"
                               prepend-icon="event"
                               readonly
@@ -208,9 +208,6 @@
                           v-validate="'required|max:9|decimal:2'"
                           :error-messages="errors.collect('expense.amount')" 
                         ></v-currency-field>
-                        <v-btn @click="test">
-                         show
-                        </v-btn>
                       </v-flex>
                     </v-layout>
                     <v-switch
@@ -348,10 +345,6 @@
     },
 
     methods: {
-      test() {
-        console.log(this.materials)
-      },
-
       removeMaterial(id){
         const index = this.materials.findIndex(x => x.id == id)
         if (index > -1) this.materials.splice(index, 1)

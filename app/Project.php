@@ -4,11 +4,14 @@ namespace App;
 
 // use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Iatstuti\Database\Support\CascadeSoftDeletes;
 use Spatie\Activitylog\Traits\LogsActivity;
 
 class Project extends ApiModel
 {
-	use SoftDeletes, LogsActivity, FullTextSearch;
+	use SoftDeletes, LogsActivity, FullTextSearch, CascadeSoftDeletes;
+
+    protected $cascadeDeletes = ['expenses', 'incomes'];
 
     protected $dates = ['deleted_at'];
 
@@ -42,6 +45,6 @@ class Project extends ApiModel
 
     public static function listProjects()
     {
-        return static::orderBy('name')->select('id', 'name')->get();
+        return static::orderBy('name')->select('id', 'name')->where('state', 1)->get();
     }
 }

@@ -10,6 +10,8 @@ class Expense extends ApiModel
 {
     use SoftDeletes, LogsActivity, FullTextSearch;
 
+    // protected $cascadeDeletes = ['materials'];
+
     protected $dates = ['deleted_at'];
 
     protected $fillable = [
@@ -32,11 +34,11 @@ class Expense extends ApiModel
 
     public function materials()
     {
-        return $this->belongsToMany(Material::class)->withPivot('quantity', 'price')->withTimestamps();
+        return $this->belongsToMany(Material::class)->withTrashed()->withPivot('quantity', 'price')->withTimestamps();
     }
 
     public function people()
     {
-        return $this->belongsToMany(Person::class)->withTimestamps();
+        return $this->belongsToMany(Person::class)->withTrashed()->withTimestamps();
     }
 }

@@ -20,7 +20,7 @@ class ActivityCreatedResource extends JsonResource
         return [
             'id' => $this->data->id,
             'description' => $this->data->description,
-            'causer' => User::where('id', $this->data->causer_id)->pluck('name')->first(),
+            'causer' => User::withTrashed()->where('id', $this->data->causer_id)->pluck('name')->first(),
             'date' => (string) $this->data->created_at
         ];
     }
