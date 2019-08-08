@@ -13,6 +13,7 @@ router.beforeEach((to, from, next) => {
   const redirectIfLogged = to.matched.some(record => record.meta.redirectIfLogged);
   const authenticating = store.getters.authenticating;
   if (requiresAuth) {
+    console.log(to)
     if (!authenticating) {
       next({
         path: '/login',

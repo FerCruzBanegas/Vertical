@@ -25,7 +25,7 @@ const PeopleService = {
       const response = await ApiService.post('/people', data)
       return response
     } catch (error) {
-      console.log(error)
+      throw error
     }
   },
 
@@ -34,7 +34,7 @@ const PeopleService = {
       const response = await ApiService.put(`people/${id}`, data)
       return response
     } catch (error) {
-      console.log(error)
+      throw error
     }
   },
 }

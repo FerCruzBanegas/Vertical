@@ -230,7 +230,7 @@
             }
           }
         } catch (err) {
-          this.$setErrorsFromResponse(err.response.data);
+          if(err.response.status === 422) this.$setErrorsFromResponse(err.response.data);
           vm.loading = false
         }
       }

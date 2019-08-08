@@ -161,5 +161,6 @@ return [
         'amount'                => 'monto',
         'state'                 => 'estado',
         'password_current'      => 'contraseña actual',
+        'surnames'              => 'apellidos',
     ],
 ];

@@ -21,6 +21,10 @@
                               color="grey darken-2"
                               label="Nombre *"
                               v-model="people.name"
+                              data-vv-name="name"
+                              data-vv-as="nombre"
+                              v-validate="'required|max:32'"
+                              :error-messages="errors.collect('name')"
                             ></v-text-field>
                           </v-flex>
                         </v-layout>
@@ -31,6 +35,10 @@
                               color="grey darken-2"
                               label="Apellidos"
                               v-model="people.surnames"
+                              data-vv-name="surnames"
+                              data-vv-as="apellidos"
+                              v-validate="'max:32'"
+                              :error-messages="errors.collect('surnames')"
                             ></v-text-field>
                           </v-flex>
                         </v-layout>
@@ -41,6 +49,10 @@
                               color="grey darken-2"
                               label="Teléfono *"
                               v-model="people.phone"
+                              data-vv-name="phone"
+                              data-vv-as="teléfono"
+                              v-validate="'required|max:10'"
+                              :error-messages="errors.collect('phone')"
                             ></v-text-field>
                           </v-flex>
                         </v-layout>
@@ -51,6 +63,10 @@
                               color="grey darken-2"
                               label="Dirección"
                               v-model="people.address"
+                              data-vv-name="address"
+                              data-vv-as="dirección"
+                              v-validate="'max:64'"
+                              :error-messages="errors.collect('address')"
                             ></v-textarea>
                           </v-flex>
                         </v-layout>
@@ -88,6 +104,10 @@
   import PeopleService from '../../services/people.service'
 
   export default {
+    $_veeValidate: {
+      validator: 'new'
+    },
+
     name: 'form-people',
     data() {
       return {
@@ -126,21 +146,27 @@
       },
 
       submit: async function() {
+        this.$validator.errors.clear();
         const vm = this
         vm.loading = true
-        if(vm.id) {
-          vm._save = await PeopleService.updatePeople(vm.id, vm.people)
-        } else {
-          vm._save = await PeopleService.storePeople(vm.people)
-        }
-        if (vm._save.status === 201 || vm._save.status === 200) {
-          vm.$snotify.simple(vm._save.data.message, 'Felicidades')
-          vm.loading = false
-          if (vm.retry) {
-            vm.people = new Material()
+        try {
+          if(vm.id) {
+            vm._save = await PeopleService.updatePeople(vm.id, vm.people)
           } else {
-            vm.$router.push('/people')
+            vm._save = await PeopleService.storePeople(vm.people)
           }
+          if (vm._save.status === 201 || vm._save.status === 200) {
+            vm.$snotify.simple(vm._save.data.message, 'Felicidades')
+            vm.loading = false
+            if (vm.retry) {
+              vm.people = new People()
+            } else {
+              vm.$router.push('/people')
+            }
+          }
+        } catch (err) {
+          if(err.response.status === 422) this.$setErrorsFromResponse(err.response.data);
+          vm.loading = false
         }
       }
     }

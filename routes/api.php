@@ -1,6 +1,7 @@
 <?php
 use Illuminate\Http\Request;
-use App\Http\Resources\Expense\ExpenseCollection;
+use Illuminate\Support\Facades\DB;
+// use Carbon\Carbon;
 //use Illuminate\Http\Request;
 
 /*
@@ -19,21 +20,21 @@ use App\Http\Resources\Expense\ExpenseCollection;
 
 Route::get('/test', function(Request $request) {
 
-    $actions = \App\Action::select('title', 'name', 'id')->get();
-    $test = array(
-            ['title' => 'Sistema', 'permissions' => array(['id' => 1, 'name' => 'Acceso Total'])],
-            ['title' => 'Egresos', 'permissions' => array(['id' => 2, 'name' => 'Ver Lista'],['id' => 3, 'name' => 'Ver Detalle'],['id' => 4, 'name' => 'Registrar'],['id' => 5, 'name' => 'Actualizar'],['id' => 6, 'name' => 'Actualizar'])],
-            ['title' => 'Ingresos', 'permissions' => array(['id' => 7, 'name' => 'Ver Lista'],['id' => 8, 'name' => 'Ver Detalle'],['id' => 9, 'name' => 'Registrar'],['id' => 10, 'name' => 'Actualizar'],['id' => 11, 'name' => 'Actualizar'])]
-        );
-        // foreach ($actions as $key => $value) {
-        //     $data[$key]['title'] = $value->title;
-        // }
+    // $actions = \App\Action::select('title', 'name', 'id')->get();
+    // $test = array(
+    //         ['title' => 'Sistema', 'permissions' => array(['id' => 1, 'name' => 'Acceso Total'])],
+    //         ['title' => 'Egresos', 'permissions' => array(['id' => 2, 'name' => 'Ver Lista'],['id' => 3, 'name' => 'Ver Detalle'],['id' => 4, 'name' => 'Registrar'],['id' => 5, 'name' => 'Actualizar'],['id' => 6, 'name' => 'Actualizar'])],
+    //         ['title' => 'Ingresos', 'permissions' => array(['id' => 7, 'name' => 'Ver Lista'],['id' => 8, 'name' => 'Ver Detalle'],['id' => 9, 'name' => 'Registrar'],['id' => 10, 'name' => 'Actualizar'],['id' => 11, 'name' => 'Actualizar'])]
+    //     );
+    //     // foreach ($actions as $key => $value) {
+    //     //     $data[$key]['title'] = $value->title;
+    //     // }
         
-        $data = array();
-        $actions->each(function ($item, $key) use(&$data) {
-            $data[$key]['title'] = $item->title;
-        });
-        $data = collect($data)->unique()->values()->toArray();
+    //     $data = array();
+    //     $actions->each(function ($item, $key) use(&$data) {
+    //         $data[$key]['title'] = $item->title;
+    //     });
+    //     $data = collect($data)->unique()->values()->toArray();
         // $data->each(function ($i, $key) use($actions) {
         //     $actions->each(function ($j, $key) use($i, &$transform){
         //         if ($i['title'] == $j->title) {
@@ -54,6 +55,103 @@ Route::get('/test', function(Request $request) {
         // }); 
         // $route = $;
         // return response()->json($route);
+        // $expenses1 = DB::table('expenses')
+        //     ->select(DB::raw('SUM(amount) as total_expense, MONTH(date) as month, YEAR(date) as year'))
+        //     ->groupBy(DB::raw('YEAR(date) ASC, MONTH(date) ASC'))->get();
+
+        // $expenses = DB::table('expenses')
+        // ->select(DB::raw('SUM(amount) as total_expense'))
+        // ->groupBy(DB::raw('YEAR(created_at) DESC, MONTH(created_at) DESC'))->get();
+
+        // $data = DB::table('expenses')->selectRaw('month(date) as month, sum(amount) as sum')
+        //     ->groupBy(DB::raw('month desc'))
+        //     ->orderBy('month', 'desc')
+        //     ->get();
+
+        // $something = DB::table('expenses')->get(['id', 'created_at'])->groupBy(function($date) {
+        //     return Carbon::parse($date->created_at)->format('m');
+        // });
+
+        // $orders = $users = DB::select(DB::raw('t1.month,COALESCE(t2.amount, 0) AS expenses, COALESCE(t3.amount, 0) AS incomes'))
+        //              ->from()
+        //              ->where('status', '<>', 1)
+        //              ->groupBy('status')
+        //              ->get();
+
+        // $expenses = DB::table('expenses')
+        //     ->select(DB::raw('SUM(amount) as total_expense, MONTH(date) as month, YEAR(date) as year'))
+        //     ->groupBy(DB::raw('YEAR(date) ASC, MONTH(date) ASC'))->get();
+
+        // $expense = \App\Expense::select(
+        //     DB::raw('sum(amount) as sums'), 
+        //     DB::raw("MONTH(date) as months")
+        //   )->where(function($query) {
+        //     $query->where('date', '>=', '2019-01-01')
+        //           ->where('date', '<=', '2019-12-31');
+        //     })
+        //   ->groupBy('months')
+        //   ->get();
+
+        // $income = \App\Income::select(
+        //     DB::raw('sum(amount) as sums'), 
+        //     DB::raw("MONTH(date) as months")
+        //   )->where(function($query) {
+        //     $query->where('date', '>=', '2019-01-01')
+        //           ->where('date', '<=', '2019-12-31');
+        //     })
+        //   ->groupBy('months')
+        //   ->get();
+
+        // $expense = \App\Expense::select(
+        //     DB::raw('MONTH(date) AS month'), 
+        //     DB::raw('SUM(amount) AS amount')
+        //   )
+        //   ->where(function($query) {
+        //     $query->where('date', '>=', '2019-01-01')
+        //           ->where('date', '<=', '2019-12-31');
+        //     })
+        //   ->groupBy('month')->get();
+
+        $date = '2019-08-07';
+
+        $expense = DB::table('expenses')
+          ->select(
+            DB::raw('MONTH(date) AS month'), 
+            DB::raw('SUM(amount) AS amount')
+          )
+          ->where(function($query) use ($date) {
+            $query->where('date', '>=', DB::raw("DATE_FORMAT('$date', '%Y-01-01')"))
+                  ->where('date', '<=', DB::raw("DATE_FORMAT('$date', '%Y-12-31')"))
+                  ->whereNull('deleted_at');
+            })
+          ->groupBy('month');  
+
+
+        $income = DB::table('incomes')
+          ->select(
+            DB::raw('MONTH(date) AS month'), 
+            DB::raw('SUM(amount) AS amount')
+          )
+          ->where(function($query) use ($date) {
+            $query->where('date', '>=', DB::raw("DATE_FORMAT('$date', '%Y-01-01')"))
+                  ->where('date', '<=', DB::raw("DATE_FORMAT('$date', '%Y-12-31')"))
+                  ->whereNull('deleted_at');
+            })
+          ->groupBy('month'); 
+
+
+        $data = DB::table('projects AS p')
+          ->join('incomes AS i', 'p.id', '=', 'i.project_id')
+          ->select(DB::raw('SUM(i.amount) total'), 'p.name')
+          ->where(function($query) {
+            $query->where('i.date', '>=', DB::raw("DATE_FORMAT(NOW() ,'%Y-%m-01')"))
+                  ->where('i.date', '<=', DB::raw("LAST_DAY(now())"));
+            })
+          ->groupBy('p.name')
+          ->get();
+
+
+        return response()->json($data);
 
     // $expenses = \App\Expense::with([
     //     'expense_type',
@@ -90,10 +188,10 @@ Route::get('/test', function(Request $request) {
 
     // return response()->json($data);
     
-    $expenses = \App\Expense::orderBy('id', 'DESC');
+    // $expenses = \App\Expense::orderBy('id', 'DESC');
 
-    $expenses = $expenses->paginate(5);
-    return new ExpenseCollection($expenses); 
+    // $expenses = $expenses->paginate(5);
+    // return new ExpenseCollection($expenses); 
 });
 
 // \DB::listen(function($query) {
@@ -207,6 +305,9 @@ Route::group(['middleware' => ['auth:api', 'acl:api']], function () {
     Route::post('profiles', 'ProfileController@store')->name('profiles.create');
     Route::put('profiles/{id}', 'ProfileController@update')->name('profiles.update');
     Route::delete('profiles/{id}', 'ProfileController@destroy')->name('profiles.destroy');
+
+    //Graphics
+    Route::get('graphics', 'ReportController@getQueryForGraphics');
 });
 
 //LEER
@@ -214,3 +315,68 @@ Route::group(['middleware' => ['auth:api', 'acl:api']], function () {
 // 2.- Validar que los proeyectos finalisados no aparescan para ser seleccionados.
 // 3.- validar montos en formularios de egresos
 // 4.- ver permisos para actualizar contrasena de un usuario
+// SELECT
+//     t1.month,
+//     COALESCE(t2.amount, 0) AS expenses,
+//     COALESCE(t3.amount, 0) AS incomes
+// FROM
+// (
+//     SELECT 1 AS month UNION ALL
+//     SELECT 2 UNION ALL
+//     SELECT 3 UNION ALL
+//     SELECT 4 UNION ALL
+//     SELECT 5 UNION ALL
+//     SELECT 6 UNION ALL
+//     SELECT 7 UNION ALL
+//     SELECT 8 UNION ALL
+//     SELECT 9 UNION ALL
+//     SELECT 10 UNION ALL
+//     SELECT 11 UNION ALL
+//     SELECT 12
+// ) t1
+// LEFT JOIN
+// (
+//     SELECT MONTH(date) AS month, SUM(amount) AS amount
+//     FROM expenses
+//     WHERE date >= '2019-01-01' AND date <= '2019-12-31'
+//     GROUP BY MONTH(date)
+// ) t2
+//     ON t1.month = t2.month
+// LEFT JOIN
+// (
+//     SELECT MONTH(date) AS month, SUM(amount) AS amount
+//     FROM incomes
+//     WHERE date >= '2019-01-01' AND date <= '2019-12-31'
+//     GROUP BY MONTH(date)
+// ) t3
+//     ON t1.month = t3.month
+// ORDER BY
+//     t1.month;
+// explain select `t1`.`month`, COALESCE(t2.amount, 0) AS expenses, COALESCE(t3.amount, 0) AS incomes 
+// from (
+//   select 1 AS month UNION ALL 
+//   SELECT 2 UNION ALL 
+//   SELECT 3 UNION ALL 
+//   SELECT 4 UNION ALL 
+//   SELECT 5 UNION ALL 
+//   SELECT 6 UNION ALL 
+//   SELECT 7 UNION ALL 
+//   SELECT 8 UNION ALL 
+//   SELECT 9 UNION ALL 
+//   SELECT 10 UNION ALL 
+//   SELECT 11 UNION ALL 
+//   SELECT 12
+// ) as `t1` 
+// left join (
+//   select MONTH(date) AS month, SUM(amount) AS amount 
+//   from `expenses` 
+//   where (`date` >= '2019-01-01' and `date` <= '2019-12-31' and `deleted_at` is null) 
+//   group by `month`
+// ) as `t2` on `t1`.`month` = `t2`.`month` 
+// left join (
+//   select MONTH(date) AS month, SUM(amount) AS amount 
+//   from `incomes` 
+//   where (`date` >= '2019-01-01' and `date` <= '2019-12-31' and `deleted_at` is null) 
+//   group by `month`
+// ) as `t3` on `t1`.`month` = `t3`.`month` 
+// order by `t1`.`month` asc

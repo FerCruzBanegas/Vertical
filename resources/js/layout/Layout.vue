@@ -45,6 +45,7 @@
               v-for="(child, i) in item.children"
               :key="i"
               router :to="child.url"
+              v-show="permission(child.permission) || child.permission ==''"
             >
               <v-list-tile-action v-if="child.icon">
                 <v-icon>{{ child.icon }}</v-icon>
@@ -56,7 +57,7 @@
               </v-list-tile-content>
             </v-list-tile>
           </v-list-group>
-          <v-list-tile v-else :key="item.text" router :to="item.url">
+          <v-list-tile v-else :key="item.text" router :to="item.url" v-show="permission(item.permission) || item.permission ==''">
             <v-list-tile-action>
               <v-icon>{{ item.icon }}</v-icon>
             </v-list-tile-action>
@@ -84,31 +85,36 @@
 </template>
 
 <script>
+  import permission from '../mixins/permission'
   import AppFooter from './AppFooter.vue'
   import AppToolbar from './AppToolbar.vue'
 
   export default {
     name: 'layout',
+
+    mixins: [permission],
+
     components: {
       'app-footer': AppFooter,
       'app-toolbar': AppToolbar
     },
+
     data () {
       return {
         clipped: false,
         drawer: true,
         miniVariant: false,
         items: [
-        { icon: 'home', text: 'Inicio', url: '/dashboard' },
-        { icon: 'find_in_page', text: 'Informes', url: '/reports' },
+        { icon: 'home', text: 'Inicio', url: '/dashboard', permission: '' },
+        { icon: 'find_in_page', text: 'Informes', url: '/reports', permission: 'reports.index' },
         {
           icon: 'domain',
           'icon-alt': 'domain',
           text: 'Proyectos',
           model: false,
           children: [
-            { icon: 'create', text: 'Registrar Nuevo', url: '/projects/create' },
-            { icon: 'list', text: 'Ver Lista', url: '/projects' }
+            { icon: 'create', text: 'Registrar Nuevo', url: '/projects/create', permission: 'projects.create' },
+            { icon: 'list', text: 'Ver Lista', url: '/projects', permission: 'projects.index' }
           ]
         },
         {
@@ -117,8 +123,8 @@
           text: 'Materiales',
           model: false,
           children: [
-            { icon: 'create', text: 'Registrar Nuevo', url: '/materials/create' },
-            { icon: 'list', text: 'Ver Lista', url: '/materials' }
+            { icon: 'create', text: 'Registrar Nuevo', url: '/materials/create', permission: 'materials.create' },
+            { icon: 'list', text: 'Ver Lista', url: '/materials', permission: 'materials.index' }
           ]
         },
         {
@@ -127,8 +133,8 @@
           text: 'Ingresos',
           model: false,
           children: [
-            { icon: 'create', text: 'Registrar Nuevo', url: '/incomes/create' },
-            { icon: 'list', text: 'Ver Lista', url: '/incomes' }
+            { icon: 'create', text: 'Registrar Nuevo', url: '/incomes/create', permission: 'incomes.create' },
+            { icon: 'list', text: 'Ver Lista', url: '/incomes', permission: 'incomes.index' }
           ]
         },
         {
@@ -137,8 +143,8 @@
           text: 'Egresos',
           model: false,
           children: [
-            { icon: 'create', text: 'Registrar Nuevo', url: '/expenses/create' },
-            { icon: 'list', text: 'Ver Lista', url: '/expenses' }
+            { icon: 'create', text: 'Registrar Nuevo', url: '/expenses/create', permission: 'expenses.create' },
+            { icon: 'list', text: 'Ver Lista', url: '/expenses', permission: 'expenses.index' }
           ]
         },
         {
@@ -147,10 +153,10 @@
           text: 'Categorías',
           model: false,
           children: [
-            { icon: 'remove', text: 'Tipos de Proyecto', url: '/project-types' },
-            { icon: 'remove', text: 'Tipos de Material', url: '/material-types' },
-            { icon: 'remove', text: 'Tipos de Ingreso', url: '/income-types' },
-            { icon: 'remove', text: 'Tipos de Egreso', url: '/expense-types' }
+            { icon: 'remove', text: 'Tipos de Proyecto', url: '/project-types', permission: 'project-types.index' },
+            { icon: 'remove', text: 'Tipos de Material', url: '/material-types', permission: 'material-types.index' },
+            { icon: 'remove', text: 'Tipos de Ingreso', url: '/income-types', permission: 'income-types.index' },
+            { icon: 'remove', text: 'Tipos de Egreso', url: '/expense-types', permission: 'expense-types.index' }
           ]
         },
         {
@@ -159,9 +165,9 @@
           text: 'Configuración',
           model: false,
           children: [
-            { icon: 'remove', text: 'Personas', url: '/people' },
-            { icon: 'remove', text: 'Usuarios', url: '/users' },
-            { icon: 'remove', text: 'Perfil y Permisos', url: '/profiles' }
+            { icon: 'remove', text: 'Personas', url: '/people', permission: 'people.index' },
+            { icon: 'remove', text: 'Usuarios', url: '/users', permission: 'users.index' },
+            { icon: 'remove', text: 'Perfil y Permisos', url: '/profiles', permission: 'profiles.index' }
           ]
         }
       ],
