@@ -4,13 +4,16 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use App\Http\Resources\Report\InAndExMonthYearCollection;
+use App\Http\Resources\Report\InAndExYearCollection;
+use App\Http\Resources\Report\InAndExRangeCollection;
+use App\Http\Resources\Report\InAndExMonthCollection;
 
 class ReportController extends ApiController
 {
-    public function getIncomeAndExpenseForYear() 
+    public function getIncomeAndExpenseForDate($date = NULL) 
     {
-
-        $date = date('Y-m-d');
+    	if (is_null($date)) $date = date('Y-m-d');
 
     	$expense = DB::table('expenses')
           ->select(
@@ -52,7 +55,7 @@ class ReportController extends ApiController
           ->get();
 
 
-        $months = array("Ene","Feb","Mar","Abr","May","Jun","Jul","Ago","Sep","Oct","Nov","Dic"); 
+        $months = array("Enero","Febrero","Marzo","Abril","Mayo","Junio","Julio","Agosto","Septiembre","Octubre","Noviembre","Diciembre");
 
         $transform = $data->transform(function($row) use ($months) {
             return [
@@ -62,7 +65,7 @@ class ReportController extends ApiController
             ];
         });
 
-        return $data;
+        return $transform;
     }
 
     public function getExpenseForProject() 
@@ -72,7 +75,9 @@ class ReportController extends ApiController
           ->select(DB::raw('SUM(e.amount) total'), 'p.name AS project')
           ->where(function($query) {
             $query->where('e.date', '>=', DB::raw("DATE_FORMAT(NOW() ,'%Y-%m-01')"))
-                  ->where('e.date', '<=', DB::raw("LAST_DAY(now())"));
+                  ->where('e.date', '<=', DB::raw("LAST_DAY(now())"))
+                  ->where('p.state', '!=', 0)
+                  ->whereNull('e.deleted_at');
             })
           ->groupBy('p.name')
           ->get();
@@ -87,7 +92,9 @@ class ReportController extends ApiController
           ->select(DB::raw('SUM(i.amount) total'), 'p.name AS project')
           ->where(function($query) {
             $query->where('i.date', '>=', DB::raw("DATE_FORMAT(NOW() ,'%Y-%m-01')"))
-                  ->where('i.date', '<=', DB::raw("LAST_DAY(now())"));
+                  ->where('i.date', '<=', DB::raw("LAST_DAY(now())"))
+                  ->where('p.state', '!=', 0)
+                  ->whereNull('i.deleted_at');
             })
           ->groupBy('p.name')
           ->get();
@@ -97,7 +104,7 @@ class ReportController extends ApiController
 
     public function getQueryForGraphics() 
     {
-    	$year = $this->getIncomeAndExpenseForYear();
+    	$year = $this->getIncomeAndExpenseForDate();
     	$expense = $this->getExpenseForProject();
     	$income = $this->getIncomeForProject();
 
@@ -107,12 +114,103 @@ class ReportController extends ApiController
     		'income' => $income,
     	];
 
-        return $this->respond($data);
+    	return $this->respond($data);
+    }
+
+    public function getIncomeAndExpenseMonthYear(Request $request)
+    {
+    	$date = $request->data.'-01-01';
+    	$data = $this->getIncomeAndExpenseForDate($date);
+    	return new InAndExMonthYearCollection($data, $request->data);
+    }
+
+    public function getIncomeAndExpenseForYear()
+    {
+    	$expense = DB::table('expenses')->select('date', DB::raw('0'), 'amount')->whereNull('deleted_at');;
+
+        $data = DB::query()->fromSub(function ($query) use ($expense) {
+            $query->select('date', 'amount as sale_amount', DB::raw('0 as purchase_amount'))
+                  ->from('incomes')
+                  ->whereNull('deleted_at')
+                  ->unionAll($expense);
+          }, 'sp')
+          ->select(DB::raw('YEAR(date) as year'), DB::raw('SUM(sale_amount) as income'), DB::raw('SUM(purchase_amount) as expense'))
+          ->groupBy(DB::raw('YEAR(date)'))
+          ->get();
+
+    	return new InAndExYearCollection($data);
+    }
+
+    public function getIncomeAndExpenseForRange(Request $request)
+    {
+        if ($request->has('data')) {
+        	if (sizeof($request->data) === 1) {
+        		$date = [$request->data[0], $request->data[0]];
+        	} else {
+        		$date = $request->data;
+        	}
+        } else {
+        	$date = [date('Y-m-d'), date('Y-m-d')];
+        }
+    	$expense = DB::table('expenses as e')
+                   ->select('e.title', 'e.payment', 'e.date', 'p.name', DB::raw('0 as inc_amount'), DB::raw('SUM(e.amount) as exp_amount'))
+                   ->join('projects as p', 'p.id', '=', 'e.project_id')
+                   ->where(function($query) use ($date) {
+                    $query->where('e.date', '>=', $date[0])
+                          ->where('e.date', '<=', $date[1])
+                          ->whereNull('e.deleted_at');
+                   })
+                   ->groupBy('e.id');
+
+        $data = DB::query()->fromSub(function ($query) use ($expense, $date) {
+            $query->select('i.title', 'i.payment', 'i.date', 'p.name', DB::raw('SUM(i.amount) as inc_amount'), DB::raw('0 as exp_amount'))
+                  ->from('incomes as i')
+                  ->join('projects as p', 'p.id', '=', 'i.project_id')
+                  ->where(function($query) use ($date) {
+                    $query->where('i.date', '>=', $date[0])
+                          ->where('i.date', '<=', $date[1])
+                          ->whereNull('i.deleted_at');
+                  })
+                  ->groupBy('i.id')
+                  ->unionAll($expense);
+          }, 'sp')
+          ->select('*')
+          ->orderBy('date', 'desc')
+          ->get();
+
+    	return new InAndExRangeCollection($data, $date);
+    }
+
+    public function getIncomeAndExpenseForMonth(Request $request)
+    {
+    	$date = $request->data.'-01';
+
+    	$expense = DB::table('expenses as e')
+                   ->select('e.title', 'e.payment', 'e.date', 'p.name', DB::raw('0 as inc_amount'), DB::raw('SUM(e.amount) as exp_amount'))
+                   ->join('projects as p', 'p.id', '=', 'e.project_id')
+                   ->where(function($query) use ($date) {
+                    $query->where('e.date', '>=', DB::raw("DATE_FORMAT('$date' ,'%Y-%m-01')"))
+                          ->where('e.date', '<=', DB::raw("LAST_DAY('$date')"))
+                          ->whereNull('e.deleted_at');
+                   })
+                   ->groupBy('e.id');
+
+        $data = DB::query()->fromSub(function ($query) use ($expense, $date) {
+            $query->select('i.title', 'i.payment', 'i.date', 'p.name', DB::raw('SUM(i.amount) as inc_amount'), DB::raw('0 as exp_amount'))
+                  ->from('incomes as i')
+                  ->join('projects as p', 'p.id', '=', 'i.project_id')
+                  ->where(function($query) use ($date) {
+                    $query->where('i.date', '>=', DB::raw("DATE_FORMAT('$date' ,'%Y-%m-01')"))
+                          ->where('i.date', '<=', DB::raw("LAST_DAY('$date')"))
+                          ->whereNull('i.deleted_at');
+                  })
+                  ->groupBy('i.id')
+                  ->unionAll($expense);
+          }, 'sp')
+          ->select('*')
+          ->orderBy('date', 'desc')
+          ->get();
+
+    	return new InAndExMonthCollection($data, $request->data);
     }
 }
-// select SUM(e.amount) total, p.name
-// from projects p
-// inner join expenses e
-// on p.id = e.project_id
-// where e.date >= DATE_FORMAT(NOW() ,'%Y-%m-01') and e.date <= LAST_DAY(now())
-// group by p.name

@@ -1,6 +1,7 @@
 import Layout from '../layout/Layout.vue'
 import Login from '../views/auth/Login.vue'
 import Dashboard from '../views/dashboard/Dashboard.vue'
+import Report from '../views/report/Report.vue'
 //project-type
 import ListProjectTypes from '../views/project-type/ListProjectTypes.vue'
 import FormProjectType from '../views/project-type/FormProjectType.vue'
@@ -54,6 +55,11 @@ export default [
         path: '/dashboard',
         name: 'Dashboard',
         component: Dashboard,
+      },
+      {
+        path: '/reports',
+        name: 'Report',
+        component: Report,
       },
       {
         path: '/project-types',

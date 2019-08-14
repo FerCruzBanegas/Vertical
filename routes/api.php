@@ -112,46 +112,48 @@ Route::get('/test', function(Request $request) {
         //     })
         //   ->groupBy('month')->get();
 
-        $date = '2019-08-07';
+        
 
-        $expense = DB::table('expenses')
-          ->select(
-            DB::raw('MONTH(date) AS month'), 
-            DB::raw('SUM(amount) AS amount')
-          )
-          ->where(function($query) use ($date) {
-            $query->where('date', '>=', DB::raw("DATE_FORMAT('$date', '%Y-01-01')"))
-                  ->where('date', '<=', DB::raw("DATE_FORMAT('$date', '%Y-12-31')"))
-                  ->whereNull('deleted_at');
-            })
-          ->groupBy('month');  
-
-
-        $income = DB::table('incomes')
-          ->select(
-            DB::raw('MONTH(date) AS month'), 
-            DB::raw('SUM(amount) AS amount')
-          )
-          ->where(function($query) use ($date) {
-            $query->where('date', '>=', DB::raw("DATE_FORMAT('$date', '%Y-01-01')"))
-                  ->where('date', '<=', DB::raw("DATE_FORMAT('$date', '%Y-12-31')"))
-                  ->whereNull('deleted_at');
-            })
-          ->groupBy('month'); 
+        // $expense = DB::table('expenses')
+        //   ->select(
+        //     DB::raw('MONTH(date) AS month'), 
+        //     DB::raw('SUM(amount) AS amount')
+        //   )
+        //   ->where(function($query) use ($date) {
+        //     $query->where('date', '>=', DB::raw("DATE_FORMAT('$date', '%Y-01-01')"))
+        //           ->where('date', '<=', DB::raw("DATE_FORMAT('$date', '%Y-12-31')"))
+        //           ->whereNull('deleted_at');
+        //     })
+        //   ->groupBy('month');  
 
 
-        $data = DB::table('projects AS p')
-          ->join('incomes AS i', 'p.id', '=', 'i.project_id')
-          ->select(DB::raw('SUM(i.amount) total'), 'p.name')
-          ->where(function($query) {
-            $query->where('i.date', '>=', DB::raw("DATE_FORMAT(NOW() ,'%Y-%m-01')"))
-                  ->where('i.date', '<=', DB::raw("LAST_DAY(now())"));
-            })
-          ->groupBy('p.name')
-          ->get();
+        // $income = DB::table('incomes')
+        //   ->select(
+        //     DB::raw('MONTH(date) AS month'), 
+        //     DB::raw('SUM(amount) AS amount')
+        //   )
+        //   ->where(function($query) use ($date) {
+        //     $query->where('date', '>=', DB::raw("DATE_FORMAT('$date', '%Y-01-01')"))
+        //           ->where('date', '<=', DB::raw("DATE_FORMAT('$date', '%Y-12-31')"))
+        //           ->whereNull('deleted_at');
+        //     })
+        //   ->groupBy('month'); 
 
 
-        return response()->json($data);
+        // $data = DB::table('projects AS p')
+        //   ->join('incomes AS i', 'p.id', '=', 'i.project_id')
+        //   ->select(DB::raw('SUM(i.amount) total'), 'p.name')
+        //   ->where(function($query) {
+        //     $query->where('i.date', '>=', DB::raw("DATE_FORMAT(NOW() ,'%Y-%m-01')"))
+        //           ->where('i.date', '<=', DB::raw("LAST_DAY(now())"));
+        //     })
+        //   ->groupBy('p.name')
+        //   ->get();
+
+
+        $months = array("Enero","Febrero","Marzo","Abril","Mayo","Junio","Julio","Agosto","Septiembre","Octubre","Noviembre","Diciembre");
+
+        return response()->json($months['12'-1]);
 
     // $expenses = \App\Expense::with([
     //     'expense_type',
@@ -308,6 +310,12 @@ Route::group(['middleware' => ['auth:api', 'acl:api']], function () {
 
     //Graphics
     Route::get('graphics', 'ReportController@getQueryForGraphics');
+
+    //Reports
+    Route::get('report-months-year', 'ReportController@getIncomeAndExpenseMonthYear');
+    Route::get('report-year', 'ReportController@getIncomeAndExpenseForYear');
+    Route::get('report-range', 'ReportController@getIncomeAndExpenseForRange');
+    Route::get('report-month', 'ReportController@getIncomeAndExpenseForMonth');
 });
 
 //LEER
@@ -380,3 +388,94 @@ Route::group(['middleware' => ['auth:api', 'acl:api']], function () {
 //   group by `month`
 // ) as `t3` on `t1`.`month` = `t3`.`month` 
 // order by `t1`.`month` asc
+      // report1(json) {
+      //   return {
+      //     dataSource: {
+      //       data: json
+      //     },
+      //     slice: {
+      //       rows: [
+      //         {
+      //           uniqueName: "month",
+      //           caption: "mes",
+      //           sort: "unsorted"
+      //         }
+      //       ],
+      //       columns: [
+      //         {
+      //           uniqueName: "[Measures]"
+      //         }
+      //       ],
+      //       measures: [
+      //         {
+      //           uniqueName: "income",
+      //           aggregation: "sum",
+      //           grandTotalCaption: "Ingresos"
+      //         },
+      //         {
+      //           uniqueName: "expense",
+      //           aggregation: "sum",
+      //           grandTotalCaption: "Egresos"
+      //         },
+      //         {
+      //           uniqueName: "diff",
+      //           formula: 'sum("income") - sum("expense")',
+      //           caption: "Ahorro Anual"
+      //         }
+      //       ]
+      //     },
+      //     options: {
+      //       grid: {
+      //         title: `Ingresos / Egresos Mensual por Año ${this.params}`
+      //       },
+      //     }
+      //   }
+      // },
+// select sum(sale_amount) as sales, sum(purchase_amount) as purchases
+// from (
+//   (
+//     select amount as sale_amount, 0 as purchase_amount 
+//      from expenses
+//      where date >= '2019-06-01' and date <= '2019-09-01'
+//   ) union all
+//   (
+//     select 0, amount 
+//      from incomes
+//      where date >= '2019-06-01' and date <= '2019-09-01' 
+//   )
+  
+// ) sp
+// select title, date, payment, amount
+// from (
+//   (
+//     select title, date, payment, amount
+//      from expenses
+//      where date >= '2019-06-01' and date <= '2019-09-01'
+//   ) union all
+//   (
+//     select title, date, payment, amount
+//      from incomes
+//      where date >= '2019-06-01' and date <= '2019-09-01' 
+//   )
+  
+// ) sp
+// select * 
+// from (
+//   (
+//     select `i`.`title`, `i`.`payment`, `i`.`date`, `p`.`name`, SUM(i.amount) as inc_amount, 0 as exp_amount 
+//      from `incomes` as `i` 
+//      inner join `projects` as `p` 
+//      on `p`.`id` = `i`.`project_id` 
+//      where (`i`.`date` >= '2019-06-01' and `i`.`date` <= '2019-09-01' and `i`.`deleted_at` is null) 
+//      group by `i`.`id`
+//   ) union all 
+//   (
+//     select `e`.`title`, `e`.`payment`, `e`.`date`, `p`.`name`, 0 as inc_amount, SUM(e.amount) as exp_amount 
+//      from `expenses` as `e` 
+//      inner join `projects` as `p`
+//      on `p`.`id` = `e`.`project_id`
+//      where (`e`.`date` >= '2019-06-01' and `e`.`date` <= '2019-09-01' and `e`.`deleted_at` is null) 
+//      group by `e`.`id`
+//   )
+// ) as `sp` 
+// order by `date` desc

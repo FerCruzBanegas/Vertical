@@ -10,6 +10,10 @@ const ApiService = {
         return http.get(resource)
     },
 
+    getParams(resource, data) {
+        return http.get(resource, data)
+    },
+
     post(resource, data) {
         return http.post(resource, data)
     },
