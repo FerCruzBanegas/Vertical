@@ -76,6 +76,7 @@ class AuthController extends Controller
             'name' => $user->name,
             'perfil_id' => $user->profile_id,
             'email' => $user->email,
+            'created' => $user->created_at,
             'acl' => $actions
         ];
 

@@ -13,14 +13,13 @@ router.beforeEach((to, from, next) => {
   const redirectIfLogged = to.matched.some(record => record.meta.redirectIfLogged);
   const authenticating = store.getters.authenticating;
   if (requiresAuth) {
-    console.log(to)
     if (!authenticating) {
       next({
         path: '/login',
         query: { redirect: to.fullPath }
       })
     }
-    if (to.name == 'Dashboard') {
+    if (to.name == 'Dashboard' || to.name == 'UserProfile'|| to.name == 'Password') {
       return next()
     }
     if ((store.getters.currentUser.acl !== null && store.getters.currentUser.acl.includes(to.meta.AccessControlList)) || store.getters.currentUser.acl.includes('*')) {

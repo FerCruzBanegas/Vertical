@@ -21,69 +21,69 @@ class InAndExRangeCollection extends ResourceCollection
         return [
             'dataSource' => ['data' => $this->collection->transform(function($data){
                     return [
-                        'title' => $data->title,
-                        'payment' => $data->payment,
-                        'date' => Carbon::parse($data->date)->format('d/m/Y'),
-                        'project' => $data->name,
-                        'income' => $data->inc_amount,
-                        'expense' => $data->exp_amount
+                        'titulo' => $data->title,
+                        'pago' => $data->payment,
+                        'fecha' => Carbon::parse($data->date)->format('d/m/Y'),
+                        'proyecto' => $data->name,
+                        'ingresos' => $data->inc_amount,
+                        'egresos' => $data->exp_amount
                     ];
                 })
             ],
             'slice' => [
                 'rows' => array(
                     [
-                        'uniqueName' => "title",
+                        'uniqueName' => "titulo",
                         'caption' => "Título",
                         'sort' => "unsorted"
                     ],
                     [
-                        'uniqueName' => "payment",
+                        'uniqueName' => "pago",
                         'caption' => "Tipo de Pago",
                         'sort' => "unsorted"
                     ],
                     [
-                        'uniqueName' => "date",
+                        'uniqueName' => "fecha",
                         'caption' => "Fecha",
                         'sort' => "unsorted"
                     ],
                     [
-                        'uniqueName' => "project",
+                        'uniqueName' => "proyecto",
                         'caption' => "Proyecto",
                         'sort' => "unsorted"
                     ],
                     [
-                        'uniqueName' => "income",
+                        'uniqueName' => "ingresos",
                         'caption' => "Ingreso",
                         'sort' => "unsorted"
                     ],
                     [
-                        'uniqueName' => "expense",
+                        'uniqueName' => "egresos",
                         'caption' => "Egreso",
                         'sort' => "unsorted"
                     ]
                 ),
                 'measures' => array(
                     [
-                       'uniqueName' => "income",
+                       'uniqueName' => "ingresos",
                        'aggregation' => "sum",
                     ],
                     [
-                       'uniqueName' => "expense",
+                       'uniqueName' => "egresos",
                        'aggregation' => "sum",
                     ],
                     [
                        'uniqueName' => "diff",
-                       'formula' => "sum('income') - sum('expense')",
+                       'formula' => "sum('ingresos') - sum('egresos')",
                        'caption' => "Diferencia"
                     ]
                 ),
-                'flatOrder' => ['title', 'payment', 'date', 'project', 'income', 'expense']
+                'flatOrder' => ['titulo', 'pago', 'fecha', 'proyecto', 'ingresos', 'egresos']
             ],
             'conditions' => array(
                 [
                     'formula' => "#value > 0",
-                    'measure' => "income",
+                    'measure' => "ingresos",
                     'format' => [
                         "backgroundColor" => "#AED581",
                         "color" => "#000000",
@@ -93,7 +93,7 @@ class InAndExRangeCollection extends ResourceCollection
                 ],
                 [
                     'formula' => "#value > 0",
-                    'measure' => "expense",
+                    'measure' => "egresos",
                     'format' => [
                         "backgroundColor" => "#E57373",
                         "color" => "#000000",

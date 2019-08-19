@@ -63,7 +63,13 @@ class UserController extends ApiController
     {
         try {
             $user = $this->user->find($id);
-            $user->update($request->all());
+            if (!$request->has('state')) {
+                $user->update($request->all());
+            } else {
+                $user->name = $request->name;
+                $user->email = $request->email;
+                $user->save();
+            }
         } catch (\Exception $e) {
             return $this->respondInternalError();
         }

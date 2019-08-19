@@ -8,6 +8,9 @@ use App\Http\Resources\Report\InAndExMonthYearCollection;
 use App\Http\Resources\Report\InAndExYearCollection;
 use App\Http\Resources\Report\InAndExRangeCollection;
 use App\Http\Resources\Report\InAndExMonthCollection;
+use App\Http\Resources\Report\InAndExProjectCollection;
+use App\Http\Resources\Report\ExDetailProjectCollection;
+use App\Http\Resources\Report\ExMaterialProjectCollection;
 
 class ReportController extends ApiController
 {
@@ -212,5 +215,73 @@ class ReportController extends ApiController
           ->get();
 
     	return new InAndExMonthCollection($data, $request->data);
+    }
+
+    public function getIncomeAndExpenseForProject(Request $request)
+    {
+    	$params  = json_decode($request->data, true);
+    	$expense = DB::table('expenses as e')
+                   ->select('e.title', 'e.payment', 'e.date', 'p.name', DB::raw('0 as inc_amount'), DB::raw('SUM(e.amount) as exp_amount'))
+                   ->join('projects as p', 'p.id', '=', 'e.project_id')
+                   ->where(function($query) use ($params) {
+                    $query->where('p.id', '=', $params['id'])
+                          ->whereNull('e.deleted_at');
+                   })
+                   ->groupBy('e.id');
+
+        $data = DB::query()->fromSub(function ($query) use ($expense, $params) {
+            $query->select('i.title', 'i.payment', 'i.date', 'p.name', DB::raw('SUM(i.amount) as inc_amount'), DB::raw('0 as exp_amount'))
+                  ->from('incomes as i')
+                  ->join('projects as p', 'p.id', '=', 'i.project_id')
+                  ->where(function($query) use ($params) {
+                    $query->where('p.id', '=', $params['id'])
+                          ->whereNull('i.deleted_at');
+                  })
+                  ->groupBy('i.id')
+                  ->unionAll($expense);
+          }, 'sp')
+          ->select('*')
+          ->orderBy('date', 'desc')
+          ->get();
+
+    	return new InAndExProjectCollection($data, $params['name']);
+    }
+
+    public function getExpenseDetailForProject(Request $request)
+    {
+    	$params  = json_decode($request->data, true);
+        $data = DB::table('projects AS p')
+          ->join('expenses AS e', 'p.id', '=', 'e.project_id')
+          ->join('expense_types AS t', 't.id', '=', 'e.expense_type_id')
+          ->leftJoin('expense_material AS em', 'e.id', '=', 'em.expense_id')
+          ->leftJoin('materials AS m', 'em.material_id', '=', 'm.id')
+          ->where(function($query) use ($params) {
+            $query->where('p.id', '=', $params['id'])
+                  ->whereNull('e.deleted_at');
+            })
+          ->select('e.title', 't.name AS type', 'e.payment', 'e.date', 'm.name AS material', 'm.unity', 'em.quantity', DB::raw('COALESCE(em.price, null) AS amount'), DB::raw('COALESCE(em.quantity * em.price, e.amount) AS total'))
+          ->orderBy('e.date', 'desc')
+          ->get();
+
+    	return new ExDetailProjectCollection($data, $params['name']);
+    }
+
+    public function getExpenseMaterialForProject(Request $request)
+    {
+    	$params  = json_decode($request->data, true);
+        $data = DB::table('projects AS p')
+          ->join('expenses AS e', 'p.id', '=', 'e.project_id')
+          ->join('expense_material AS em', 'e.id', '=', 'em.expense_id')
+          ->join('materials AS m', 'em.material_id', '=', 'm.id')
+          ->join('material_types AS mt', 'm.material_type_id', '=', 'mt.id')
+          ->where(function($query) use ($params) {
+            $query->where('p.id', '=', $params['id'])
+                  ->whereNull('e.deleted_at');
+            })
+          ->select('mt.name AS type', 'm.name', 'm.unity', DB::raw('SUM(em.quantity) AS quantity'), DB::raw('SUM(em.quantity * em.price) AS total'))
+          ->groupBy('m.name', 'type', 'm.unity')
+          ->get();
+
+    	return new ExMaterialProjectCollection($data, $params['name']);
     }
 }

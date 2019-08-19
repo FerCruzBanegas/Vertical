@@ -66,14 +66,7 @@ class ProjectController extends ApiController
         try {
         	$uuid = \Uuid::generate()->string;
 
-            $this->project->create([
-            	'uuid'            => $uuid,
-                'name'            => $request->name,
-                'location'        => $request->location,
-                'comments'        => $request->comments,
-                'start_date'      => $request->start_date,
-                'project_type_id' => $request->project_type_id,
-            ]);
+            $this->project->create($request->all());
         } catch (\Exception $e) {
             return $this->respondInternalError();
         }
@@ -84,13 +77,7 @@ class ProjectController extends ApiController
     {
         try {
             $project = $this->project->find($id);
-            $project->update([
-            	'name'            => $request->name,
-                'location'        => $request->location,
-                'comments'        => $request->comments,
-                'start_date'      => $request->start_date,
-                'project_type_id' => $request->project_type_id,
-            ]);
+            $project->update($request->all());
         } catch (\Exception $e) {
             return $this->respondInternalError();
         }
@@ -125,6 +112,12 @@ class ProjectController extends ApiController
     public function listing()
     {
     	$projects = $this->project->listProjects();
+        return $this->respond($projects);
+    }
+
+    public function listReport()
+    {
+        $projects = $this->project->orderBy('name')->select('id', 'name')->get();
         return $this->respond($projects);
     }
 }

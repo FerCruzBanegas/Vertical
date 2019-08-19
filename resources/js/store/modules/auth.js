@@ -39,7 +39,12 @@ const mutations = {
 
   refreshTokenPromise(state, promise) {
     state.refreshTokenPromise = promise
-  }
+  },
+
+  updateUser(state, data) {
+    state.user.name = data.name
+    state.user.email = data.email
+  },
 }
 
 const actions = {
@@ -70,6 +75,10 @@ const actions = {
         return true
       } 
     } catch (e) { }
+  },
+
+  updateUser({commit}, data) {
+    commit('updateUser', data)
   },
 
   refreshToken({ commit, state }) {

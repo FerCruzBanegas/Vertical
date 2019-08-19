@@ -39,6 +39,7 @@ import FormProfile from '../views/profile/FormProfile.vue'
 import ListUsers from '../views/user/ListUsers.vue'
 import FormUser from '../views/user/FormUser.vue'
 import Password from '../views/user/Password.vue'
+import UserProfile from '../views/user/UserProfile.vue'
 
 import NotFoundComponent  from '../components/404.vue'
 import DeniedComponent  from '../components/403.vue'
@@ -60,6 +61,9 @@ export default [
         path: '/reports',
         name: 'Report',
         component: Report,
+        meta: {
+          AccessControlList: 'reports.index',
+        }
       },
       {
         path: '/project-types',
@@ -458,12 +462,14 @@ export default [
             }
           },
           {
-            path: ':id/password',
+            path: 'profile',
+            name: 'UserProfile',
+            component: UserProfile
+          },
+          {
+            path: 'password',
             name: 'Password',
-            component: Password,
-            meta: {
-              AccessControlList: 'users.update',
-            }
+            component: Password
           }
         ]
       },

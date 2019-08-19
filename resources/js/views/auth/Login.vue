@@ -7,7 +7,7 @@
             <v-toolbar color="grey lighten-2">
               <v-toolbar-title>Iniciar Sesión</v-toolbar-title>
               <v-spacer></v-spacer>
-              <img src="/img/img.png" width="180px">
+              <img src="/img/logo2.png" width="40px">
             </v-toolbar>
             <v-card-text @keyup.enter="loginSubmit">
               <v-alert 

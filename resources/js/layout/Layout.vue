@@ -13,8 +13,8 @@
       <v-toolbar flat color="">
         <v-list>
           <v-list-tile>
-            <img src="/img/logo.png" width="210px" v-if="!miniVariant">
-            <img src="/img/logo2.png" width="45px" v-else="miniVariant">
+            <img src="/img/logo.png" width="200px" v-if="!miniVariant">
+            <img src="/img/logo2.png" width="45px" v-else>
           </v-list-tile>
         </v-list>
       </v-toolbar>

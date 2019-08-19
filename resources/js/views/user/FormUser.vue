@@ -119,10 +119,6 @@
                             </v-flex>
                           </v-layout>
                         </div>
-                        <v-layout row wrap>
-                          <v-spacer></v-spacer>
-                          <router-link to="password" v-if="id">Cambiar Contraseña</router-link>
-                        </v-layout>
                       </v-flex>
                     </v-layout>
                     <v-switch
@@ -153,6 +149,7 @@
 </template>
 
 <script>
+  import { mapGetters } from 'vuex'
   import ProfileService from '../../services/profile.service'
   import UserService from '../../services/user.service'
   import User from '../../models/User'
@@ -193,7 +190,10 @@
           return 'Editar Usuario'
         }
         return 'Nuevo Usuario'
-      }
+      },
+      ...mapGetters([
+        'currentUser'
+      ])
     },
 
     created(){
@@ -237,6 +237,9 @@
             vm._save = await UserService.storeUser(vm.user)
           }
           if (vm._save.status === 201 || vm._save.status === 200) {
+            if (vm._save.status === 200 && vm.id == vm.currentUser.id) {
+              vm.$store.dispatch('updateUser', vm.user)
+            }
             vm.$snotify.simple(vm._save.data.message, 'Felicidades')
             vm.loading = false
             if (vm.retry) {

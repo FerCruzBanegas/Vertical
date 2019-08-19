@@ -71,7 +71,7 @@
           </v-card-text>
           <v-divider class="mt-5"></v-divider>
           <v-card-actions>
-            <v-btn :disabled="loading" to="/users">
+            <v-btn :disabled="loading" to="/users/profile">
               Cancelar
             </v-btn>
             <v-spacer></v-spacer>
@@ -86,6 +86,7 @@
 </template>
 
 <script>
+  import { mapGetters } from 'vuex'
   import User from '../../models/User'
   import UserService from '../../services/user.service'
 
@@ -100,7 +101,6 @@
         user: new User(),
         success: false,
         loading: false,
-        id: this.$route.params.id,
         isPassVisible: false,
         isPasswordVisible: false,
         isPasswordVisible2: false,
@@ -114,6 +114,12 @@
       }
     },
 
+    computed: {
+      ...mapGetters([
+        'currentUser'
+      ])
+    },
+
     mounted () {
       this.$validator.localize('es', this.dictionary)
     }, 
@@ -124,15 +130,11 @@
         const vm = this
         vm.loading = true
         try {
-          const response = await UserService.changePassword(vm.id, vm.user)
+          const response = await UserService.changePassword(vm.currentUser.id, vm.user)
           if (response.status === 200) {
             vm.$snotify.simple(response.data.message, 'Felicidades')
             vm.loading = false
-            if (vm.retry) {
-              vm.user = new User()
-            } else {
-              vm.$router.push('/users')
-            }
+            vm.$router.push('/users/profile')
           }
         } catch (err) {
           if(err.response.status === 422) this.$setErrorsFromResponse(err.response.data);

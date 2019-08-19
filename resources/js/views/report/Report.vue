@@ -28,7 +28,7 @@
                   </template>
                 </v-autocomplete>
               </v-flex>
-              <v-flex xs12 sm12 md3 lg3 xl3 v-if="yearShow">
+              <v-flex xs12 sm12 md3 lg3 xl3 v-show="yearShow">
                 <v-autocomplete
                   v-model="params"
                   :items="yearData"
@@ -37,7 +37,7 @@
                   label="Año"
                 ></v-autocomplete>
               </v-flex>
-              <v-flex xs12 sm12 md4 lg4 xl4 v-if="projectShow">
+              <v-flex xs12 sm12 md4 lg4 xl4 v-show="projectShow">
                 <v-autocomplete
                   v-model="params"
                   :items="projectData"
@@ -46,24 +46,25 @@
                   label="Proyecto"
                   item-text="name"
                   item-value="id"
+                  return-object
                 ></v-autocomplete>
               </v-flex>
-              <v-flex xs12 sm12 md4 lg4 xl4 v-if="rangeShow">
+              <v-flex xs12 sm12 md4 lg4 xl4 v-show="rangeShow">
                 <v-menu
-                  ref="menu" v-model="menu" :close-on-content-click="false" :nudge-right="30"
+                  ref="menu" v-model="menuRange" :close-on-content-click="false" :nudge-right="30"
                   lazy transition="scale-transition" offset-y full-width min-width="290px"
                 >
                   <v-text-field box color="grey darken-2" slot="activator" :value="formattedRange" readonly></v-text-field>
                   <date-range-picker v-model="dateRange">
                     <v-spacer></v-spacer>
-                    <v-btn @click="menu = false" color="red darken-3" flat>OK</v-btn>
+                    <v-btn @click="menuRange = false" color="red darken-3" flat>OK</v-btn>
                   </date-range-picker>
                 </v-menu>
               </v-flex>
               <v-flex xs12 sm12 md4 lg4 xl4 v-if="monthShow">
                 <v-menu
                   ref="menu"
-                  v-model="menu"
+                  v-model="menuMonth"
                   :close-on-content-click="false"
                   :nudge-right="40"
                   :return-value.sync="params"
@@ -94,7 +95,7 @@
                     locale="es-es"
                   >
                     <v-spacer></v-spacer>
-                    <v-btn flat color="red darken-3" @click="menu = false">Cancelar</v-btn>
+                    <v-btn flat color="red darken-3" @click="menuMonth = false">Cancelar</v-btn>
                     <v-btn flat color="red darken-3" @click="$refs.menu.save(params)">OK</v-btn>
                   </v-date-picker>
                 </v-menu>
@@ -128,7 +129,8 @@
     data () {
       return {
         dateRange: [],
-        menu: false,
+        menuRange: false,
+        menuMonth: false,
         loading: false,
         pivot: null,
         params: null,
@@ -141,7 +143,9 @@
           { name: 'Ingresos / Egresos por Mes', data: { url: 'report-month', type: 'month' } },
           { divider: true },
           { header: 'Proyectos' },
-          { name: 'Ingresos / Egresos por Proyectos' , data: { url: 'report-year', type: 'project' } },
+          { name: 'Ingresos / Egresos por Proyecto' , data: { url: 'report-project', type: 'project' } },
+          { name: 'Detalle de Egresos por Proyecto' , data: { url: 'report-detail', type: 'project' } },
+          { name: 'Gasto de materiales por Proyecto' , data: { url: 'report-material', type: 'project' } },
         ],
         submitShow: false,
         yearData: ['2018','2019', '2020', '2021'],
@@ -253,7 +257,7 @@
 
     methods: {
       listProjects: async function() {
-        const projects = await ProjectService.getProjects('projects/listing')
+        const projects = await ProjectService.getProjects('projects/list-report')
         if (projects.status === 200) {
           this.projectData = projects.data;
         }
@@ -270,9 +274,23 @@
           params = { params: { data: this.dateRange }};
           url = `${this.model.data.url}`
         } else url = this.model.data.url
-        const response = await ReportService.getReports(url, params)
-        if (response.status === 200) {
-          this.pivot.setReport(response.data.data)
+        try {
+          const response = await ReportService.getReports(url, params)
+          if (response.status === 200) {
+            if (response.data.data.dataSource.data.length > 0) {
+              this.pivot.setReport(response.data.data)
+            } else {
+              this.pivot.setOptions({
+                grid: {
+                  title: "Sin Resultados"
+                }
+              });
+              this.pivot.refresh();
+              this.pivot.updateData({});
+            }
+            this.loading = false
+          }
+        } catch (err) {
           this.loading = false
         }
       }

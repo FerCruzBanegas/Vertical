@@ -16,7 +16,7 @@ class Project extends ApiModel
     protected $dates = ['deleted_at'];
 
     protected $fillable = [
-        'uuid', 'name', 'location', 'comments', 'start_date', 'end_date', 'state', 'project_type_id',
+        'name', 'location', 'comments', 'start_date', 'end_date', 'state', 'project_type_id',
     ];
 
     protected $searchable = [

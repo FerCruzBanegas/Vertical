@@ -44,7 +44,20 @@ instance.interceptors.response.use(
       })
       .then(async () => {
         await store.dispatch('cleanSession')
-        router.push({ name: 'login' })
+        router.push({ name: 'Login' })
+      })
+    }
+
+    if (error.response.status === 403) {
+      router.push({ name: 'Unauthorized' })
+    }
+
+    if (error.response.status >= 500) {
+      store.dispatch('responseMessage', {
+        type: 'error',
+        text: error.response.data.errors.message,
+        title: 'Error',
+        modal: true
       })
     }
     

@@ -9,10 +9,17 @@ class InAndExYearCollection extends ResourceCollection
     public function toArray($request)
     {
         return [
-            'dataSource' => ['data' => $this->collection],
+            'dataSource' => ['data' => $this->collection->transform(function($data){
+                    return [
+                        'año' => $data->year,
+                        'ingresos' => $data->income,
+                        'egresos' => $data->expense
+                    ];
+                })
+            ],
             'slice' => [
                 'rows' => array([
-                    'uniqueName' => "year",
+                    'uniqueName' => "año",
                     'caption' => "Año",
                     'sort' => "unsorted"
                 ]),
@@ -21,18 +28,18 @@ class InAndExYearCollection extends ResourceCollection
                 ]),
                 'measures' => array(
                     [
-                       'uniqueName' => "income",
+                       'uniqueName' => "ingresos",
                        'aggregation' => "sum",
                        'grandTotalCaption' => "Ingresos"
                     ],
                     [
-                       'uniqueName' => "expense",
+                       'uniqueName' => "egresos",
                        'aggregation' => "sum",
                        'grandTotalCaption' => "Egresos"
                     ],
                     [
                        'uniqueName' => "diff",
-                       'formula' => "sum('income') - sum('expense')",
+                       'formula' => "sum('ingresos') - sum('egresos')",
                        'caption' => "Ahorro Anual"
                     ]
                 )

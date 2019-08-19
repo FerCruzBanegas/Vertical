@@ -151,9 +151,31 @@ Route::get('/test', function(Request $request) {
         //   ->get();
 
 
-        $months = array("Enero","Febrero","Marzo","Abril","Mayo","Junio","Julio","Agosto","Septiembre","Octubre","Noviembre","Diciembre");
+        $expense = DB::table('expenses as e')
+                   ->select('e.title', 'e.payment', 'e.date', 'p.name', DB::raw('NULL as inc_amount'), DB::raw('SUM(e.amount) as exp_amount'))
+                   ->join('projects as p', 'p.id', '=', 'e.project_id')
+                   ->where(function($query) {
+                    $query->where('p.id', '=', 53)
+                          ->whereNull('e.deleted_at');
+                   })
+                   ->groupBy('e.id');
 
-        return response()->json($months['12'-1]);
+        $data = DB::query()->fromSub(function ($query) use ($expense) {
+            $query->select('i.title', 'i.payment', 'i.date', 'p.name', DB::raw('SUM(i.amount) as inc_amount'), DB::raw('NULL as exp_amount'))
+                  ->from('incomes as i')
+                  ->join('projects as p', 'p.id', '=', 'i.project_id')
+                  ->where(function($query) {
+                    $query->where('p.id', '=', 53)
+                          ->whereNull('i.deleted_at');
+                  })
+                  ->groupBy('i.id')
+                  ->unionAll($expense);
+          }, 'sp')
+          ->select('*')
+          ->orderBy('date', 'desc')
+          ->get();
+
+        return response()->json($data);
 
     // $expenses = \App\Expense::with([
     //     'expense_type',
@@ -204,6 +226,7 @@ Route::post('/login', 'Auth\AuthController@login');
 
 Route::get('project-types/listing', 'ProjectTypeController@listing');
 Route::get('projects/listing', 'ProjectController@listing');
+Route::get('projects/list-report', 'ProjectController@listReport');
 Route::get('material-types/listing', 'MaterialTypeController@listing');
 Route::get('income-types/listing', 'IncomeTypeController@listing');
 Route::get('expense-types/listing', 'ExpenseTypeController@listing');
@@ -316,9 +339,13 @@ Route::group(['middleware' => ['auth:api', 'acl:api']], function () {
     Route::get('report-year', 'ReportController@getIncomeAndExpenseForYear');
     Route::get('report-range', 'ReportController@getIncomeAndExpenseForRange');
     Route::get('report-month', 'ReportController@getIncomeAndExpenseForMonth');
+    Route::get('report-project', 'ReportController@getIncomeAndExpenseForProject');
+    Route::get('report-detail', 'ReportController@getExpenseDetailForProject');
+    Route::get('report-material', 'ReportController@getExpenseMaterialForProject');
 });
 
 //LEER
+// revisar perfil error al deslogearse desde esas pagina
 // 1.- Validar que los proyectos no se puedan finalizar sin ningun evento de ingresos o egresos.
 // 2.- Validar que los proeyectos finalisados no aparescan para ser seleccionados.
 // 3.- validar montos en formularios de egresos
@@ -479,3 +506,26 @@ Route::group(['middleware' => ['auth:api', 'acl:api']], function () {
 //   )
 // ) as `sp` 
 // order by `date` desc
+// select e.id, e.title, m.name
+// from projects p
+// inner join expenses e
+// on p.id = e.project_id
+// inner join expense_material em
+// on e.id = em.expense_id
+// inner join materials m
+// on em.material_id = m.id
+// where p.id = 53
+// select m.name, m.unity, sum(em.quantity), sum(em.quantity * em.price)
+// from projects p
+// inner join expenses e
+// on p.id = e.project_id
+// inner join expense_material em
+// on e.id = em.expense_id
+// inner join materials m
+// on em.material_id = m.id
+// where p.id = 53
+// group by m.name, m.unity
+// ef7ba6f2-44cc-3e9e-aeb9-9332b6eb40b9
+// 1b2eae1f-5cc3-39f5-a0bf-b4fcdbbb6500
+// f550691c-2c76-3ed5-bcb2-74b53fd768c2
+// cadd3c0e-741e-373f-bd9e-f12d7f34f21b
