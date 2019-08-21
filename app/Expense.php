@@ -27,6 +27,11 @@ class Expense extends ApiModel
         return $this->belongsTo(ExpenseType::class);
     }
 
+    public function account()
+    {
+        return $this->belongsTo(Account::class);
+    }
+
     public function project()
     {
         return $this->belongsTo(Project::class);

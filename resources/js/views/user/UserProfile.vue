@@ -8,7 +8,7 @@
             <v-spacer></v-spacer>
             <div>
               <span class="title mb-3">Registrado:</span>
-              <span class="subheading">{{ currentUser.created | formatDate('DD/MM/YYYY') }}</span>
+              <span class="subheading" v-if="currentUser">{{ currentUser.created | formatDate('DD/MM/YYYY') }}</span>
             </div>
           </v-card-title>
           <v-container fluid>
@@ -88,7 +88,7 @@
       ])
     },
 
-    created(){
+    mounted(){
       this.user.name = this.currentUser.name
       this.user.email = this.currentUser.email
     }, 

@@ -56,7 +56,10 @@
     name: 'Dashboard',
     data () {
       return {
-        success: false 
+        success: false,
+        chart1: null,
+        chart2: null,
+        chart3: null,
       }
     },
 
@@ -64,6 +67,14 @@
 
     mounted() {
       this.getQueryForGraphics()
+    },
+
+    beforeDestroy() {
+      if (this.chart1 && this.chart2 && this.chart3) {
+        this.chart1.dispose();
+        this.chart2.dispose();
+        this.chart3.dispose();
+      }
     },
 
     methods: {
@@ -78,19 +89,19 @@
         }
       },
       getColumnChart(data) {
-        let chart = am4core.create(this.$refs.chartdiv, am4charts.XYChart);
+        this.chart1 = am4core.create(this.$refs.chartdiv, am4charts.XYChart);
 
-        chart.data = data
+        this.chart1.data = data
 
         //create category axis for years
-        let categoryAxis = chart.xAxes.push(new am4charts.CategoryAxis());
+        let categoryAxis = this.chart1.xAxes.push(new am4charts.CategoryAxis());
         categoryAxis.dataFields.category = "month";
 
         //create value axis for income and expenses
-        let valueAxis = chart.yAxes.push(new am4charts.ValueAxis());
+        let valueAxis = this.chart1.yAxes.push(new am4charts.ValueAxis());
 
         //create columns
-        let series = chart.series.push(new am4charts.ColumnSeries());
+        let series = this.chart1.series.push(new am4charts.ColumnSeries());
         series.name = "Ingresos";
         series.dataFields.valueY = "income";
         series.dataFields.categoryX = "month";
@@ -99,7 +110,7 @@
         series.tooltipText = "Ingresos en {categoryX}: {valueY.value}";
 
         //create line
-        let lineSeries = chart.series.push(new am4charts.LineSeries());
+        let lineSeries = this.chart1.series.push(new am4charts.LineSeries());
         lineSeries.name = "Egresos";
         lineSeries.dataFields.valueY = "expense";
         lineSeries.dataFields.categoryX = "month";
@@ -112,24 +123,24 @@
         circleBullet.circle.strokeWidth = 2;
 
         //add chart cursor
-        chart.cursor = new am4charts.XYCursor();
-        chart.cursor.behavior = "zoomX";
+        this.chart1.cursor = new am4charts.XYCursor();
+        this.chart1.cursor.behavior = "zoomX";
 
         //add legend
-        chart.legend = new am4charts.Legend();
+        this.chart1.legend = new am4charts.Legend();
       },
 
       getPieChart(data) {
         // Create chart instance
-        let chart = am4core.create(this.$refs.piediv, am4charts.PieChart);
+        this.chart2 = am4core.create(this.$refs.piediv, am4charts.PieChart);
 
         // Add and configure Series
-        let pieSeries = chart.series.push(new am4charts.PieSeries());
+        let pieSeries = this.chart2.series.push(new am4charts.PieSeries());
         pieSeries.dataFields.value = "total";
         pieSeries.dataFields.category = "project";
 
         // Let's cut a hole in our Pie chart the size of 30% the radius
-        chart.innerRadius = am4core.percent(30);
+        this.chart2.innerRadius = am4core.percent(30);
 
         // Put a thick white border around each Slice
         pieSeries.slices.template.stroke = am4core.color("#fff");
@@ -159,23 +170,23 @@
         hoverShadow.blur = 5;
 
         // Add a legend
-        chart.legend = new am4charts.Legend();
+        this.chart2.legend = new am4charts.Legend();
 
-        chart.data = data;
+        this.chart2.data = data;
       },
 
       getPie2Chart(data) {
         // am4core.useTheme(am4themes_moonrisekingdom);
         // Create chart instance
-        let chart = am4core.create(this.$refs.pie2div, am4charts.PieChart);
+        this.chart3 = am4core.create(this.$refs.pie2div, am4charts.PieChart);
 
         // Add and configure Series
-        let pieSeries = chart.series.push(new am4charts.PieSeries());
+        let pieSeries = this.chart3.series.push(new am4charts.PieSeries());
         pieSeries.dataFields.value = "total";
         pieSeries.dataFields.category = "project";
 
         // Let's cut a hole in our Pie chart the size of 30% the radius
-        chart.innerRadius = am4core.percent(30);
+        this.chart3.innerRadius = am4core.percent(30);
 
         // Put a thick white border around each Slice
         pieSeries.slices.template.stroke = am4core.color("#fff");
@@ -205,9 +216,9 @@
         hoverShadow.blur = 5;
 
         // Add a legend
-        chart.legend = new am4charts.Legend();
+        this.chart3.legend = new am4charts.Legend();
 
-        chart.data = data;
+        this.chart3.data = data;
       }
     }
   }

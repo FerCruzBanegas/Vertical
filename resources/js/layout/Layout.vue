@@ -128,6 +128,16 @@
           ]
         },
         {
+          icon: 'credit_card',
+          'icon-alt': 'credit_card',
+          text: 'Cuentas',
+          model: false,
+          children: [
+            { icon: 'create', text: 'Registrar Nuevo', url: '/accounts/create', permission: 'accounts.create' },
+            { icon: 'list', text: 'Ver Lista', url: '/accounts', permission: 'accounts.index' }
+          ]
+        },
+        {
           icon: 'attach_money',
           'icon-alt': 'attach_money',
           text: 'Ingresos',

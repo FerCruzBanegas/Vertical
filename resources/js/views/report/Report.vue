@@ -1,5 +1,5 @@
 <template>
-  <v-container fluid grid-list-md>
+  <v-container fluid grid-list-md v-show="success">
     <v-layout row wrap>
       <v-flex xs12 sm12 md12 lg12 xl12>
         <v-card>
@@ -128,6 +128,7 @@
     name: 'Report',
     data () {
       return {
+        success: false,
         dateRange: [],
         menuRange: false,
         menuMonth: false,
@@ -260,6 +261,7 @@
         const projects = await ProjectService.getProjects('projects/list-report')
         if (projects.status === 200) {
           this.projectData = projects.data;
+          this.success = true
         }
       },
 

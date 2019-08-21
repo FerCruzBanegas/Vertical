@@ -40,6 +40,9 @@ import ListUsers from '../views/user/ListUsers.vue'
 import FormUser from '../views/user/FormUser.vue'
 import Password from '../views/user/Password.vue'
 import UserProfile from '../views/user/UserProfile.vue'
+//account
+import ListAccounts from '../views/account/ListAccounts.vue'
+
 
 import NotFoundComponent  from '../components/404.vue'
 import DeniedComponent  from '../components/403.vue'
@@ -64,6 +67,24 @@ export default [
         meta: {
           AccessControlList: 'reports.index',
         }
+      },
+      {
+        path: '/accounts',
+        name: 'Accounts',
+        redirect: '/accounts',
+        component: {
+          render (c) { return c('router-view') }
+        },
+        children: [
+          {
+            path: '',
+            name: 'ListAccounts',
+            component: ListAccounts,
+            meta: {
+              AccessControlList: 'accounts.index',
+            }
+          }
+        ]
       },
       {
         path: '/project-types',
