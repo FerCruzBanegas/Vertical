@@ -15,7 +15,7 @@ class Expense extends ApiModel
     protected $dates = ['deleted_at'];
 
     protected $fillable = [
-        'title', 'payment', 'date', 'note', 'amount', 'expense_type_id', 'project_id'
+        'title', 'payment', 'date', 'note', 'amount', 'expense_type_id', 'project_id', 'account_id'
     ];
 
     protected $searchable = [

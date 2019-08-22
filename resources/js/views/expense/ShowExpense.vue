@@ -26,8 +26,8 @@
 
                     <v-list-tile avatar>
                       <v-list-tile-content>
-                        <v-list-tile-title>Fecha de Egreso</v-list-tile-title>
-                        <v-list-tile-sub-title>{{ expense.date | formatDate('DD/MM/YYYY') }}</v-list-tile-sub-title>
+                        <v-list-tile-title>Cuenta</v-list-tile-title>
+                        <v-list-tile-sub-title>{{ expense.account}}</v-list-tile-sub-title>
                       </v-list-tile-content>
                     </v-list-tile>
 
@@ -35,8 +35,8 @@
 
                     <v-list-tile avatar>
                       <v-list-tile-content>
-                        <v-list-tile-title>Proyecto</v-list-tile-title>
-                        <v-list-tile-sub-title>{{ expense.project }}</v-list-tile-sub-title>
+                        <v-list-tile-title>Fecha de Egreso</v-list-tile-title>
+                        <v-list-tile-sub-title>{{ expense.date | formatDate('DD/MM/YYYY') }}</v-list-tile-sub-title>
                       </v-list-tile-content>
                     </v-list-tile>
 
@@ -65,6 +65,15 @@
 
                     <v-list-tile avatar>
                       <v-list-tile-content>
+                        <v-list-tile-title>Proyecto</v-list-tile-title>
+                        <v-list-tile-sub-title>{{ expense.project }}</v-list-tile-sub-title>
+                      </v-list-tile-content>
+                    </v-list-tile>
+
+                    <v-divider></v-divider>
+
+                    <v-list-tile avatar>
+                      <v-list-tile-content>
                         <v-list-tile-title>Tipo de Egreso</v-list-tile-title>
                         <v-list-tile-sub-title>{{ expense.expense_type }}</v-list-tile-sub-title>
                       </v-list-tile-content>
@@ -74,17 +83,22 @@
 
                     <v-list-tile avatar>
                       <v-list-tile-content>
-                        <v-list-tile-title>Nota</v-list-tile-title>
-                        <v-list-tile-sub-title>{{ expense.note }}</v-list-tile-sub-title>
-                      </v-list-tile-content>
-                    </v-list-tile>
-
-                    <v-divider></v-divider>
-
-                    <v-list-tile avatar>
-                      <v-list-tile-content>
                         <v-list-tile-title>Actualización</v-list-tile-title>
                         <v-list-tile-sub-title>Modificado por: {{ expense.created.causer }} en fecha {{ expense.updated.date | formatDate('DD/MM/YYYY') }}</v-list-tile-sub-title>
+                      </v-list-tile-content>
+                    </v-list-tile>
+                  </v-list>
+                </v-card>
+              </v-flex>
+            </v-layout>
+            <v-layout wrap>
+              <v-flex xs12 sm12 md12 lg12 v-if="expense.note">
+                <v-card>
+                  <v-list two-line subheader>
+                    <v-list-tile avatar>
+                      <v-list-tile-content>
+                        <v-list-tile-title>Nota</v-list-tile-title>
+                        <v-list-tile-sub-title>{{ expense.note }}</v-list-tile-sub-title>
                       </v-list-tile-content>
                     </v-list-tile>
                   </v-list>

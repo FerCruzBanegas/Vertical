@@ -158,6 +158,16 @@
           ]
         },
         {
+          icon: 'local_atm',
+          'icon-alt': 'local_atm',
+          text: 'Arqueos de Caja',
+          model: false,
+          children: [
+            { icon: 'create', text: 'Registrar Nuevo', url: '/boxes/create', permission: 'boxes.create' },
+            { icon: 'list', text: 'Ver Lista', url: '/boxes', permission: 'boxes.index' }
+          ]
+        },
+        {
           icon: 'style',
           'icon-alt': 'style',
           text: 'Categorías',

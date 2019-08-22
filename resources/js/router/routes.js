@@ -42,7 +42,10 @@ import Password from '../views/user/Password.vue'
 import UserProfile from '../views/user/UserProfile.vue'
 //account
 import ListAccounts from '../views/account/ListAccounts.vue'
-
+import FormAccount from '../views/account/FormAccount.vue'
+//box
+import ListBoxes from '../views/box/ListBoxes.vue'
+import FormBox from '../views/box/FormBox.vue'
 
 import NotFoundComponent  from '../components/404.vue'
 import DeniedComponent  from '../components/403.vue'
@@ -82,6 +85,56 @@ export default [
             component: ListAccounts,
             meta: {
               AccessControlList: 'accounts.index',
+            }
+          },
+          {
+            path: 'create',
+            name: 'CreateAccount',
+            component: FormAccount,
+            meta: {
+              AccessControlList: 'accounts.create',
+            }
+          },
+          {
+            path: ':id/edit',
+            name: 'EditAccount',
+            component: FormAccount,
+            meta: {
+              AccessControlList: 'accounts.update',
+            }
+          }
+        ]
+      },
+      {
+        path: '/boxes',
+        name: 'Boxes',
+        redirect: '/boxes',
+        component: {
+          render (c) { return c('router-view') }
+        },
+        children: [
+          {
+            path: '',
+            name: 'ListBoxes',
+            component: ListBoxes,
+            meta: {
+              AccessControlList: 'boxes.index',
+            }
+          },
+          {
+            path: 'create',
+            name: 'CreateBox',
+            component: FormBox,
+            meta: {
+              AccessControlList: 'boxes.create',
+            }
+          },
+          {
+            path: ':id/edit',
+            name: 'EditBox',
+            component: FormBox,
+            meta: {
+              AccessControlList: 'boxes.update',
             }
           }
         ]

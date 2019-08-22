@@ -17,6 +17,7 @@ class ExpenseResource extends JsonResource
             'amount' => $this->amount,
             'expense_type_id' => $this->expense_type_id,
             'project_id' => $this->project_id,
+            'account_id' => $this->account_id,
             'materials' => collect($this->materials)->transform(function($material){
                 return [
                     'id' => $material->id,
@@ -24,7 +25,15 @@ class ExpenseResource extends JsonResource
                     'quantity' => $material->pivot->quantity,
                     'price' => $material->pivot->price
                 ];
-            })
+            }),
+            'people' => collect($this->people)->transform(function($person){
+                return [
+                    'id' => $person->id,
+                    'name' => $person->name,
+                    'surnames' => $person->surnames,
+                    'phone' => $person->phone
+                ];
+            }),
         ];        
     }
 }

@@ -1,53 +1,41 @@
 <template>
   <v-container fluid grid-list-md>
-    <info-events v-if="infoExpense" :data="infoExpense" :icon="'trending_down'"></info-events>
     <v-layout row wrap>
       <v-flex xs12 sm12 md12 lg12 xl12>
+        <modal-delete :message="message" :loading="loading" :remove="remove" @hide="remove = !remove" @deleted="deleted"></modal-delete>
         <v-card flat>
-          <modal-delete :message="message" :loading="loading" :remove="remove" @hide="remove = !remove" @deleted="deleted"></modal-delete>
           <v-card-title primary-title>
-            <h3 class="headline mb-0">Lista de Egresos</h3>
+            <h3 class="headline mb-0">Lista de Cuentas</h3>
           </v-card-title>
           <v-container fluid>
             <v-layout>
               <v-flex xs12 sm12 md12 lg12 xl12>
                 <v-card>
                   <v-card-title>
-                    <v-container fluid>
-                      <v-layout row wrap>
-                        <v-flex xs12 sm12 md4 lg4>
-                          <v-btn
-                            v-if="permission('expenses.create')"
-                            dark color="grey darken-1" 
-                            slot="activator" 
-                            class="mb-2" 
-                            to="expenses/create"
-                          >
-                            <v-icon dark>note_add</v-icon>
-                          </v-btn>
-                        </v-flex>
-                        <v-spacer></v-spacer>
-                        <v-flex xs12 sm12 md6 lg6>
-                          <v-text-field
-                            color="grey darken-2"
-                            v-model="search"
-                            @keypress.enter.prevent="filterData"
-                            append-icon="search"
-                            label="Buscar"
-                            single-line
-                            hide-details
-                            clearable
-                          >
-                            <template v-slot:prepend>
-                              <v-btn flat icon color="red darken-3" @click="allData">
-                                <v-icon>cached</v-icon>
-                              </v-btn>
-                            </template>
-                          </v-text-field>
-                        </v-flex>
-                      </v-layout>
-                      <filters @changeDate="dateFilter" @selectProject="projectFilter"></filters>
-                    </v-container>
+                    <v-btn
+                      v-if="permission('accounts.create')"
+                      dark color="grey darken-1" 
+                      slot="activator" 
+                      class="mb-2" 
+                      to="accounts/create"
+                    >
+                      <v-icon dark>note_add</v-icon>
+                    </v-btn>
+                    </v-btn>
+                    <v-spacer></v-spacer>
+                    <v-btn flat icon color="red darken-3" @click="allData">
+                      <v-icon>cached</v-icon>
+                    </v-btn>
+                    <v-text-field
+                      color="grey darken-2"
+                      v-model="search"
+                      @keypress.enter.prevent="filterData"
+                      append-icon="search"
+                      label="Buscar"
+                      single-line
+                      hide-details
+                      clearable
+                    ></v-text-field>
                   </v-card-title>
                   <v-data-table
                     :headers="headers"
@@ -61,27 +49,46 @@
                     <v-progress-linear height="3" slot="progress" color="red darken-3" indeterminate></v-progress-linear>
                     <template slot="items" slot-scope="props">
                       <td class="justify-center layout px-0">
-                        <v-btn v-if="permission('expenses.show')" icon class="mx-0" :to="{ name: 'ShowExpense', params: { id: props.item.id }}">
+                        <v-btn v-if="permission('accounts.show')" icon class="mx-0">
                           <v-icon color="grey darken-1">visibility</v-icon>
                         </v-btn>
                       </td>
                       <td>{{ props.item.title }}</td>
                       <td>{{ props.item.date | formatDate('DD/MM/YYYY') }}</td>
-                      <td><strong>Bs. {{ props.item.amount | currency }}</strong></td>
-                      <td>{{ props.item.project }}</td>
+                      <td><strong>{{ props.item.amount | currency }}</strong></td>
+                      <td>
+                        <v-chip
+                          v-if="props.item.state == 'Inactivo'"
+                          color="red lighten-4"
+                          class="ml-0"
+                          label
+                          small
+                        >
+                          {{ props.item.state }}
+                        </v-chip>
+                        <v-chip
+                          v-else
+                          color="green lighten-4"
+                          class="ml-0"
+                          label
+                          small
+                        >
+                          {{ props.item.state }}
+                        </v-chip>
+                      </td>
                       <td>
                         <v-btn
-                          v-if="permission('expenses.update')"
+                          v-if="permission('accounts.update')"
                           small 
                           flat 
                           icon class="mx-0" 
                           color="grey"
-                          :to="{ name: 'EditExpense', params: { id: props.item.id }}"
+                          :to="{ name: 'EditAccount', params: { id: props.item.id }}"
                         >
                           <v-icon small color="grey">edit</v-icon>
                         </v-btn>
-                        <v-btn
-                          v-if="permission('expenses.destroy')" 
+                        <v-btn 
+                          v-if="permission('accounts.destroy')"
                           small
                           flat 
                           icon class="mx-0" 
@@ -111,29 +118,24 @@
 
 <script>
   import permission from '../../mixins/permission'
-  import InfoEvents from '../../components/InfoEvents.vue'
   import ModalDelete from '../../components/ModalDelete.vue'
-  import Filters from '../../components/Filters.vue'
-  import ExpenseService from '../../services/expense.service'
+  import AccountService from '../../services/account.service'
 
   export default {
-    name: 'list-expense',
+    name: 'list-accounts',
     data () {
       return {
-        date: '',
-        project: null,
-        search: null,
+        search: '',
         progress: false,
         message: 'Realmente desea borrar los datos de este registro?',
         remove: false,
         loading: false,
-        infoExpense: null,
         headers: [
           { text: '', align: 'left', sortable: false, width: "50" },
-          { text: 'Título', value: 'titulo', width: "250" },
-          { text: 'Fecha Egreso', value: 'fecha egreso', width: "60" },
-          { text: 'Monto', sortable: false, value: 'monto', width: "130" },
-          { text: 'Proyecto', sortable: false, value: 'proyecto', width: "190" },
+          { text: 'Título', value: 'titulo', width: "200" },
+          { text: 'Fecha Apertura', value: 'fecha', width: "200" },
+          { text: 'Monto Inicial', value: 'monto', width: "100" },
+          { text: 'Estado', value: 'estado', width: "100" },
           { text: 'Acciones', sortable: false, value: 'acciones', width: "150" }
         ],
         items: [],
@@ -147,9 +149,7 @@
     mixins: [permission],
 
     components: {
-      'info-events' : InfoEvents,
-      'modal-delete' : ModalDelete,
-      'filters' : Filters
+      'modal-delete' : ModalDelete
     },
     
     watch: {
@@ -164,32 +164,7 @@
       }
     },
 
-    created() {
-      this.getInfoExpense()
-    },
-
     methods: {
-      dateFilter(date) {
-        this.date = date
-        this.getDataFromApi().then(data =>{
-          this.items = data.items
-        })
-      },
-
-      projectFilter(project) {
-        this.project = project
-        this.getDataFromApi().then(data =>{
-          this.items = data.items
-        })
-      },
-
-      getInfoExpense: async function() {
-        const response = await ExpenseService.getExpenses('expenses/amounts')
-        if (response.status === 200) {
-          this.infoExpense = response.data
-        }
-      },
-
       showModal(item) {
         this.remove = true
         this.id = item.id
@@ -197,7 +172,7 @@
 
       deleted:async function() {
         this.loading = true
-        const response = await ExpenseService.deleteExpense(`expenses/${this.id}`)
+        const response = await AccountService.deleteAccount(`accounts/${this.id}`)
         if (response.status === 200) {
           this.loading = false
           this.remove = false
@@ -209,16 +184,13 @@
       },
 
       allData() {
-        this.$bus.$emit('updatingData')
-        this.date = ''
-        this.project = null
-        this.search = null
+        this.search = ''
         this.pagination.page = 1
         this.getDataFromApi().then(data =>{
           this.items = data.items
         })
       },
-
+      
       filterData() {
         this.getDataFromApi().then(data =>{
           this.items = data.items
@@ -229,7 +201,7 @@
         this.progress = true
         return new Promise((resolve, reject) => {
           const { sortBy, descending, page } = this.pagination
-          ExpenseService.getExpenses(this.buildURL())
+          AccountService.getAccounts(this.buildURL())
           .then((response) => {
             this.totalItems = response.data.meta.total
             let items = response.data.data
@@ -244,10 +216,8 @@
       buildURL() {
         let page = `?page=${this.pagination.page}`
         let rowsPerPage = `&rowsPerPage=${this.pagination.rowsPerPage}`
-        let filter = this.search === null ? '' : `&filter=${this.search}`
-        let project = this.project === null ? '' : `&project=${this.project}`
-        let date = this.date === '' ? '' : `&date=${this.date}`
-        return `expenses${page}${rowsPerPage}${filter}${date}${project}`
+        let filter = this.search === '' ? '' : `&filter=${this.search}`
+        return `accounts${page}${rowsPerPage}${filter}`
       }
     }
   }

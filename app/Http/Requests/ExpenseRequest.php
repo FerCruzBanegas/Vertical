@@ -23,7 +23,8 @@ class ExpenseRequest extends FormRequest
             'expense.note' => 'nullable|min:5|max:120',
             'expense.amount' => 'required|max:9|regex:/^-?[0-9]+(?:\.[0-9]{1,2})?$/',
             'expense.expense_type_id' => 'required|integer',
-            'expense.project_id' => 'required|integer'
+            'expense.project_id' => 'required|integer',
+            'expense.account_id' => 'required|integer'
         ];
 
         // if($this->method() == 'PATCH' || $this->method() == 'PUT') {
@@ -42,7 +43,8 @@ class ExpenseRequest extends FormRequest
             'expense.note' => 'nota',
             'expense.amount' => 'monto',
             'expense.expense_type_id' => 'tipo de egreso',
-            'expense.project_id' => 'proyecto'
+            'expense.project_id' => 'proyecto',
+            'expense.account_id' => 'cuenta'
         ];
     }
 }

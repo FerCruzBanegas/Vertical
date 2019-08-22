@@ -35,6 +35,11 @@ class Account extends ApiModel
 
     public function boxes()
     {
-        return $this->belongsToMany(Box::class)->withPivot('income', 'expense', 'cash')->withTimestamps();
+        return $this->belongsToMany(Box::class);
+    }
+
+    public static function listAccounts()
+    {
+        return static::orderBy('id', 'DESC')->select('id', 'title');
     }
 }

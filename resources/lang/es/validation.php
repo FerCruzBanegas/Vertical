@@ -146,6 +146,7 @@ return [
         //added
         'profile_id'            => 'perfil',
         'project_id'            => 'proyecto',
+        'account_id'            => 'cuenta',
         'project_type_id'       => 'tipo de proyecto',
         'material_type_id'      => 'tipo de material',
         'income_type_id'        => 'tipo de ingreso',

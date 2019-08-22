@@ -62,6 +62,23 @@
                         <v-autocomplete
                           box
                           color="grey darken-2"
+                          :items="accounts"
+                          v-model="income.account_id"
+                          label="Cuenta *"
+                          data-vv-name="income.account_id"
+                          data-vv-as="cuenta"
+                          v-validate="'required'"
+                          :error-messages="errors.collect('income.account_id')"
+                          item-text="title"
+                          item-value="id"
+                        ></v-autocomplete>
+                      </v-flex>
+                    </v-layout>
+                    <v-layout row wrap>
+                      <v-flex xs12 sm12 md6 lg6>
+                        <v-autocomplete
+                          box
+                          color="grey darken-2"
                           :items="payment"
                           label="Método de Pago *"
                           v-model="income.payment"
@@ -71,8 +88,6 @@
                           :error-messages="errors.collect('payment')"
                         ></v-autocomplete>
                       </v-flex>
-                    </v-layout>
-                    <v-layout row wrap>
                       <v-flex xs12 sm12 md6 lg6>
                         <v-menu
                           v-model="picker"
@@ -109,7 +124,9 @@
                           ></v-date-picker>
                         </v-menu>
                       </v-flex>
-                      <v-flex xs12 sm12 md6 lg6>
+                    </v-layout>
+                    <v-layout row wrap>
+                      <v-flex xs12 sm12 md12 lg12>
                         <v-text-field
                           box
                           color="grey darken-2"
@@ -170,6 +187,7 @@
   import IncomeTypeService from '../../services/income.type.service'
   import IncomeService from '../../services/income.service'
   import ProjectService from '../../services/project.service'
+  import AccountService from '../../services/account.service'
 
   export default {
     $_veeValidate: {
@@ -195,6 +213,7 @@
         picker: false,
         income_types: [],
         projects: [],
+        accounts: [],
         payment: ['Tarjeta', 'Efectivo', 'Cheque', 'Credito', 'Transferencia'],
         income: new Income(),
         dateFormatted: '',
@@ -223,7 +242,7 @@
         this.showIncome();
       }
 
-      Promise.all([this.listIncomeTypes(), this.listProjects()])
+      Promise.all([this.listIncomeTypes(), this.listProjects(), this.listAccounts()])
       .then(() =>{
         this.success = true
       })
@@ -248,6 +267,13 @@
         const projects = await ProjectService.getProjects('projects/listing')
         if (projects.status === 200) {
           this.projects = projects.data;
+        }
+      },
+
+      listAccounts: async function() {
+        const accounts = await AccountService.getAccounts('accounts/listing')
+        if (accounts.status === 200) {
+          this.accounts = accounts.data;
         }
       },
 

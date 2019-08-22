@@ -13,7 +13,7 @@ class Income extends ApiModel
     protected $dates = ['deleted_at'];
 
     protected $fillable = [
-        'title', 'payment', 'date', 'note', 'amount', 'income_type_id', 'project_id'
+        'title', 'payment', 'date', 'note', 'amount', 'income_type_id', 'project_id', 'account_id'
     ];
 
     protected $searchable = [
@@ -23,6 +23,11 @@ class Income extends ApiModel
     public function income_type()
     {
         return $this->belongsTo(IncomeType::class);
+    }
+
+    public function account()
+    {
+        return $this->belongsTo(Account::class);
     }
 
     public function project()

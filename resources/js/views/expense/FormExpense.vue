@@ -62,6 +62,23 @@
                         <v-autocomplete
                           box
                           color="grey darken-2"
+                          :items="accounts"
+                          v-model="expense.account_id"
+                          label="Cuenta *"
+                          data-vv-name="expense.account_id"
+                          data-vv-as="cuenta"
+                          v-validate="'required'"
+                          :error-messages="errors.collect('expense.account_id')"
+                          item-text="title"
+                          item-value="id"
+                        ></v-autocomplete>
+                      </v-flex>
+                    </v-layout>
+                    <v-layout row wrap>
+                      <v-flex xs12 sm12 md6 lg6>
+                        <v-autocomplete
+                          box
+                          color="grey darken-2"
                           :items="payment"
                           v-model="expense.payment"
                           label="Método de Pago *"
@@ -71,8 +88,6 @@
                           :error-messages="errors.collect('expense.payment')"
                         ></v-autocomplete>
                       </v-flex>
-                    </v-layout>
-                    <v-layout row wrap>
                       <v-flex xs12 sm12 md6 lg6>
                         <v-menu
                           v-model="picker"
@@ -109,7 +124,9 @@
                           ></v-date-picker>
                         </v-menu>
                       </v-flex>
-                      <v-flex xs12 sm12 md6 lg6>
+                    </v-layout>
+                    <v-layout row wrap>
+                      <v-flex xs12 sm12 md12 lg12>
                         <v-text-field
                           box
                           color="grey darken-2"
@@ -245,6 +262,7 @@
   import ExpenseService from '../../services/expense.service'
   import MaterialService from '../../services/material.service'
   import ProjectService from '../../services/project.service'
+  import AccountService from '../../services/account.service'
   import PeopleService from '../../services/people.service'
 
   export default {
@@ -286,6 +304,7 @@
         picker: false,
         expense_types: [],
         projects: [],
+        accounts: [],
         payment: ['Tarjeta', 'Efectivo', 'Cheque', 'Credito', 'Transferencia'],
         expense: new Expense(),
         dateFormatted: '',
@@ -338,7 +357,7 @@
         this.showExpense();
       }
 
-      Promise.all([this.listExpenseTypes(), this.listProjects()])
+      Promise.all([this.listExpenseTypes(), this.listProjects(), this.listAccounts()])
       .then(() =>{
         this.success = true
       })
@@ -417,12 +436,23 @@
         }
       },
 
+      listAccounts: async function() {
+        const accounts = await AccountService.getAccounts('accounts/listing')
+        if (accounts.status === 200) {
+          this.accounts = accounts.data;
+        }
+      },
+
       showExpense:async function() {
         const response = await ExpenseService.getExpenses(`expenses/${this.id}`)
         if (response.status === 200) {
           if (response.data.data.materials.length > 0) {
             this.checkMaterial = true
             this.materials = response.data.data.materials;
+          }
+          if (response.data.data.people.length > 0) {
+            this.checkPeople = true
+            this.people = response.data.data.people;
           }
           this.expense = response.data.data;
           this.success = true

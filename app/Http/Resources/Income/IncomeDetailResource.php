@@ -18,6 +18,7 @@ class IncomeDetailResource extends JsonResource
             'amount' => $this->amount,
             'income_type' => $this->income_type->name,
             'project' => $this->project->name,
+            'account' => $this->account->title,
             'created' => new ActivityCreatedResource($this->activities),
             'updated' => new ActivityUpdatedResource($this->activities)
         ];

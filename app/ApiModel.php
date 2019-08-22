@@ -11,7 +11,7 @@ class ApiModel extends Model
 
     public function getCreatedAtAttribute($date)
     {
-        return Carbon::parse($date)->format('d/m/Y');
+        return Carbon::parse($date)->format('Y-m-d H:i:s');
     }
     
     public function getUpdatedAtAttribute($date)

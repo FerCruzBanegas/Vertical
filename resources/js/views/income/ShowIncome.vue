@@ -26,8 +26,8 @@
 
                     <v-list-tile avatar>
                       <v-list-tile-content>
-                        <v-list-tile-title>Fecha de Ingreso</v-list-tile-title>
-                        <v-list-tile-sub-title>{{ income.date | formatDate('DD/MM/YYYY') }}</v-list-tile-sub-title>
+                        <v-list-tile-title>Cuenta</v-list-tile-title>
+                        <v-list-tile-sub-title>{{ income.account}}</v-list-tile-sub-title>
                       </v-list-tile-content>
                     </v-list-tile>
 
@@ -35,8 +35,8 @@
 
                     <v-list-tile avatar>
                       <v-list-tile-content>
-                        <v-list-tile-title>Proyecto</v-list-tile-title>
-                        <v-list-tile-sub-title>{{ income.project }}</v-list-tile-sub-title>
+                        <v-list-tile-title>Fecha de Ingreso</v-list-tile-title>
+                        <v-list-tile-sub-title>{{ income.date | formatDate('DD/MM/YYYY') }}</v-list-tile-sub-title>
                       </v-list-tile-content>
                     </v-list-tile>
 
@@ -65,6 +65,15 @@
 
                     <v-list-tile avatar>
                       <v-list-tile-content>
+                        <v-list-tile-title>Proyecto</v-list-tile-title>
+                        <v-list-tile-sub-title>{{ income.project }}</v-list-tile-sub-title>
+                      </v-list-tile-content>
+                    </v-list-tile>
+
+                    <v-divider></v-divider>
+
+                    <v-list-tile avatar>
+                      <v-list-tile-content>
                         <v-list-tile-title>Tipo de Ingreso</v-list-tile-title>
                         <v-list-tile-sub-title>{{ income.income_type }}</v-list-tile-sub-title>
                       </v-list-tile-content>
@@ -74,17 +83,22 @@
 
                     <v-list-tile avatar>
                       <v-list-tile-content>
-                        <v-list-tile-title>Nota</v-list-tile-title>
-                        <v-list-tile-sub-title>{{ income.note }}</v-list-tile-sub-title>
-                      </v-list-tile-content>
-                    </v-list-tile>
-
-                    <v-divider></v-divider>
-
-                    <v-list-tile avatar>
-                      <v-list-tile-content>
                         <v-list-tile-title>Actualización</v-list-tile-title>
                         <v-list-tile-sub-title>Modificado por: {{ income.created.causer }} en fecha {{ income.updated.date | formatDate('DD/MM/YYYY') }}</v-list-tile-sub-title>
+                      </v-list-tile-content>
+                    </v-list-tile>
+                  </v-list>
+                </v-card>
+              </v-flex>
+            </v-layout>
+            <v-layout wrap>
+              <v-flex xs12 sm12 md12 lg12 v-if="income.note">
+                <v-card>
+                  <v-list two-line subheader>
+                    <v-list-tile avatar>
+                      <v-list-tile-content>
+                        <v-list-tile-title>Nota</v-list-tile-title>
+                        <v-list-tile-sub-title>{{ income.note }}</v-list-tile-sub-title>
                       </v-list-tile-content>
                     </v-list-tile>
                   </v-list>

@@ -18,6 +18,7 @@ class ExpenseDetailResource extends JsonResource
             'amount' => $this->amount,
             'expense_type' => $this->expense_type->name,
             'project' => $this->project->name,
+            'account' => $this->account->title,
             'materials' => collect($this->materials)->transform(function($material){
                 return [
                     'name' => $material->name,
