@@ -5,7 +5,7 @@
         <modal-delete :message="message" :loading="loading" :remove="remove" @hide="remove = !remove" @deleted="deleted"></modal-delete>
         <v-card flat>
           <v-card-title primary-title>
-            <h3 class="headline mb-0">Lista de Cuentas</h3>
+            <h3 class="headline mb-0">Lista de Arqueos</h3>
           </v-card-title>
           <v-container fluid>
             <v-layout>
@@ -49,14 +49,14 @@
                     <v-progress-linear height="3" slot="progress" color="red darken-3" indeterminate></v-progress-linear>
                     <template slot="items" slot-scope="props">
                       <td class="justify-center layout px-0">
-                        <v-btn v-if="permission('boxes.show')" icon class="mx-0">
+                        <v-btn v-if="permission('boxes.show')" icon class="mx-0" :to="{ name: 'ShowBox', params: { id: props.item.id }}">
                           <v-icon color="grey darken-1">visibility</v-icon>
                         </v-btn>
                       </td>
                       <td>{{ props.item.date_init | formatDate('DD/MM/YYYY') }}</td>
                       <td>{{ props.item.date_end | formatDate('DD/MM/YYYY') }}</td>
-                      <td>{{ props.item.note }}</td>
-                      <td>{{ props.item.created_at | formatDate('DD/MM/YYYY') }}</td>
+                      <td>{{ props.item.causer.causer }}</td>
+                      <td>{{ props.item.created | formatDate('DD/MM/YYYY') }}</td>
                       <td>
                         <v-btn
                           v-if="permission('boxes.update')"
@@ -113,9 +113,9 @@
         loading: false,
         headers: [
           { text: '', align: 'left', sortable: false, width: "50" },
-          { text: 'Desde', value: 'desde', width: "200" },
-          { text: 'Hasta', value: 'hasta', width: "200" },
-          { text: 'Nota', value: 'nota', width: "100" },
+          { text: 'Desde', value: 'desde', width: "150" },
+          { text: 'Hasta', value: 'hasta', width: "150" },
+          { text: 'Encargado', value: 'encargado', width: "150" },
           { text: 'Registrado', value: 'registrado', width: "100" },
           { text: 'Acciones', sortable: false, value: 'acciones', width: "150" }
         ],

@@ -3,57 +3,38 @@
     <v-layout row wrap>
       <v-flex d-flex xs12 sm12 md12>
         <v-card v-show="success">
+          <v-card-title primary-title>
+            <h3 class="headline mb-0">Arqueo de Caja</h3>
+          </v-card-title>
           <v-container fluid>
-            <div style="border: 2px solid #ddd; padding: 1em">
-              <p class="headline mb-0">{{ addSubtitle }}</p>
-              <p class="headline mb-0">{{ addSubtitle }}</p>
+            <div class="div-group">
+              <div class="subdiv-group">
+                <div class="title">Fecha Desde:
+                  <span class="subheading"> {{ box.date_init | formatDate('DD/MM/YYYY') }}</span>
+                </div>
+                <div class="title">Fecha Hasta:
+                  <span class="subheading"> {{ box.fecha_init | formatDate('DD/MM/YYYY') }}</span>
+                </div>
+              </div>
+              <div class="title">Arqueo realizado por:
+                <br>
+                <span class="subheading"> {{ (causer) ? causer : currentUser.name }}</span>
+              </div>
             </div>
             <v-layout wrap>
               <v-flex xs12 sm12 md12 lg12 xl12>
-                <table>
-                  <caption>Lista de Cuentas y Montos</caption>
-                  <thead>
-                    <tr id="tr1">
-                      <th class="blank"></th>
-                      <th class="amount" colspan="2">Monto Estimado</th>
-                      <th class="total">Total</th>
-                    </tr>
-                    <tr id="tr2">
-                      <th scope="col">Cuenta</th>
-                      <th scope="col">Ingresos</th>
-                      <th scope="col">Egresos</th>
-                      <th scope="col">Diferencia</th>
-                      <th scope="col">Monto Real</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr v-for="(account, index) in accounts" :key="index">
-                      <td data-label="Cuenta">{{ account.title }}</td>
-                      <td data-label="Ingresos">{{ account.incomes | currency }}</td>
-                      <td data-label="Egresos">{{ account.expenses | currency }}</td>
-                      <td data-label="Total">{{ (account.incomes - account.expenses) | currency }}</td>
-                      <td>
-                        <v-currency-field 
-                          color="grey darken-2"
-                          v-bind="currency_config" 
-                          v-model="account.cash"
-                        ></v-currency-field>
-                      </td>
-                    </tr>
-                  </tbody>
-                  <tfoot>
-                    <tr>
-                      <th></th>
-                      <th>$7,750.00</th>
-                      <th>$7,750.00</th>
-                      <th></th>
-                    </tr>
-                  </tfoot>
-                </table>
+                <table-accounts :show="false" :accounts="accounts"></table-accounts>
               </v-flex>
             </v-layout>
+            <div class="title">Saldo actual en caja:</div>
+            <div class="div-group">
+              <div class="display-1">TOTAL:
+                <span class="display-1 grey--text"> {{ totalBox | currency }}</span>
+              </div>
+            </div>
             <v-layout wrap>
               <v-flex xs12 sm12 md12 lg12>
+                <small>Agregar alguna nota u observación</small>
                 <v-text-field
                   box
                   color="grey darken-2"
@@ -68,6 +49,15 @@
               </v-flex>
             </v-layout>
           </v-container>
+          <v-card-actions>
+            <v-btn :disabled="loading" to="/boxes">
+              Cancelar
+            </v-btn>
+            <v-spacer></v-spacer>
+            <v-btn @click="submit" :loading="loading">
+              {{ id == null ? 'Registrar' : 'Actualizar' }}
+            </v-btn>
+          </v-card-actions>
           <!-- <pre>{{ $data }}</pre> -->
         </v-card>
       </v-flex>
@@ -76,9 +66,11 @@
 </template>
 
 <script>
+  import { mapGetters } from 'vuex'
+  import TableAccounts from '../../components/TableAccounts.vue'
   import Box from '../../models/Box'
   import AccountService from '../../services/account.service'
-  import MaterialService from '../../services/material.service'
+  import BoxService from '../../services/box.service'
 
   export default {
     $_veeValidate: {
@@ -90,41 +82,37 @@
       return {
         success: false,
         loading: false,
-        currency_config: {
-          decimal: '.',
-          thousands: ',',
-          prefix: 'Bs ',
-          suffix: '',
-          precision: 2,
-          masked: false,
-          allowBlank: false,
-          min: Number.MIN_SAFE_INTEGER,
-          max: Number.MAX_SAFE_INTEGER
-        },
         accounts: [],
         box: new Box(),
         id: this.$route.params.id,
-        retry: false
+        causer: null
       }
     },
 
+    components: {
+      'table-accounts' : TableAccounts
+    },
+
     computed: {
-      addSubtitle () {
-        if(this.id) {
-          return 'Editar Material'
-        }
-        return 'Registrar Material'
+      ...mapGetters([
+        'currentUser'
+      ]),
+
+      totalBox () {
+        let total = 0;
+        this.accounts.forEach(item => {
+          total = total + item.cash
+        })
+        return total;
       }
     },
 
     created() {
-      this.getAccounts();
-
-      // if (this.id) {
-      //   this.showMaterial();
-      // }else{
-      //   this.success = true
-      // }
+      if (this.id) {
+        this.showBox();
+      } else {
+        this.getAccounts();
+      }
     },
 
     methods: {
@@ -134,174 +122,61 @@
           this.accounts = accounts.data.accounts;
           this.box.date_init = accounts.data.dates.init;
           this.box.date_end = accounts.data.dates.end;
-          this.accounts.map((obj) => { 
-            let rObj = {}
-            rObj['id'] = obj.id
-            rObj['title'] = obj.title
-            rObj['expenses'] = obj.expenses
-            rObj['incomes'] = obj.incomes
-            rObj['cash'] = 0
-            return rObj
-          })
           this.success = true
+        }
+      },
+
+      showBox:async function() {
+        const response = await BoxService.getBoxes(`boxes/${this.id}`)
+        if (response.status === 200) {
+          this.accounts = response.data.data.accounts;
+          this.box.date_init = response.data.data.date_init;
+          this.box.date_end = response.data.data.date_end;
+          this.box.note = response.data.data.note;
+          this.causer = response.data.data.causer.causer;
+          this.success = true
+        }
+      },
+
+      submit: async function() {
+        this.$validator.errors.clear();
+        const vm = this
+        const data = {box: vm.box, accounts: vm.accounts}
+        vm.loading = true
+        try {
+          if(vm.id) {
+            vm._save = await BoxService.updateBox(vm.id, data)
+          } else {
+            vm._save = await BoxService.storeBox(data)
+          }
+          if (vm._save.status === 201 || vm._save.status === 200) {
+            vm.$snotify.simple(vm._save.data.message, 'Felicidades')
+            vm.loading = false
+            // vm.box = new Material()
+            // vm.$router.push('/boxes')
+          }
+        } catch (err) {
+          if(err.response.status === 422) this.$setErrorsFromResponse(err.response.data);
+          vm.loading = false
         }
       }
     }
   }
 </script>
 <style scoped>
-  table {
-    border-collapse: separate;
-    border-spacing: 0;
-    margin: 0;
-    padding: 0;
+  .div-group {
     width: 100%;
-    table-layout: fixed;
+    border: 2px solid #ddd; 
+    padding: 1em;
+    display:flex;
+    flex-direction:row;
   }
-
-  table caption {
-    font-size: 1.5em;
-    margin: .5em 0 .75em;
+  .subdiv-group {
+    display:flex;
+    flex-direction:column;
   }
-
-  tbody tr:hover {
-    background-color: #F3F3F3;
-  }
-
-  th ,td {
-    border-right:none;
-    border-bottom: 2px solid #ddd;
-    background-color: #FFFFF;
-    padding: .35em;
-  }
-
-  #tr1 th:last-child {
-    border-top: 2px solid #ddd;
-    border-right: 2px solid #ddd;
-    color: #FFFFFF;
-    background-color: #636363;
-  }
-
-  #tr1 th:nth-child(2) {
-    border-left: 2px solid #ddd;
-    border-top: 2px solid #ddd;
-    color: #FFFFFF;
-    background-color: #636363;
-  }
-
-  #tr2 {
-    color: #FFFFFF;
-    background-color: #2F426E;
-  }
-
-  #tr2 th:first-child{
-    border-top: 2px solid #ddd;
-    border-left: 2px solid #ddd;
-  }
-
-  #tr2 th:last-child{
-    border-top: 2px solid #ddd;
-    border-right: 2px solid #ddd;
-  }
-
-  tr td:first-child{
-    border-left: 2px solid #ddd;
-  }
-
-  tr td:last-child{
-    border-right: 2px solid #ddd;
-  }
-
-  tr td:nth-child(2){
-    background-color: #CDE6FF;
-  }
-
-  tr td:nth-child(3){
-    background-color: #FFF083;
-  }
-
-  tfoot tr th {
-    border-bottom: none;
-  }
-
-  tfoot tr th:nth-child(2){
-    color: #FFFFFF;
-    background-color: #017EE7;
-  }
-
-  tfoot tr th:nth-child(3){
-    color: #FFFFFF;
-    background-color: #D8A504;
-  }
-
-  .blank {
-    background-color: #FFFFFF;
-    border: none;
-  }
-
-  .amount {
-     border-top-left-radius: 25px;
-  }
-
-  .total {
-     border-top-right-radius: 25px;
-  }
-
-  table th,
-  table td {
-    padding: .625em;
-    text-align: center;
-  }
-
-  table th {
-    font-size: .85em;
-    letter-spacing: .1em;
-    text-transform: uppercase;
-  }
-
-  @media screen and (max-width: 600px) {
-    table {
-      border: 0;
-    }
-
-    table caption {
-      font-size: 1.3em;
-    }
-    
-    table thead {
-      border: none;
-      clip: rect(0 0 0 0);
-      height: 1px;
-      margin: -1px;
-      overflow: hidden;
-      padding: 0;
-      position: absolute;
-      width: 1px;
-    }
-    
-    table tr {
-      border-bottom: 3px solid #ddd;
-      display: block;
-      margin-bottom: .625em;
-    }
-    
-    table td {
-      border-bottom: 1px solid #ddd;
-      display: block;
-      font-size: .8em;
-      text-align: right;
-    }
-    
-    table td::before {
-      content: attr(data-label);
-      float: left;
-      font-weight: bold;
-      text-transform: uppercase;
-    }
-    
-    table td:last-child {
-      border-bottom: 0;
-    }
+  .div-group div:last-child {
+    margin-left: auto
   }
 </style>
 

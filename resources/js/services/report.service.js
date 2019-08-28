@@ -19,6 +19,15 @@ const ReportService = {
       console.log(error)
     }
   },
+
+  getReportPdf: async function(data) {
+    try {
+      const response = await ApiService.customRequest(data)
+      return response
+    } catch (error) {
+      console.log(error)
+    }
+  }
 }
 
 export default ReportService

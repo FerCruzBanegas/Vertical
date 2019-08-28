@@ -272,26 +272,26 @@
 </script>
 
 <style scoped>
-  .expense {
-    background-color: #FFF5A0;
+  .income {
+    background-color: #CDE6FF;
   }
 
-  .income {
-    background-color: #F0F6FF;
+  .expense {
+    background-color: #FFF083;
   }
 
   .total {
-    background-color: #6E6E6E;
-    color: #FFFFFF;
-  }
-
-  .ex {
-    background-color: #C69F01;
+    background-color: #636363;
     color: #FFFFFF;
   }
 
   .in {
-    background-color: #146AE4;
+    background-color: #017EE7;
+    color: #FFFFFF;
+  }
+
+  .ex {
+    background-color: #D8A504;
     color: #FFFFFF;
   }
 </style>

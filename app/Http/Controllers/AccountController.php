@@ -78,7 +78,7 @@ class AccountController extends ApiController
           ->leftJoinSub($income, 't3', function ($join) {
               $join->on('t1.id', '=', 't3.account_id');
           })
-          ->select('t1.id', 't1.title', DB::raw('ROUND(COALESCE(t2.amount, 0), 2) AS expenses'), DB::raw('ROUND(COALESCE(t3.amount, 0), 2) AS incomes'))
+          ->select('t1.id', 't1.title', DB::raw('ROUND(COALESCE(t2.amount, 0), 2) AS expenses'), DB::raw('ROUND(COALESCE(t3.amount, 0), 2) AS incomes'), DB::raw('0 AS cash'))
           ->orderBy('t1.id')
           ->get();
 

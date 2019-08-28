@@ -1,7 +1,7 @@
 <?php
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-// use Carbon\Carbon;
+use Carbon\Carbon;
 //use Illuminate\Http\Request;
 
 /*
@@ -246,7 +246,13 @@ Route::get('/test', function(Request $request) {
           ->orderBy('t1.title')
           ->get();
 
-        return response()->json($query);
+        $data = [
+            'accounts' => $query,
+            'dates' => [ 'init' => $date_init, 'end' => $date_end], 
+        ];
+
+$date = Carbon::now();
+echo $date->isoFormat('dddd Do MMMM, YYYY'); // June 15th 2018, 5:34:15 pm
 
     // $expenses = \App\Expense::with([
     //     'expense_type',
@@ -425,6 +431,7 @@ Route::group(['middleware' => ['auth:api', 'acl:api']], function () {
     Route::get('graphics', 'ReportController@getQueryForGraphics');
 
     //Reports
+    Route::post('pdf-report', 'ReportController@getPdfReport');
     Route::get('report-months-year', 'ReportController@getIncomeAndExpenseMonthYear');
     Route::get('report-year', 'ReportController@getIncomeAndExpenseForYear');
     Route::get('report-range', 'ReportController@getIncomeAndExpenseForRange');
@@ -436,7 +443,8 @@ Route::group(['middleware' => ['auth:api', 'acl:api']], function () {
 
 //LEER
 // revisar perfil error al deslogearse desde esas pagina
-// agregar las acciones de las nuevas tablas
+// agregar las acciones de las nuevas tablas y actualizar permisos en ruta
+// agregar columna total a box
 // 1.- Validar que los proyectos no se puedan finalizar sin ningun evento de ingresos o egresos.
 // 2.- Validar que los proeyectos finalisados no aparescan para ser seleccionados.
 // 3.- validar montos en formularios de egresos

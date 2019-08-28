@@ -13,7 +13,7 @@ class Box extends ApiModel
     protected $dates = ['deleted_at'];
 
     protected $fillable = [
-        'date_init', 'date_end', 'note', 'user_id',
+        'date_init', 'date_end', 'note',
     ];
 
     protected $searchable = [

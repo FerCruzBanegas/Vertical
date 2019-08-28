@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use App\Http\Requests\BoxRequest;
 use App\Http\Resources\Box\BoxResource;
 use App\Http\Resources\Box\BoxCollection;
+use Illuminate\Support\Facades\DB;
 
 class BoxController extends ApiController
 {
@@ -43,9 +44,19 @@ class BoxController extends ApiController
 
     public function store(BoxRequest $request)
     {
+        DB::beginTransaction();
         try {
-            $this->box->create($request->all());
+            $box = $this->box->create($request->box);
+            if (!empty($request->accounts)) {
+                $account = array();
+                foreach ($request->accounts as $key => $value) {
+                    $account[$value['id']] = ['income' => $value['incomes'], 'expense' => $value['expenses'], 'cash' => $value['cash']];
+                }
+                $box->accounts()->attach($account);
+            } 
+            DB::commit();
         } catch (\Exception $e) {
+            DB::rollback();
             return $this->respondInternalError();
         }
         return $this->respondCreated();
@@ -53,10 +64,20 @@ class BoxController extends ApiController
 
     public function update(BoxRequest $request, $id)
     {
+        DB::beginTransaction();
         try {
             $box = $this->box->find($id);
-            $box->update($request->all());
+            $box->update($request->box);
+            if (!empty($request->accounts)) {
+                $account = array();
+                foreach ($request->accounts as $key => $value) {
+                    $account[$value['id']] = ['income' => $value['incomes'], 'expense' => $value['expenses'], 'cash' => $value['cash']];
+                }
+                $box->accounts()->sync($account);
+            } 
+            DB::commit();
         } catch (\Exception $e) {
+            DB::rollback();
             return $this->respondInternalError();
         }
         return $this->respondUpdated();

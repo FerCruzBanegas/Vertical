@@ -3,6 +3,7 @@
 namespace App\Http\Resources\Box;
 
 use Illuminate\Http\Resources\Json\ResourceCollection;
+use App\Http\Resources\Activity\ActivityCreatedResource;
 
 class BoxCollection extends ResourceCollection
 {
@@ -14,8 +15,8 @@ class BoxCollection extends ResourceCollection
                     'id' => $box->id,
                     'date_init' => $box->date_init,
                     'date_end' => $box->date_end,
-                    'note' => $box->note,
-                    'state' => $box->created_at,
+                    'causer' => new ActivityCreatedResource($box->activities),
+                    'created' => $box->created_at,
                 ];
             }),
         ];

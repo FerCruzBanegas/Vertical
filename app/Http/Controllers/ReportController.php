@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use App\Http\Resources\Report\InAndExMonthYearCollection;
 use App\Http\Resources\Report\InAndExYearCollection;
@@ -11,6 +12,7 @@ use App\Http\Resources\Report\InAndExMonthCollection;
 use App\Http\Resources\Report\InAndExProjectCollection;
 use App\Http\Resources\Report\ExDetailProjectCollection;
 use App\Http\Resources\Report\ExMaterialProjectCollection;
+use PDF;
 
 class ReportController extends ApiController
 {
@@ -155,7 +157,7 @@ class ReportController extends ApiController
         } else {
         	$date = [date('Y-m-d'), date('Y-m-d')];
         }
-    	$expense = DB::table('expenses as e')
+    	  $expense = DB::table('expenses as e')
                    ->select('e.title', 'e.payment', 'e.date', 'p.name', DB::raw('0 as inc_amount'), DB::raw('SUM(e.amount) as exp_amount'))
                    ->join('projects as p', 'p.id', '=', 'e.project_id')
                    ->where(function($query) use ($date) {
@@ -181,7 +183,7 @@ class ReportController extends ApiController
           ->orderBy('date', 'desc')
           ->get();
 
-    	return new InAndExRangeCollection($data, $date);
+    	  return new InAndExRangeCollection($data, $date);
     }
 
     public function getIncomeAndExpenseForMonth(Request $request)
@@ -268,7 +270,7 @@ class ReportController extends ApiController
 
     public function getExpenseMaterialForProject(Request $request)
     {
-    	$params  = json_decode($request->data, true);
+    	  $params  = json_decode($request->data, true);
         $data = DB::table('projects AS p')
           ->join('expenses AS e', 'p.id', '=', 'e.project_id')
           ->join('expense_material AS em', 'e.id', '=', 'em.expense_id')
@@ -282,6 +284,27 @@ class ReportController extends ApiController
           ->groupBy('m.name', 'type', 'm.unity')
           ->get();
 
-    	return new ExMaterialProjectCollection($data, $params['name']);
+    	  return new ExMaterialProjectCollection($data, $params['name']);
+    }
+
+    public function getPdfReport(Request $request) 
+    {
+        $date = Carbon::now();
+        $totalIncome = 0;
+        $totalExpense = 0;
+        $totalCash = 0;
+        foreach ($request->accounts as $value) {
+          $totalIncome = $totalIncome + $value['incomes'];
+          $totalExpense = $totalExpense + $value['expenses'];
+          $totalCash = $totalCash + $value['cash'];
+        }
+        $array = array('accounts' => $request->accounts, 'box' => $request->box, 'totals' => [$totalIncome, $totalExpense, $totalCash], 'date' => $date->isoFormat('dddd Do MMMM, YYYY'));
+        $path = public_path() . '/arqueo-caja.pdf';
+
+        $pdf = PDF::loadView('report', $array);
+
+        $pdf->setPaper('A4')->save($path);
+        
+        return response()->download($path);
     }
 }

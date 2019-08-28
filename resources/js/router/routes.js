@@ -46,6 +46,7 @@ import FormAccount from '../views/account/FormAccount.vue'
 //box
 import ListBoxes from '../views/box/ListBoxes.vue'
 import FormBox from '../views/box/FormBox.vue'
+import ShowBox from '../views/box/ShowBox.vue'
 
 import NotFoundComponent  from '../components/404.vue'
 import DeniedComponent  from '../components/403.vue'
@@ -135,6 +136,14 @@ export default [
             component: FormBox,
             meta: {
               AccessControlList: 'boxes.update',
+            }
+          },
+          {
+            path: ':id/show',
+            name: 'ShowBox',
+            component: ShowBox,
+            meta: {
+              AccessControlList: 'boxes.show',
             }
           }
         ]
