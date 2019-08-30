@@ -75,7 +75,7 @@
                           {{ props.item.state }}
                         </v-chip>
                       </td>
-                      <td>{{ props.item.created }}</td>
+                      <td>{{ props.item.created | formatDate('DD/MM/YYYY') }}</td>
                       <td>
                         <v-btn
                           v-if="permission('projects.update')"

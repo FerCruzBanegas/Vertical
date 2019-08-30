@@ -3,6 +3,8 @@
     <v-layout row wrap>
       <v-flex xs12 sm12 md12 lg12 xl12>
         <modal-delete :message="message" :loading="loading" :remove="remove" @hide="remove = !remove" @deleted="deleted"></modal-delete>
+        <modal-loader :loader="loader"></modal-loader>
+        <modal-account :modal="modal" @hide="modal = !modal" :data="account"></modal-account>
         <v-card flat>
           <v-card-title primary-title>
             <h3 class="headline mb-0">Lista de Cuentas</h3>
@@ -49,7 +51,7 @@
                     <v-progress-linear height="3" slot="progress" color="red darken-3" indeterminate></v-progress-linear>
                     <template slot="items" slot-scope="props">
                       <td class="justify-center layout px-0">
-                        <v-btn v-if="permission('accounts.show')" icon class="mx-0">
+                        <v-btn v-if="permission('accounts.show')" icon class="mx-0" @click="getDetail(props.item.id)">
                           <v-icon color="grey darken-1">visibility</v-icon>
                         </v-btn>
                       </td>
@@ -118,6 +120,8 @@
 
 <script>
   import permission from '../../mixins/permission'
+  import ModalLoader from '../../components/ModalLoader.vue'
+  import ModalAccount from '../../components/ModalAccount.vue'
   import ModalDelete from '../../components/ModalDelete.vue'
   import AccountService from '../../services/account.service'
 
@@ -130,6 +134,9 @@
         message: 'Realmente desea borrar los datos de este registro?',
         remove: false,
         loading: false,
+        loader: false,
+        modal: false,
+        account: null,
         headers: [
           { text: '', align: 'left', sortable: false, width: "50" },
           { text: 'Título', value: 'titulo', width: "200" },
@@ -149,6 +156,8 @@
     mixins: [permission],
 
     components: {
+      'modal-loader' : ModalLoader,
+      'modal-account' : ModalAccount,
       'modal-delete' : ModalDelete
     },
     
@@ -211,6 +220,16 @@
             this.progress = false
           })
         })
+      },
+
+      getDetail: async function(id) {
+        this.loader = true
+        const response = await AccountService.getAccounts(`accounts/${id}/detail`)
+        if (response.status === 200) {
+          this.account = response.data.data
+          this.loader = false
+          this.modal = true
+        }
       },
 
       buildURL() {

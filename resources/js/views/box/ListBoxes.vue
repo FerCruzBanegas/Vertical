@@ -21,21 +21,23 @@
                     >
                       <v-icon dark>note_add</v-icon>
                     </v-btn>
-                    </v-btn>
                     <v-spacer></v-spacer>
                     <v-btn flat icon color="red darken-3" @click="allData">
                       <v-icon>cached</v-icon>
                     </v-btn>
-                    <v-text-field
-                      color="grey darken-2"
-                      v-model="search"
-                      @keypress.enter.prevent="filterData"
-                      append-icon="search"
-                      label="Buscar"
-                      single-line
-                      hide-details
-                      clearable
-                    ></v-text-field>
+                    <v-flex xs12 sm12 md6 lg6 xl6>
+                      <v-menu
+                        ref="menu" v-model="menuRange" :close-on-content-click="false" :nudge-right="30"
+                        lazy transition="scale-transition" offset-y full-width min-width="290px"
+                      >
+                        <v-text-field box label="Rango de fechas" color="grey darken-2" slot="activator" :value="formattedRange" readonly>
+                        </v-text-field>
+                        <date-range-picker v-model="dateRange">
+                          <v-spacer></v-spacer>
+                          <v-btn @click="search" color="red darken-3" flat>OK</v-btn>
+                        </date-range-picker>
+                      </v-menu>
+                    </v-flex>
                   </v-card-title>
                   <v-data-table
                     :headers="headers"
@@ -56,7 +58,7 @@
                       <td>{{ props.item.date_init | formatDate('DD/MM/YYYY') }}</td>
                       <td>{{ props.item.date_end | formatDate('DD/MM/YYYY') }}</td>
                       <td>{{ props.item.causer.causer }}</td>
-                      <td>{{ props.item.created | formatDate('DD/MM/YYYY') }}</td>
+                      <td>{{ props.item.amount | currency }}</td>
                       <td>
                         <v-btn
                           v-if="permission('boxes.update')"
@@ -98,6 +100,8 @@
 </template>
 
 <script>
+  import moment from 'moment'
+  import DateRangePicker from '../../components/DateRangePicker'
   import permission from '../../mixins/permission'
   import ModalDelete from '../../components/ModalDelete.vue'
   import BoxService from '../../services/box.service'
@@ -106,7 +110,8 @@
     name: 'list-boxes',
     data () {
       return {
-        search: '',
+        menuRange: false,
+        dateRange: [],
         progress: false,
         message: 'Realmente desea borrar los datos de este registro?',
         remove: false,
@@ -116,7 +121,7 @@
           { text: 'Desde', value: 'desde', width: "150" },
           { text: 'Hasta', value: 'hasta', width: "150" },
           { text: 'Encargado', value: 'encargado', width: "150" },
-          { text: 'Registrado', value: 'registrado', width: "100" },
+          { text: 'Monto Total', value: 'total', width: "150" },
           { text: 'Acciones', sortable: false, value: 'acciones', width: "150" }
         ],
         items: [],
@@ -130,7 +135,20 @@
     mixins: [permission],
 
     components: {
-      'modal-delete' : ModalDelete
+      'modal-delete' : ModalDelete,
+      DateRangePicker
+    },
+
+    computed: {
+      formattedRange () {
+        if (this.dateRange.length) {
+          let range = moment(this.dateRange[0]).format('D MMMM')
+          if (this.dateRange[1]) {
+            range += ' - ' + moment(this.dateRange[1]).format('D MMMM')
+          }
+          return range
+        }
+      }
     },
     
     watch: {
@@ -164,8 +182,15 @@
         }
       },
 
+      search() {
+        this.menuRange = false
+        this.getDataFromApi().then(data =>{
+          this.items = data.items
+        })
+      },
+
       allData() {
-        this.search = ''
+        this.dateRange = []
         this.pagination.page = 1
         this.getDataFromApi().then(data =>{
           this.items = data.items
@@ -197,8 +222,8 @@
       buildURL() {
         let page = `?page=${this.pagination.page}`
         let rowsPerPage = `&rowsPerPage=${this.pagination.rowsPerPage}`
-        let filter = this.search === '' ? '' : `&filter=${this.search}`
-        return `boxes${page}${rowsPerPage}${filter}`
+        let dateRange = `&dateRange=${JSON.stringify(this.dateRange)}`
+        return `boxes${page}${rowsPerPage}${dateRange}`
       }
     }
   }

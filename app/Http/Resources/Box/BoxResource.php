@@ -4,6 +4,7 @@ namespace App\Http\Resources\Box;
 
 use Illuminate\Http\Resources\Json\JsonResource;
 use App\Http\Resources\Activity\ActivityCreatedResource;
+use App\Http\Resources\Activity\ActivityUpdatedResource;
 
 class BoxResource extends JsonResource
 {
@@ -13,6 +14,7 @@ class BoxResource extends JsonResource
             'id' => $this->id,
             'date_init' => $this->date_init,
             'date_end' => $this->date_end,
+            'amount' => $this->amount,
             'note' => $this->note,
             'accounts' => collect($this->accounts)->transform(function($account){
                 return [
@@ -23,7 +25,8 @@ class BoxResource extends JsonResource
                     'cash' => $account->pivot->cash
                 ];
             }),
-            'causer' => new ActivityCreatedResource($this->activities),
+            'created' => new ActivityCreatedResource($this->activities),
+            'updated' => new ActivityUpdatedResource($this->activities)
         ]; 
     }
 }

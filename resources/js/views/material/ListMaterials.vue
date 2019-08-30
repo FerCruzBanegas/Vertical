@@ -58,7 +58,7 @@
                       <td>{{ props.item.name }}</td>
                       <td>{{ props.item.material_type }}</td>
                       <td>{{ props.item.unity }}</td>
-                      <td>{{ props.item.created }}</td>
+                      <td>{{ props.item.created | formatDate('DD/MM/YYYY') }}</td>
                       <td>
                         <v-btn
                           v-if="permission('materials.update')"

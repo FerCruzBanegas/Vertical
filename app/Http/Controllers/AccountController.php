@@ -9,6 +9,7 @@ use App\Income;
 use Illuminate\Http\Request;
 use App\Http\Requests\AccountRequest;
 use App\Http\Resources\Account\AccountResource;
+use App\Http\Resources\Account\AccountDetailResource;
 use App\Http\Resources\Account\AccountCollection;
 use Illuminate\Support\Facades\DB;
 
@@ -90,6 +91,12 @@ class AccountController extends ApiController
         return $this->respond($data);
     }
 
+    public function detail(Request $request, $id)
+    {
+        $account = $this->account->findOrFail($id);
+        return new AccountDetailResource($account);
+    }
+
     public function show($id)
     {
         $account = $this->account->findOrFail($id);
@@ -130,8 +137,8 @@ class AccountController extends ApiController
 
     public function listing(Request $request) 
     {
-    	if ($request->is('api/accounts/listing')) $account = $this->account->listAccounts()->where('state', 1)->get();
-		else $account = $this->account->listAccounts()->get();
+    	  if ($request->is('api/accounts/listing')) $account = $this->account->listAccounts()->where('state', 1)->get();
+		    else $account = $this->account->listAccounts()->get();
         return $this->respond($account);
     }
 }

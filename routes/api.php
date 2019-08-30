@@ -151,30 +151,34 @@ Route::get('/test', function(Request $request) {
         //   ->get();
 
 
-        // $expense = DB::table('expenses as e')
-        //            ->select('e.title', 'e.payment', 'e.date', 'p.name', DB::raw('NULL as inc_amount'), DB::raw('SUM(e.amount) as exp_amount'))
-        //            ->join('projects as p', 'p.id', '=', 'e.project_id')
-        //            ->where(function($query) {
-        //             $query->where('p.id', '=', 53)
-        //                   ->whereNull('e.deleted_at');
-        //            })
-        //            ->groupBy('e.id');
+        $expense = DB::table('expenses as e')
+                   ->select('e.title', 'e.payment', 'e.date', DB::raw('0 as inc_amount'), DB::raw('SUM(e.amount) as exp_amount'))
+                   ->join('accounts as a', 'a.id', '=', 'e.account_id')
+                   ->where(function($query) {
+                    $query->where('a.id', '=', 1)
+                          ->where('e.date', '>=', '2019-08-01')
+                          ->where('e.date', '<=', '2019-08-31')
+                          ->whereNull('e.deleted_at');
+                   })
+                   ->groupBy('e.id');
 
-        // $data = DB::query()->fromSub(function ($query) use ($expense) {
-        //     $query->select('i.title', 'i.payment', 'i.date', 'p.name', DB::raw('SUM(i.amount) as inc_amount'), DB::raw('NULL as exp_amount'))
-        //           ->from('incomes as i')
-        //           ->join('projects as p', 'p.id', '=', 'i.project_id')
-        //           ->where(function($query) {
-        //             $query->where('p.id', '=', 53)
-        //                   ->whereNull('i.deleted_at');
-        //           })
-        //           ->groupBy('i.id')
-        //           ->unionAll($expense);
-        //   }, 'sp')
-        //   ->select('*')
-        //   ->orderBy('date', 'desc')
-        //   ->get();
-        $data = \App\Account::orderBy('id', 'desc')->first();
+        $data = DB::query()->fromSub(function ($query) use ($expense) {
+            $query->select('i.title', 'i.payment', 'i.date', DB::raw('SUM(i.amount) as inc_amount'), DB::raw('0 as exp_amount'))
+                  ->from('incomes as i')
+                  ->join('accounts as a', 'a.id', '=', 'i.account_id')
+                  ->where(function($query) {
+                    $query->where('a.id', '=', 1)
+                          ->where('i.date', '>=', '2019-08-01')
+                          ->where('i.date', '<=', '2019-08-31')
+                          ->whereNull('i.deleted_at');
+                  })
+                  ->groupBy('i.id')
+                  ->unionAll($expense);
+          }, 'sp')
+          ->select('*')
+          ->orderBy('date', 'desc')
+          ->get();
+        return response()->json($data);
         // $expense = DB::table('expenses')
         //   ->select('account_id', DB::raw('SUM(amount) AS amount'))
         //   ->where(function($query) {
@@ -205,54 +209,11 @@ Route::get('/test', function(Request $request) {
         //   ->select('t1.title', DB::raw('COALESCE(t2.amount, 0) AS expenses'), DB::raw('COALESCE(t3.amount, 0) AS incomes'))
         //   ->orderBy('t1.title')
         //   ->get();
-        $date_end = date('Y-m-d H:i:s');
-        $box = \App\Box::orderBy('id', 'DESC')->first();
-        if ($box === null) {
-           $date_ex = \App\Expense::orderBy('id', 'ASC')->first();
-           $date_in = \App\Income::orderBy('id', 'ASC')->first();
-           $date_init = ($date_ex->created_at > $date_in->created_at) ? $date_in->created_at : $date_ex->created_at;
-        } else {
-           $date_init = $box->created_at; 
-        }
-
-        $expense = DB::table('expenses')
-          ->select('account_id', DB::raw('SUM(amount) AS amount'))
-          ->where(function($query) use ($date_init, $date_end) {
-            $query->where('created_at', '>=', $date_init)
-                  ->where('created_at', '<=', $date_end)
-                  ->whereNull('deleted_at');
-            })
-          ->groupBy('account_id');  
-
-
-        $income = DB::table('incomes')
-          ->select('account_id', DB::raw('SUM(amount) AS amount'))
-          ->where(function($query) use ($date_init, $date_end) {
-            $query->where('created_at', '>=', $date_init)
-                  ->where('created_at', '<=', $date_end)
-                  ->whereNull('deleted_at');
-            })
-          ->groupBy('account_id'); 
-
-
-        $query = DB::table('accounts AS t1')
-          ->leftJoinSub($expense, 't2', function ($join) {
-              $join->on('t1.id', '=', 't2.account_id');
-          })
-          ->leftJoinSub($income, 't3', function ($join) {
-              $join->on('t1.id', '=', 't3.account_id');
-          })
-          ->select('t1.title', DB::raw('COALESCE(t2.amount, 0) AS expenses'), DB::raw('COALESCE(t3.amount, 0) AS incomes'))
-          ->orderBy('t1.title')
-          ->get();
-
-        $data = [
-            'accounts' => $query,
-            'dates' => [ 'init' => $date_init, 'end' => $date_end], 
-        ];
-
-$date = Carbon::now();
-echo $date->isoFormat('dddd Do MMMM, YYYY'); // June 15th 2018, 5:34:15 pm
+        // $date_end = date('Y-m-d H:i:s');
+        // $filter = ['2019-08-12', '2019-08-29'];
+        // $init = $filter[0].' 00:00:00';
+        // $end = $filter[1].' 23:59:59';
+        // echo $end;
 
     // $expenses = \App\Expense::with([
     //     'expense_type',
@@ -299,6 +260,7 @@ echo $date->isoFormat('dddd Do MMMM, YYYY'); // June 15th 2018, 5:34:15 pm
 //     var_dump($query->sql);
 // });
 
+
 Route::post('/login', 'Auth\AuthController@login');
 
 Route::get('project-types/listing', 'ProjectTypeController@listing');
@@ -328,7 +290,7 @@ Route::group(['middleware' => ['auth:api', 'acl:api']], function () {
     //Accounts
     Route::get('accounts', 'AccountController@index')->name('accounts.index');
     Route::get('accounts/box', 'AccountController@getdataAccounts');
-    Route::get('accounts/{id}', 'AccountController@show')->name('accounts.show');
+    Route::get('accounts/{id}/detail', 'AccountController@detail')->name('accounts.show');
     Route::post('accounts', 'AccountController@store')->name('accounts.create');
     Route::get('accounts/{id}/edit', 'AccountController@show');
     Route::put('accounts/{id}', 'AccountController@update')->name('accounts.update');
@@ -439,6 +401,7 @@ Route::group(['middleware' => ['auth:api', 'acl:api']], function () {
     Route::get('report-project', 'ReportController@getIncomeAndExpenseForProject');
     Route::get('report-detail', 'ReportController@getExpenseDetailForProject');
     Route::get('report-material', 'ReportController@getExpenseMaterialForProject');
+    Route::get('report-account', 'ReportController@getIncomeAndExpenseForAccount');
 });
 
 //LEER
@@ -764,3 +727,26 @@ Route::group(['middleware' => ['auth:api', 'acl:api']], function () {
 //   text-transform: uppercase;
 // }
 
+// SELECT
+//     t1.title,
+//     COALESCE(t2.amount, 0) AS expenses,
+//     COALESCE(t3.amount, 0) AS incomes
+// FROM accounts t1
+// LEFT JOIN
+// (
+//     SELECT account_id, SUM(amount) AS amount
+//     FROM expenses
+//     WHERE created_at >= '2019-06-13 20:11:46' AND created_at <= '2019-08-21 21:11:46'
+//     GROUP BY account_id
+// ) t2
+//     ON t1.id = t2.account_id
+// LEFT JOIN
+// (
+//     SELECT account_id, SUM(amount) AS amount
+//     FROM incomes
+//     WHERE created_at >= '2019-06-11 21:07:57' AND created_at <= '2019-08-21 21:11:46'
+//     GROUP BY account_id
+// ) t3
+//     ON t1.id = t3.account_id
+// ORDER BY
+//     t1.title;

@@ -1,8 +1,8 @@
 <template>
   <v-container fluid grid-list-md>
-    <v-layout row wrap>
-      <v-flex d-flex xs12 sm12 md12>
-        <v-card v-show="success">
+    <v-layout row wrap  v-show="success">
+      <v-flex d-flex xs12 sm12 md12 v-if="accounts.length > 0">
+        <v-card>
           <v-card-title primary-title>
             <h3 class="headline mb-0">Arqueo de Caja</h3>
           </v-card-title>
@@ -61,6 +61,20 @@
           <!-- <pre>{{ $data }}</pre> -->
         </v-card>
       </v-flex>
+      <v-flex d-flex xs12 sm12 md12 v-else>
+        <v-card color="grey darken-2" class="white--text">
+          <v-card-title primary-title>
+            <div>
+              <div class="headline">Sin movimientos</div>
+              <span>No puede realizar esta acción por que no se realizaron movimientos en las cuentas desde su último arqueo.</span>
+            </div>
+          </v-card-title>
+          <v-card-actions>
+            <v-btn flat dark to="/incomes/create">Nuevo Ingreso</v-btn>
+            <v-btn flat dark to="/expenses/create">Nuevo Egreso</v-btn>
+          </v-card-actions>
+        </v-card>
+      </v-flex>
     </v-layout>
   </v-container>
 </template>
@@ -103,6 +117,7 @@
         this.accounts.forEach(item => {
           total = total + item.cash
         })
+        this.box.amount = total
         return total;
       }
     },
@@ -119,21 +134,27 @@
       getAccounts: async function() {
         const accounts = await AccountService.getAccounts('accounts/box')
         if (accounts.status === 200) {
-          this.accounts = accounts.data.accounts;
+          this.success = true
+          let total = 0;
+          accounts.data.accounts.forEach(account => {
+            total = total + account.incomes + account.expenses
+          })
+          if (total > 0) {
+            this.accounts = accounts.data.accounts;
+          }
           this.box.date_init = accounts.data.dates.init;
           this.box.date_end = accounts.data.dates.end;
-          this.success = true
         }
       },
 
       showBox:async function() {
-        const response = await BoxService.getBoxes(`boxes/${this.id}`)
+        const response = await BoxService.getBoxes(`boxes/${this.id}/edit`)
         if (response.status === 200) {
           this.accounts = response.data.data.accounts;
           this.box.date_init = response.data.data.date_init;
           this.box.date_end = response.data.data.date_end;
           this.box.note = response.data.data.note;
-          this.causer = response.data.data.causer.causer;
+          this.causer = response.data.data.created.causer;
           this.success = true
         }
       },
@@ -152,8 +173,7 @@
           if (vm._save.status === 201 || vm._save.status === 200) {
             vm.$snotify.simple(vm._save.data.message, 'Felicidades')
             vm.loading = false
-            // vm.box = new Material()
-            // vm.$router.push('/boxes')
+            vm.$router.push('/boxes')
           }
         } catch (err) {
           if(err.response.status === 422) this.$setErrorsFromResponse(err.response.data);

@@ -16,7 +16,7 @@ class BoxCollection extends ResourceCollection
                     'date_init' => $box->date_init,
                     'date_end' => $box->date_end,
                     'causer' => new ActivityCreatedResource($box->activities),
-                    'created' => $box->created_at,
+                    'amount' => $box->amount,
                 ];
             }),
         ];

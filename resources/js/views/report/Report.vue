@@ -5,7 +5,7 @@
         <v-card>
           <v-container fluid>
             <v-layout row wrap>
-              <v-flex xs12 sm12 md6 lg6 xl6>
+              <v-flex xs12 sm12 md5 lg5 xl5>
                 <v-autocomplete
                   v-model="model"
                   :items="reports"
@@ -28,15 +28,6 @@
                   </template>
                 </v-autocomplete>
               </v-flex>
-              <v-flex xs12 sm12 md3 lg3 xl3 v-show="yearShow">
-                <v-autocomplete
-                  v-model="params"
-                  :items="yearData"
-                  box
-                  color="grey darken-2"
-                  label="Año"
-                ></v-autocomplete>
-              </v-flex>
               <v-flex xs12 sm12 md4 lg4 xl4 v-show="projectShow">
                 <v-autocomplete
                   v-model="params"
@@ -49,7 +40,28 @@
                   return-object
                 ></v-autocomplete>
               </v-flex>
-              <v-flex xs12 sm12 md4 lg4 xl4 v-show="rangeShow">
+              <v-flex xs12 sm12 md4 lg4 xl4 v-show="accountShow">
+                <v-autocomplete
+                  v-model="params"
+                  :items="accountData"
+                  box
+                  color="grey darken-2"
+                  label="Cuenta"
+                  item-text="title"
+                  item-value="id"
+                  return-object
+                ></v-autocomplete>
+              </v-flex>
+              <v-flex xs12 sm12 md3 lg3 xl3 v-show="yearShow">
+                <v-autocomplete
+                  v-model="params"
+                  :items="yearData"
+                  box
+                  color="grey darken-2"
+                  label="Año"
+                ></v-autocomplete>
+              </v-flex>
+              <v-flex xs12 sm12 md3 lg3 xl3 v-show="rangeShow">
                 <v-menu
                   ref="menu" v-model="menuRange" :close-on-content-click="false" :nudge-right="30"
                   lazy transition="scale-transition" offset-y full-width min-width="290px"
@@ -123,6 +135,7 @@
   import traslate from '../../libraries/es.json'
   import ReportService from '../../services/report.service'
   import ProjectService from '../../services/project.service'
+  import AccountService from '../../services/account.service'
 
   export default {
     name: 'Report',
@@ -147,12 +160,16 @@
           { name: 'Ingresos / Egresos por Proyecto' , data: { url: 'report-project', type: 'project' } },
           { name: 'Detalle de Egresos por Proyecto' , data: { url: 'report-detail', type: 'project' } },
           { name: 'Gasto de materiales por Proyecto' , data: { url: 'report-material', type: 'project' } },
+          { header: 'Cuentas' },
+          { name: 'Movimientos por Cuenta' , data: { url: 'report-account', type: 'account' } },
         ],
         submitShow: false,
         yearData: ['2018','2019', '2020', '2021'],
         yearShow: false ,
         projectData: [],
         projectShow: false,
+        accountData: [],
+        accountShow: false,
         rangeShow: false,
         monthShow: false,
       }
@@ -184,11 +201,20 @@
               this.rangeShow = false;
               this.projectShow = false;
               this.monthShow = false;
+              this.accountShow = false;
               this.params = new Date().getFullYear().toString();
               break;
             case 'project':
               this.projectShow = true;
               this.rangeShow = false;
+              this.yearShow = false;
+              this.monthShow = false;
+              this.accountShow = false;
+              break;
+            case 'account':
+              this.accountShow = true;
+              this.rangeShow = true;
+              this.projectShow = false;
               this.yearShow = false;
               this.monthShow = false;
               break;
@@ -197,12 +223,14 @@
               this.projectShow = false;
               this.yearShow = false;
               this.monthShow = false;
+              this.accountShow = false;
               break;
             case 'month':
               this.monthShow = true;
               this.rangeShow = false;
               this.yearShow = false;
               this.projectShow = false;
+              this.accountShow = false;
               this.params = new Date().toISOString().substr(0, 7);
               break;
           }
@@ -253,7 +281,10 @@
     },
 
     created() {
-      this.listProjects()
+      Promise.all([this.listProjects(), this.listAccounts()])
+      .then(() =>{
+        this.success = true
+      })
     },
 
     methods: {
@@ -261,7 +292,13 @@
         const projects = await ProjectService.getProjects('projects/list-report')
         if (projects.status === 200) {
           this.projectData = projects.data;
-          this.success = true
+        }
+      },
+
+      listAccounts: async function() {
+        const accounts = await AccountService.getAccounts('accounts/listing/report')
+        if (accounts.status === 200) {
+          this.accountData = accounts.data;
         }
       },
 
@@ -270,8 +307,13 @@
         let url;
         let params
         if (this.params) {
-          params = { params: { data: this.params }};
-          url = `${this.model.data.url}`
+          if (this.accountShow && this.rangeShow) {
+            params = { params: { data: { account: this.params, range: this.dateRange }}};
+            url = `${this.model.data.url}` 
+          } else {
+            params = { params: { data: this.params }};
+            url = `${this.model.data.url}`
+          }
         } else if (this.dateRange.length > 0) {
           params = { params: { data: this.dateRange }};
           url = `${this.model.data.url}`

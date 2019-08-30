@@ -64,7 +64,7 @@
                           </template>
                         </v-badge>
                       </td>
-                      <td>{{ props.item.created }}</td>
+                      <td>{{ props.item.created | formatDate('DD/MM/YYYY') }}</td>
                       <td>
                         <v-btn
                           v-if="permission('expense-types.update')"

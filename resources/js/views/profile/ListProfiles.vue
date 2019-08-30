@@ -52,7 +52,7 @@
                     <v-progress-linear height="3" slot="progress" color="red darken-3" indeterminate></v-progress-linear>
                     <template slot="items" slot-scope="props">
                       <td>{{ props.item.description }}</td>
-                      <td>{{ props.item.created }}</td>
+                      <td>{{ props.item.created | formatDate('DD/MM/YYYY') }}</td>
                       <td>{{ props.item.updated }}</td>
                       <td>
                         <v-btn

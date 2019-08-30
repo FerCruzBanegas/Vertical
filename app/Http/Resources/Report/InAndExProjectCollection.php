@@ -24,7 +24,6 @@ class InAndExProjectCollection extends ResourceCollection
                         'titulo' => $data->title,
                         'pago' => $data->payment,
                         'fecha' => Carbon::parse($data->date)->format('d/m/Y'),
-                        'proyecto' => $data->name,
                         'ingresos' => $data->inc_amount,
                         'egresos' => $data->exp_amount
                     ];
@@ -45,11 +44,6 @@ class InAndExProjectCollection extends ResourceCollection
                     [
                         'uniqueName' => "fecha",
                         'caption' => "Fecha",
-                        'sort' => "unsorted"
-                    ],
-                    [
-                        'uniqueName' => "proyecto",
-                        'caption' => "Proyecto",
                         'sort' => "unsorted"
                     ],
                     [
@@ -89,7 +83,7 @@ class InAndExProjectCollection extends ResourceCollection
                 //         'tuple' => ['date'],
                 //     ]
                 // ),
-                'flatOrder' => ['titulo', 'pago', 'fecha', 'proyecto', 'ingresos', 'egresos']
+                'flatOrder' => ['titulo', 'pago', 'fecha', 'ingresos', 'egresos']
             ],
             'conditions' => array(
                 [

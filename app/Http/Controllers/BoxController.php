@@ -26,10 +26,16 @@ class BoxController extends ApiController
 
         $boxes = $this->box->orderBy('id', 'DESC');
 
-        if ($request->has('filter')) {
-            $filter = $request->input('filter');
+        $filter = json_decode($request->dateRange, true);
 
-            $boxes = $boxes->search($filter);
+        if (sizeof($filter) > 0) {
+            $init = $filter[0].' 00:00:00';
+            $end = $filter[1].' 23:59:59';
+
+            $boxes = $boxes->where(function($query) use ($init, $end) {
+                $query->where('date_init', '>=', $init)
+                      ->where('date_init', '<=', $end);
+            });
         }
 
     	$boxes = $boxes->paginate($rowsPerPage);

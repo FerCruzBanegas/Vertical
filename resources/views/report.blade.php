@@ -1,10 +1,7 @@
 <html>
   <head>
     <style>
-
-      @page {
-                margin: 0cm 0cm;
-            }
+      @page { margin: 0cm 0cm; }
 	  table {
 		border-collapse: separate;
 		border-spacing: 0;
@@ -80,11 +77,6 @@
 	    background-color: #D8A504;
 	  }
 
-	  .blank {
-	    background-color: #FFFFFF;
-	    border: none;
-	  }
-
 	  table th,
 	  table td {
 	    padding: .625em;
@@ -97,133 +89,136 @@
 	    text-transform: uppercase;
 	  }
 
+      body {
+        margin-top: 3cm;
+        margin-left: 2cm;
+        margin-right: 2cm;
+        margin-bottom: 2cm;
+        font-family: 'Lucida Console', Monaco, monospace;
+      }
 
-            /** Define now the real margins of every page in the PDF **/
-            body {
-                margin-top: 3cm;
-                margin-left: 2cm;
-                margin-right: 2cm;
-                margin-bottom: 2cm;
-                font-family: 'Lucida Console', Monaco, monospace;
-            }
+      header {
+        position: fixed;
+        top: 0cm;
+        left: 0cm;
+        right: 0cm;
+        height: 3cm;
+      }
 
-            /** Define the header rules **/
-            header {
-                position: fixed;
-                top: 0cm;
-                left: 0cm;
-                right: 0cm;
-                height: 3cm;
-            }
-
-            img{
+      img{
         text-align: center;
         top: 0;
         float:left;
         padding-left: 40px;
         width: 300px;
-    }
+      }
 
-            footer {
-                position: fixed; 
-                bottom: 0cm; 
-                left: 0cm; 
-                right: 0cm;
-                height: 2cm;
+      footer {
+        position: fixed; 
+        bottom: 0cm; 
+        left: 0cm; 
+        right: 0cm;
+        height: 2cm;
+        color: #FFFFFF;
+        background-color: #636363;
+        text-align: center;
+        line-height: 1.5cm;
+      }
+       
+      .blank {
+	    background-color: #FFFFFF;
+	    border: none;
+	  }
+	  
+      .pull-center {
+		text-align: center;
+	  }
 
-                /** Extra personal styles **/
-                color: #FFFFFF;
-	            background-color: #636363;
-                text-align: center;
-                line-height: 1.5cm;
-            }
+	  .pull-right {
+	    text-align: right;
+      }
 
+	  .div-table {
+		margin-top: 1em;
+		width: 100%;
+	  }
 
-.div-table {
-	margin-top: 1em;
-	width: 100%;
-}
+	  .container {
+	    width: 100%;
+	    border: 2px solid #ddd;
+	    padding: 1em;
+	    overflow: auto;
+	  }
 
-h1, h2 {
-	text-align: center;
-}
+	  .container div {
+	     display: block;
+	     width: 50%;
+	  }
 
-.container {
-  width: 100%;
-  border: 2px solid #ddd;
-  padding: 1em;
-  overflow: auto;
-}
+	  .container div:nth-of-type(1) {
+	    float: left;
+	  }
 
-.container div {
-   display: block;
-   width: 50%;
-}
+	  .container div:nth-of-type(2) {
+	    float: right;
+	    text-align: right;
+	  }
 
-.container div:nth-of-type(1) {
-  float: left;
-}
+      .amount {
+	    margin-top: 1.5em;
+      }
 
-.container div:nth-of-type(2) {
-  float: right;
-  text-align: right;
-}
+      .total {
+	    margin-top: 0.3em;
+	    border: 2px solid #ddd;
+	    padding: 0.5em;
+      }
 
-.amount {
-	margin-top: 1.5em;
-}
-.pull-right {
-	text-align: right;
-}
-.total {
-	margin-top: 0.3em;
-	border: 2px solid #ddd;
-	padding: 0.5em;
-}
-.date {
-	padding-top: 1em;
-	padding-right: 1em;
-}
+      .date {
+	    padding-top: 1em;
+	    padding-right: 1em;
+      }
     </style>
   </head>
   <body>
   	<header>
-            <img src="{{url('/img/logo_opt.png')}}"/>
-            <div class="date pull-right">{{ $date }}</div>
-        </header>
-     <h1>ARQUEO DE CAJA CENTRAL</h1>
-        <div class="container">
-  <div><strong>Fecha Desde:</strong> {{ date('d/m/Y H:i:s', strtotime($box['date_init'])) }}</div>
-  <div><strong>Realizado por:</strong> {{ $box['causer']['causer'] }}</div>
-  <div><strong>Fecha Hasta:</strong> {{ date('d/m/Y H:i:s', strtotime($box['date_end'])) }}</div>
-</div>
+      <img src="{{url('/img/logo_opt.png')}}"/>
+      <div class="date pull-right">{{ $date }}</div>
+    </header>
 
-        <!-- Wrap the content of your PDF inside a main tag -->
-        <div class="div-table">
-        	<h2>Lista de Cuentas y Montos</h2>
-        	<table>
-	  <thead>
-	    <tr id="tr1">
-	      <th class="blank"></th>
-	      <th colspan="2">Monto Estimado</th>
-	      <th>Total</th>
-	    </tr>
-	    <tr id="tr2">
-	      <th scope="col">Cuenta</th>
-	      <th scope="col">Ingresos</th>
-	      <th scope="col">Egresos</th>
-	      <th scope="col">Diferencia</th>
-	      <th scope="col">Monto Real</th>
-	    </tr>
-	  </thead>
+    <h1 class="pull-center">ARQUEO DE CAJA CENTRAL</h1>
+
+    <div class="container">
+	  <div><strong>Fecha Desde:</strong> {{ date('d/m/Y H:i:s', strtotime($box['date_init'])) }}</div>
+	  <div><strong>Realizado por:</strong> {{ $box['created']['causer'] }}</div>
+	  <div><strong>Fecha Hasta:</strong> {{ date('d/m/Y H:i:s', strtotime($box['date_end'])) }}</div>
+	</div>
+
+    <div class="div-table">
+      <h2 class="pull-center">Lista de Cuentas y Montos</h2>
+      <table>
+	    <thead>
+	      <tr id="tr1">
+	        <th class="blank"></th>
+	        <th colspan="2">Monto Estimado</th>
+	        <th>Total</th>
+	      </tr>
+	      <tr id="tr2">
+	        <th scope="col">Cuenta</th>
+	        <th scope="col">Ingresos</th>
+	        <th scope="col">Egresos</th>
+	        <th scope="col">Diferencia</th>
+	        <th scope="col">Monto Real</th>
+	      </tr>
+	    </thead>
 	    <tbody>
 	      @foreach($accounts as $account)
 	        <tr>
-	            <td data-label="Cuenta">{{ $account['title']  }}</td>
-                <td data-label="Ingresos">{{ number_format($account['incomes'], 2, '.', ',') }}</td>
-                <td data-label="Egresos">{{ number_format($account['expenses'], 2, '.', ',') }}</td>
-                <td data-label="Diferencia">{{ number_format($account['incomes']  - $account['expenses'], 2, '.', ',') }}</td>
-                <td data-label="Monto Real">{{ number_format($account['cash'], 2, '.', ',') }}</td>
+	          <td data-label="Cuenta">{{ $account['title']  }}</td>
+              <td data-label="Ingresos">{{ number_format($account['incomes'], 2, '.', ',') }}</td>
+              <td data-label="Egresos">{{ number_format($account['expenses'], 2, '.', ',') }}</td>
+              <td data-label="Diferencia">{{ number_format($account['incomes']  - $account['expenses'], 2, '.', ',') }}</td>
+              <td data-label="Monto Real">{{ number_format($account['cash'], 2, '.', ',') }}</td>
 	        </tr>
 	      @endforeach
 	    </tbody>
@@ -236,23 +231,23 @@ h1, h2 {
 	      </tr>
 	    </tfoot>
 	  </table>
-      </div>
+    </div>
 
-      <div class="amount"><strong>Saldo actual en caja:</strong></div>
-            <div class="total pull-right">
-              <div><strong>TOTAL:</strong>
-                <span> {{ number_format($totals[2], 2, '.', ',') }}</span>
-              </div>
-            </div>
-      <div class="amount"><strong>Nota:</strong></div>
-            <div class="total">
-              <div>{{ $box['note'] }}</div>
-            </div>
-	  <footer>
-            Vertical srl &copy; <?php echo date("Y");?> 
-        </footer>
-        
-  	
+    <div class="amount"><strong>Saldo actual en caja:</strong></div>
+
+    <div class="total pull-right">
+      <div><strong>TOTAL:</strong>
+        <span> {{ number_format($totals[2], 2, '.', ',') }}</span>
+      </div>
+    </div>
+
+    <div class="amount"><strong>Nota:</strong></div>
+
+    <div class="total">
+      <div>{{ $box['note'] }}</div>
+    </div>
+
+	<footer>Vertical srl &copy; <?php echo date("Y");?></footer> 
   </body>
 </html>
   

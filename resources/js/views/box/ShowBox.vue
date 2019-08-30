@@ -4,12 +4,51 @@
       <v-flex d-flex xs12 sm12 md12>
         <v-card v-show="success">
           <v-card-title primary-title>
-            <h3 class="headline mb-0">Arqueo de Caja</h3>
+            <h3 class="headline mb-0">Detalle Arqueo de Caja</h3>
+            <v-spacer></v-spacer>
+            <v-btn fab flat small color="red darken-3" @click="downloadPdf" :loading="loading">
+              <v-icon>get_app</v-icon>
+            </v-btn>
           </v-card-title>
           <v-container fluid>
-            <!-- <pre>{{ $data }}</pre> -->
-            <v-btn @click="test">test</v-btn>
+            <strong>Datos del registro</strong>
+            <div class="group">
+              <div class="body-2">Se registro el día:
+                <span class="body-1 grey--text"> {{ box.date_init | formatDate('DD/MM/YYYY') }}</span>
+              </div>
+              <div></div>
+              <div class="body-2">Se actualizó por ultima vez el:
+                <span class="body-1 grey--text"> {{ box.date_init | formatDate('DD/MM/YYYY') }}</span>
+                <span>Por:</span>
+                <span class="body-1 grey--text" v-if="box.updated"> {{ box.updated.causer }}</span>
+              </div>
+            </div>
+            <strong>Rango de Tiempo del Arqueo</strong>
+            <div class="div-group top">
+              <div class="subdiv-group">
+                <div class="title">Fecha Desde:
+                  <span class="subheading"> {{ box.date_init | formatDate('DD/MM/YYYY') }}</span>
+                </div>
+                <div class="title">Fecha Hasta:
+                  <span class="subheading"> {{ box.fecha_init | formatDate('DD/MM/YYYY') }}</span>
+                </div>
+              </div>
+              <div class="title">Arqueo realizado por:
+                <br>
+                <span class="subheading" v-if="box.created"> {{ box.created.causer }}</span>
+              </div>
+            </div>
             <table-accounts :show="true" :accounts="accounts"></table-accounts>
+            <div class="title top">Saldo actual en caja:</div>
+            <div class="div-group">
+              <div class="display-1">TOTAL:
+                <span class="display-1 grey--text"> {{ box.amount | currency }}</span>
+              </div>
+            </div>
+            <div class="title top">Nota / Observaciones:</div>
+            <div class="group">
+              <div class="body-2">{{ box.note }}</div>
+            </div>
           </v-container>
         </v-card>
       </v-flex>
@@ -28,10 +67,10 @@
     data() {
       return {
         success: false,
+        loading: false,
         accounts: [],
         box: new Box(),
         id: this.$route.params.id,
-        causer: null
       }
     },
 
@@ -44,7 +83,8 @@
     },
 
     methods: {
-      test: async function() {
+      downloadPdf: async function() {
+        this.loading = true
         const config = {
           method: 'post',
           url: 'pdf-report',
@@ -54,13 +94,18 @@
           },
           responseType: 'arraybuffer'
         }
-        const response = await ReportService.getReportPdf(config)
-        if (response.status === 200) {
-          let blob = new Blob([response.data], { type: 'application/pdf' })
-          let link = document.createElement('a')
-          link.href = window.URL.createObjectURL(blob)
-          link.download = 'arqueo-caja.pdf'
-          link.click()
+        try {
+          const response = await ReportService.getReportPdf(config)
+            if (response.status === 200) {
+            let blob = new Blob([response.data], { type: 'application/pdf' })
+            let link = document.createElement('a')
+            link.href = window.URL.createObjectURL(blob)
+            link.download = 'arqueo-caja.pdf'
+            link.click()
+            this.loading = false
+          }
+        } catch (err) {
+          this.loading = false
         }
       },
 
@@ -76,6 +121,9 @@
   }
 </script>
 <style scoped>
+  .top {
+    padding-top: 1em;
+  }
   .div-group {
     width: 100%;
     border: 2px solid #ddd; 
@@ -90,5 +138,26 @@
   .div-group div:last-child {
     margin-left: auto
   }
+
+  .group {
+  width: 100%;
+  border: 2px solid #ddd;
+  padding: 1em;
+  overflow: auto;
+}
+
+.group div {
+   display: block;
+   width: 50%;
+}
+
+.group div:nth-of-type(1) {
+  float: left;
+}
+
+.group div:nth-of-type(2) {
+  float: right;
+  text-align: right;
+}
 </style>
 

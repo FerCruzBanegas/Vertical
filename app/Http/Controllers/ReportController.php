@@ -12,15 +12,16 @@ use App\Http\Resources\Report\InAndExMonthCollection;
 use App\Http\Resources\Report\InAndExProjectCollection;
 use App\Http\Resources\Report\ExDetailProjectCollection;
 use App\Http\Resources\Report\ExMaterialProjectCollection;
+use App\Http\Resources\Report\InAndExAccountCollection;
 use PDF;
 
 class ReportController extends ApiController
 {
     public function getIncomeAndExpenseForDate($date = NULL) 
     {
-    	if (is_null($date)) $date = date('Y-m-d');
+    	  if (is_null($date)) $date = date('Y-m-d');
 
-    	$expense = DB::table('expenses')
+    	  $expense = DB::table('expenses')
           ->select(
             DB::raw('MONTH(date) AS month'), 
             DB::raw('SUM(amount) AS amount')
@@ -75,7 +76,7 @@ class ReportController extends ApiController
 
     public function getExpenseForProject() 
     {
-    	$data = DB::table('projects AS p')
+    	  $data = DB::table('projects AS p')
           ->join('expenses AS e', 'p.id', '=', 'e.project_id')
           ->select(DB::raw('SUM(e.amount) total'), 'p.name AS project')
           ->where(function($query) {
@@ -92,7 +93,7 @@ class ReportController extends ApiController
 
     public function getIncomeForProject() 
     {
-    	$data = DB::table('projects AS p')
+    	  $data = DB::table('projects AS p')
           ->join('incomes AS i', 'p.id', '=', 'i.project_id')
           ->select(DB::raw('SUM(i.amount) total'), 'p.name AS project')
           ->where(function($query) {
@@ -109,29 +110,29 @@ class ReportController extends ApiController
 
     public function getQueryForGraphics() 
     {
-    	$year = $this->getIncomeAndExpenseForDate();
-    	$expense = $this->getExpenseForProject();
-    	$income = $this->getIncomeForProject();
+      	$year = $this->getIncomeAndExpenseForDate();
+      	$expense = $this->getExpenseForProject();
+      	$income = $this->getIncomeForProject();
 
-    	$data = [
-    		'year' => $year,
-    		'expense' => $expense,
-    		'income' => $income,
-    	];
+      	$data = [
+      		'year' => $year,
+      		'expense' => $expense,
+      		'income' => $income,
+      	];
 
-    	return $this->respond($data);
+      	return $this->respond($data);
     }
 
     public function getIncomeAndExpenseMonthYear(Request $request)
     {
-    	$date = $request->data.'-01-01';
-    	$data = $this->getIncomeAndExpenseForDate($date);
-    	return new InAndExMonthYearCollection($data, $request->data);
+      	$date = $request->data.'-01-01';
+      	$data = $this->getIncomeAndExpenseForDate($date);
+      	return new InAndExMonthYearCollection($data, $request->data);
     }
 
     public function getIncomeAndExpenseForYear()
     {
-    	$expense = DB::table('expenses')->select('date', DB::raw('0'), 'amount')->whereNull('deleted_at');;
+    	  $expense = DB::table('expenses')->select('date', DB::raw('0'), 'amount')->whereNull('deleted_at');;
 
         $data = DB::query()->fromSub(function ($query) use ($expense) {
             $query->select('date', 'amount as sale_amount', DB::raw('0 as purchase_amount'))
@@ -143,7 +144,7 @@ class ReportController extends ApiController
           ->groupBy(DB::raw('YEAR(date)'))
           ->get();
 
-    	return new InAndExYearCollection($data);
+    	  return new InAndExYearCollection($data);
     }
 
     public function getIncomeAndExpenseForRange(Request $request)
@@ -188,9 +189,9 @@ class ReportController extends ApiController
 
     public function getIncomeAndExpenseForMonth(Request $request)
     {
-    	$date = $request->data.'-01';
+    	  $date = $request->data.'-01';
 
-    	$expense = DB::table('expenses as e')
+    	  $expense = DB::table('expenses as e')
                    ->select('e.title', 'e.payment', 'e.date', 'p.name', DB::raw('0 as inc_amount'), DB::raw('SUM(e.amount) as exp_amount'))
                    ->join('projects as p', 'p.id', '=', 'e.project_id')
                    ->where(function($query) use ($date) {
@@ -216,14 +217,14 @@ class ReportController extends ApiController
           ->orderBy('date', 'desc')
           ->get();
 
-    	return new InAndExMonthCollection($data, $request->data);
+    	  return new InAndExMonthCollection($data, $request->data);
     }
 
     public function getIncomeAndExpenseForProject(Request $request)
     {
-    	$params  = json_decode($request->data, true);
-    	$expense = DB::table('expenses as e')
-                   ->select('e.title', 'e.payment', 'e.date', 'p.name', DB::raw('0 as inc_amount'), DB::raw('SUM(e.amount) as exp_amount'))
+    	  $params  = json_decode($request->data, true);
+    	  $expense = DB::table('expenses as e')
+                   ->select('e.title', 'e.payment', 'e.date', DB::raw('0 as inc_amount'), DB::raw('SUM(e.amount) as exp_amount'))
                    ->join('projects as p', 'p.id', '=', 'e.project_id')
                    ->where(function($query) use ($params) {
                     $query->where('p.id', '=', $params['id'])
@@ -232,7 +233,7 @@ class ReportController extends ApiController
                    ->groupBy('e.id');
 
         $data = DB::query()->fromSub(function ($query) use ($expense, $params) {
-            $query->select('i.title', 'i.payment', 'i.date', 'p.name', DB::raw('SUM(i.amount) as inc_amount'), DB::raw('0 as exp_amount'))
+            $query->select('i.title', 'i.payment', 'i.date', DB::raw('SUM(i.amount) as inc_amount'), DB::raw('0 as exp_amount'))
                   ->from('incomes as i')
                   ->join('projects as p', 'p.id', '=', 'i.project_id')
                   ->where(function($query) use ($params) {
@@ -246,12 +247,12 @@ class ReportController extends ApiController
           ->orderBy('date', 'desc')
           ->get();
 
-    	return new InAndExProjectCollection($data, $params['name']);
+    	  return new InAndExProjectCollection($data, $params['name']);
     }
 
     public function getExpenseDetailForProject(Request $request)
     {
-    	$params  = json_decode($request->data, true);
+    	  $params  = json_decode($request->data, true);
         $data = DB::table('projects AS p')
           ->join('expenses AS e', 'p.id', '=', 'e.project_id')
           ->join('expense_types AS t', 't.id', '=', 'e.expense_type_id')
@@ -265,7 +266,7 @@ class ReportController extends ApiController
           ->orderBy('e.date', 'desc')
           ->get();
 
-    	return new ExDetailProjectCollection($data, $params['name']);
+    	  return new ExDetailProjectCollection($data, $params['name']);
     }
 
     public function getExpenseMaterialForProject(Request $request)
@@ -287,6 +288,50 @@ class ReportController extends ApiController
     	  return new ExMaterialProjectCollection($data, $params['name']);
     }
 
+    public function getIncomeAndExpenseForAccount(Request $request)
+    {
+        $params  = json_decode($request->data, true);
+        if (sizeof($params['range']) > 0) {
+          if (sizeof($params['range']) === 1) {
+            $date = [$params['range'][0], $params['range'][0]];
+          } else {
+            $date = $params['range'];
+          }
+        } else {
+          $date = [date('Y-m-d'), date('Y-m-d')];
+        }
+
+        $expense = DB::table('expenses as e')
+                   ->select('e.title', 'e.payment', 'e.date', DB::raw('0 as inc_amount'), DB::raw('SUM(e.amount) as exp_amount'))
+                   ->join('accounts as a', 'a.id', '=', 'e.account_id')
+                   ->where(function($query) use ($params, $date) {
+                    $query->where('a.id', '=', $params['account']['id'])
+                          ->where('e.date', '>=', $date[0])
+                          ->where('e.date', '<=', $date[1])
+                          ->whereNull('e.deleted_at');
+                   })
+                   ->groupBy('e.id');
+
+        $data = DB::query()->fromSub(function ($query) use ($expense, $params, $date) {
+            $query->select('i.title', 'i.payment', 'i.date', DB::raw('SUM(i.amount) as inc_amount'), DB::raw('0 as exp_amount'))
+                  ->from('incomes as i')
+                  ->join('accounts as a', 'a.id', '=', 'i.account_id')
+                  ->where(function($query) use ($params, $date) {
+                    $query->where('a.id', '=', $params['account']['id'])
+                          ->where('i.date', '>=', $date[0])
+                          ->where('i.date', '<=', $date[1])
+                          ->whereNull('i.deleted_at');
+                  })
+                  ->groupBy('i.id')
+                  ->unionAll($expense);
+          }, 'sp')
+          ->select('*')
+          ->orderBy('date', 'desc')
+          ->get();
+
+        return new InAndExAccountCollection($data, array($params['account']['title'], $date));
+    }
+
     public function getPdfReport(Request $request) 
     {
         $date = Carbon::now();
@@ -304,7 +349,7 @@ class ReportController extends ApiController
         $pdf = PDF::loadView('report', $array);
 
         $pdf->setPaper('A4')->save($path);
-        
+
         return response()->download($path);
     }
 }

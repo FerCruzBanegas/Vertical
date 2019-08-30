@@ -202,7 +202,7 @@
       },
 
       showAccount:async function() {
-        const response = await AccountService.getAccounts(`accounts/${this.id}`)
+        const response = await AccountService.getAccounts(`accounts/${this.id}/edit`)
         if (response.status === 200) {
           this.account = response.data.data;
           this.success = true
