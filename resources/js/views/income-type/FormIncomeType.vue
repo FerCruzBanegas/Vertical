@@ -104,7 +104,7 @@
     created() {
       if (this.id) {
         this.showIncomeType()
-      }else{
+      } else{
         this.success = true
       }
     },

@@ -104,7 +104,7 @@
     created() {
       if (this.id) {
         this.showExpenseType()
-      }else{
+      } else{
         this.success = true
       }
     },

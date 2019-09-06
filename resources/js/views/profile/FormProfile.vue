@@ -129,8 +129,6 @@
 
       if (this.id) {
         this.showProfile()
-      }else{
-        this.success = true
       }
     },
 
@@ -155,6 +153,7 @@
         const actions = await ActionsService.getActions('actions/listing')
         if (actions.status === 200) {
           this.actions = actions.data;
+          this.success = true
         }
       },
 

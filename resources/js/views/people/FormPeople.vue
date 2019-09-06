@@ -131,7 +131,7 @@
     created() {
       if (this.id) {
         this.showPeople();
-      }else{
+      } else{
         this.success = true
       }
     },

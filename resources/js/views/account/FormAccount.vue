@@ -188,7 +188,7 @@
     created() {
       if (this.id) {
         this.showAccount();
-      }else{
+      } else{
         this.success = true
       }
     },

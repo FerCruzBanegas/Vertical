@@ -166,8 +166,6 @@
 
       if (this.id) {
         this.showMaterial();
-      }else{
-        this.success = true
       }
     },
 
@@ -176,6 +174,7 @@
         const types = await MaterialTypeService.getMaterialTypes('material-types/listing')
         if (types.status === 200) {
           this.material_types = types.data;
+          this.success = true
         }
       },
 

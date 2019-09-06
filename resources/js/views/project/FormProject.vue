@@ -182,8 +182,6 @@
 
       if (this.id) {
         this.showProject();
-      }else{
-        this.success = true
       }
     },
 
@@ -199,6 +197,7 @@
         const types = await ProjectTypeService.getProjectTypes('project-types/listing')
         if (types.status === 200) {
           this.project_types = types.data;
+          this.success = true
         }
       },
 

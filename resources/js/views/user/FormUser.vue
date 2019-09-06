@@ -201,8 +201,6 @@
 
       if (this.id) {
         this.showUser()
-      }else{
-        this.success = true
       }
     }, 
 
@@ -215,6 +213,7 @@
         const profiles = await ProfileService.getProfiles('profiles/listing')
         if (profiles.status === 200) {
           this.profiles = profiles.data;
+          this.success = true
         }
       },
 

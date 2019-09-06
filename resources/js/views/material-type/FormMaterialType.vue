@@ -104,7 +104,7 @@
     created() {
       if (this.id) {
         this.showMaterialType()
-      }else{
+      } else{
         this.success = true
       }
     },
