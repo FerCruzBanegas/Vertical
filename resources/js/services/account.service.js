@@ -37,6 +37,15 @@ const AccountService = {
       throw error
     }
   },
+
+  changeState: async function(id) {
+    try {
+      const response = await ApiService.put(`accounts/${id}/state`)
+      return response
+    } catch (error) {
+      throw error
+    }
+  },
 }
 
 export default AccountService

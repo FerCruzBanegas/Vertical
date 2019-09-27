@@ -44,7 +44,17 @@ class ProjectController extends ApiController
         }
         $project = $this->project->with(['expenses', 'incomes'])->findOrFail($id);
         $totals = array('totals' => ['expense' => $project->expenses->sum('amount'), 'income' => $project->incomes->sum('amount')]);
-        $events = collect($project->expenses)->merge($project->incomes)->sortByDesc('date')->paginate($rowsPerPage);
+
+        if ($request->has('type')) {
+            $type = $request->input('type');
+            if ($type == 1) {
+                $events = collect($project->incomes)->sortByDesc('date')->paginate($rowsPerPage);
+            } else {
+                $events = collect($project->expenses)->sortByDesc('date')->paginate($rowsPerPage);
+            }
+        } else {
+            $events = collect($project->expenses)->merge($project->incomes)->sortByDesc('date')->paginate($rowsPerPage);
+        }
 
         return new ProjectEventsCollection($events, $totals); 
     }
@@ -93,6 +103,20 @@ class ProjectController extends ApiController
             return $this->respondInternalError();
         }
         return $this->respondDeleted();
+    }
+
+    public function openProject($id)
+    {
+        try {
+            $project = $this->project->find($id);
+            $project->update([
+                'end_date' => NULL,
+                'state' => 1
+            ]);
+        } catch (\Exception $e) {
+            return $this->respondInternalError();
+        }
+        return $this->respond($project);
     }
 
     public function finishProject($id)

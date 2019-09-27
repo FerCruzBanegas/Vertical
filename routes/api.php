@@ -151,33 +151,17 @@ Route::get('/test', function(Request $request) {
         //   ->get();
 
 
-        $expense = DB::table('expenses as e')
-                   ->select('e.title', 'e.payment', 'e.date', DB::raw('0 as inc_amount'), DB::raw('SUM(e.amount) as exp_amount'))
-                   ->join('accounts as a', 'a.id', '=', 'e.account_id')
-                   ->where(function($query) {
-                    $query->where('a.id', '=', 1)
-                          ->where('e.date', '>=', '2019-08-01')
-                          ->where('e.date', '<=', '2019-08-31')
-                          ->whereNull('e.deleted_at');
-                   })
-                   ->groupBy('e.id');
-
-        $data = DB::query()->fromSub(function ($query) use ($expense) {
-            $query->select('i.title', 'i.payment', 'i.date', DB::raw('SUM(i.amount) as inc_amount'), DB::raw('0 as exp_amount'))
-                  ->from('incomes as i')
-                  ->join('accounts as a', 'a.id', '=', 'i.account_id')
-                  ->where(function($query) {
-                    $query->where('a.id', '=', 1)
-                          ->where('i.date', '>=', '2019-08-01')
-                          ->where('i.date', '<=', '2019-08-31')
-                          ->whereNull('i.deleted_at');
-                  })
-                  ->groupBy('i.id')
-                  ->unionAll($expense);
-          }, 'sp')
-          ->select('*')
-          ->orderBy('date', 'desc')
+        $data = DB::table('projects AS p')
+          ->join('expenses AS e', 'p.id', '=', 'e.project_id')
+          ->join('expense_person AS ep', 'e.id', '=', 'ep.expense_id')
+          ->join('people AS pe', 'ep.person_id', '=', 'pe.id')
+          ->where(function($query) {
+            $query->where('p.id', '=', 64)
+                  ->whereNull('e.deleted_at');
+            })
+          ->select('e.title', 'e.date', 'pe.name', 'e.amount')
           ->get();
+
         return response()->json($data);
         // $expense = DB::table('expenses')
         //   ->select('account_id', DB::raw('SUM(amount) AS amount'))
@@ -274,6 +258,7 @@ Route::get('profiles/listing', 'ProfileController@listing');
 Route::get('actions/listing', 'ActionController@listing');
 Route::get('accounts/listing', 'AccountController@listing');
 Route::get('accounts/listing/report', 'AccountController@listing');
+Route::get('users/listing', 'UserController@listing');
 
 Route::group(['middleware' => ['auth:api', 'acl:api']], function () {
     Route::post('logout', 'Auth\AuthController@logout');
@@ -294,6 +279,7 @@ Route::group(['middleware' => ['auth:api', 'acl:api']], function () {
     Route::post('accounts', 'AccountController@store')->name('accounts.create');
     Route::get('accounts/{id}/edit', 'AccountController@show');
     Route::put('accounts/{id}', 'AccountController@update')->name('accounts.update');
+    Route::put('accounts/{id}/state', 'AccountController@changeState')->name('accounts.destroy');
     Route::delete('accounts/{id}', 'AccountController@destroy')->name('accounts.destroy');
 
     //Boxes
@@ -303,6 +289,15 @@ Route::group(['middleware' => ['auth:api', 'acl:api']], function () {
     Route::get('boxes/{id}/edit', 'BoxController@show');
     Route::put('boxes/{id}', 'BoxController@update')->name('boxes.update');
     Route::delete('boxes/{id}', 'BoxController@destroy')->name('boxes.destroy');
+
+    //Small-Boxes
+    Route::get('small-boxes', 'SmallBoxController@index')->name('small-boxes.index');
+    Route::get('small-boxes/{id}', 'SmallBoxController@show')->name('small-boxes.show');
+    Route::post('small-boxes', 'SmallBoxController@store')->name('small-boxes.create');
+    Route::get('small-boxes/{id}/edit', 'SmallBoxController@show');
+    Route::put('small-boxes/{id}', 'SmallBoxController@update')->name('small-boxes.update');
+    Route::delete('small-boxes/{id}', 'SmallBoxController@destroy')->name('small-boxes.destroy');
+
 
     //Project-Types yes
     Route::get('project-types', 'ProjectTypeController@index')->name('project-types.index');
@@ -318,6 +313,7 @@ Route::group(['middleware' => ['auth:api', 'acl:api']], function () {
     Route::get('projects/{id}/events', 'ProjectController@getEvents')->name('projects.show');
     Route::post('projects', 'ProjectController@store')->name('projects.create');
     Route::get('projects/{id}', 'ProjectController@show');
+    Route::get('projects/{id}/open', 'ProjectController@openProject')->name('projects.update');
     Route::get('projects/{id}/finish', 'ProjectController@finishProject')->name('projects.update');
     Route::put('projects/{id}', 'ProjectController@update')->name('projects.update');
     Route::delete('projects/{id}', 'ProjectController@destroy')->name('projects.destroy');
@@ -402,6 +398,7 @@ Route::group(['middleware' => ['auth:api', 'acl:api']], function () {
     Route::get('report-detail', 'ReportController@getExpenseDetailForProject');
     Route::get('report-material', 'ReportController@getExpenseMaterialForProject');
     Route::get('report-account', 'ReportController@getIncomeAndExpenseForAccount');
+    Route::get('report-person', 'ReportController@getExpensePersonForProject');
 });
 
 //LEER
@@ -412,6 +409,9 @@ Route::group(['middleware' => ['auth:api', 'acl:api']], function () {
 // 2.- Validar que los proeyectos finalisados no aparescan para ser seleccionados.
 // 3.- validar montos en formularios de egresos
 // 4.- ver permisos para actualizar contrasena de un usuario
+
+//5.- validar array de montos en caja general
+//6.- validar fecha apertura
 // SELECT
 //     t1.month,
 //     COALESCE(t2.amount, 0) AS expenses,
@@ -750,3 +750,11 @@ Route::group(['middleware' => ['auth:api', 'acl:api']], function () {
 //     ON t1.id = t3.account_id
 // ORDER BY
 //     t1.title;
+
+// fecha de apertura  date_init
+// fecha de cierre  date_end
+// monto inicial  starting amount 
+// monto gastado  used amount 
+// monto restante  remaining amount
+// monto actual  actual amount
+// comentario/nota  note

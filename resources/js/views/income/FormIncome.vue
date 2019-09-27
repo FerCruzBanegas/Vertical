@@ -248,6 +248,10 @@
       })
     },
 
+    mounted() {
+      if (this.$route.query.q) this.income.project_id = parseInt(this.$route.query.q)
+    },
+
     methods: {
       formatDate (date) {
         if (!date) return null

@@ -109,8 +109,10 @@
         text-align: center;
         top: 0;
         float:left;
-        padding-left: 40px;
-        width: 300px;
+        padding-top: 1.5em;
+        padding-left: 2em;
+        width: 90px;
+        height: 100px
       }
 
       footer {
@@ -182,7 +184,7 @@
   </head>
   <body>
   	<header>
-      <img src="{{url('/img/logo_opt.png')}}"/>
+      <img src="{{url('/img/logo3.png')}}"/>
       <div class="date pull-right">{{ $date }}</div>
     </header>
 

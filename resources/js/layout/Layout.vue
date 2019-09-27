@@ -10,7 +10,7 @@
       fixed
       app
     >
-      <v-toolbar flat color="">
+      <v-toolbar flat>
         <v-list>
           <v-list-tile>
             <img src="/img/logo.png" width="200px" v-if="!miniVariant">
@@ -70,6 +70,8 @@
         </template>
       </v-list>
     </v-navigation-drawer>
+    <v-system-bar status color="primary">
+    </v-system-bar>
     <app-toolbar 
       v-on:toggleDrawer="drawer = !drawer" :drawer="drawer" 
       v-on:toggleMiniVariant="miniVariant = !miniVariant" :miniVariant="miniVariant"
@@ -103,7 +105,7 @@
       return {
         clipped: false,
         drawer: true,
-        miniVariant: false,
+        miniVariant: true,
         items: [
         { icon: 'home', text: 'Inicio', url: '/dashboard', permission: '' },
         { icon: 'find_in_page', text: 'Informes', url: '/reports', permission: 'reports.index' },
@@ -163,8 +165,8 @@
           text: 'Arqueos de Caja',
           model: false,
           children: [
-            { icon: 'create', text: 'Registrar Nuevo', url: '/boxes/create', permission: 'boxes.create' },
-            { icon: 'list', text: 'Ver Lista', url: '/boxes', permission: 'boxes.index' }
+            { icon: 'remove', text: 'Caja General', url: '/boxes', permission: 'boxes.index' },
+            { icon: 'remove', text: 'Caja Chica', url: '/small-boxes', permission: 'small-boxes.index' }
           ]
         },
         {

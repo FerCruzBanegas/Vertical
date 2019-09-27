@@ -2,6 +2,7 @@
   <v-container fluid grid-list-md>
     <v-layout row wrap>
       <v-flex xs12 sm12 md12 lg12 xl12>
+        <modal-state :title="title_state" :message="message_state" :loading="loading_state" :state="state" @hide="state = !state" @change_state="changeState"></modal-state>
         <modal-delete :message="message" :loading="loading" :remove="remove" @hide="remove = !remove" @deleted="deleted"></modal-delete>
         <modal-loader :loader="loader"></modal-loader>
         <modal-account :modal="modal" @hide="modal = !modal" :data="account"></modal-account>
@@ -60,22 +61,22 @@
                       <td><strong>{{ props.item.amount | currency }}</strong></td>
                       <td>
                         <v-chip
-                          v-if="props.item.state == 'Inactivo'"
-                          color="red lighten-4"
-                          class="ml-0"
-                          label
-                          small
-                        >
-                          {{ props.item.state }}
-                        </v-chip>
-                        <v-chip
-                          v-else
+                          v-if="props.item.state === 1"
                           color="green lighten-4"
                           class="ml-0"
                           label
                           small
                         >
-                          {{ props.item.state }}
+                          Activa
+                        </v-chip>
+                        <v-chip
+                          v-else
+                          color="red lighten-4"
+                          class="ml-0"
+                          label
+                          small
+                        >
+                          Inactiva
                         </v-chip>
                       </td>
                       <td>
@@ -88,6 +89,16 @@
                           :to="{ name: 'EditAccount', params: { id: props.item.id }}"
                         >
                           <v-icon small color="grey">edit</v-icon>
+                        </v-btn>
+                        <v-btn 
+                          v-if="permission('accounts.destroy')"
+                          small
+                          flat 
+                          icon class="mx-0" 
+                          color="red"
+                          @click="showModalState(props.item)"
+                        >
+                          <v-icon small color="red">power_settings_new</v-icon>
                         </v-btn>
                         <v-btn 
                           v-if="permission('accounts.destroy')"
@@ -123,6 +134,7 @@
   import ModalLoader from '../../components/ModalLoader.vue'
   import ModalAccount from '../../components/ModalAccount.vue'
   import ModalDelete from '../../components/ModalDelete.vue'
+  import ModalState from '../../components/ModalState.vue'
   import AccountService from '../../services/account.service'
 
   export default {
@@ -137,6 +149,10 @@
         loader: false,
         modal: false,
         account: null,
+        state: false,
+        title_state: null,
+        message_state: null,
+        loading_state: false,
         headers: [
           { text: '', align: 'left', sortable: false, width: "50" },
           { text: 'Título', value: 'titulo', width: "200" },
@@ -158,7 +174,8 @@
     components: {
       'modal-loader' : ModalLoader,
       'modal-account' : ModalAccount,
-      'modal-delete' : ModalDelete
+      'modal-delete' : ModalDelete,
+      'modal-state' : ModalState
     },
     
     watch: {
@@ -174,9 +191,34 @@
     },
 
     methods: {
+      showModalState(item) {
+        if (item.state === 1) {
+          this.title_state = 'Desactivar Cuenta'
+          this.message_state = 'Realmente quiere desactivar esta cuenta?'
+        } else {
+          this.title_state = 'Activar Cuenta'
+          this.message_state = 'Realmente desea volver a activar esta cuenta?'
+        }
+        this.state = true
+        this.id = item.id
+      },
+
       showModal(item) {
         this.remove = true
         this.id = item.id
+      },
+
+      changeState:async function() {
+        this.loading_state = true
+        const response = await AccountService.changeState(this.id)
+        if (response.status === 200) {
+          this.loading_state = false
+          this.state = false
+          this.getDataFromApi()
+          .then(data => {
+            this.items = data.items
+          })
+        }
       },
 
       deleted:async function() {

@@ -363,6 +363,10 @@
       })
     },
 
+    mounted() {
+      if (this.$route.query.q) this.expense.project_id = parseInt(this.$route.query.q)
+    },
+
     methods: {
       removeMaterial(id){
         const index = this.materials.findIndex(x => x.id == id)

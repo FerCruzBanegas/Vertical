@@ -124,6 +124,22 @@ class AccountController extends ApiController
         return $this->respondUpdated();
     }
 
+    public function changeState($id)
+    {
+        try {
+            $account = $this->account->find($id);
+            if ($account->state === 1) {
+              $account->update(['state' => 0]);
+            } else {
+              $account->update(['state' => 1]);
+            }
+            
+        } catch (\Exception $e) {
+            return $this->respondInternalError();
+        }
+        return $this->respondUpdated();
+    }
+
     public function destroy($id)
     {
         try {

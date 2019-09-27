@@ -13,6 +13,7 @@ use App\Http\Resources\Report\InAndExProjectCollection;
 use App\Http\Resources\Report\ExDetailProjectCollection;
 use App\Http\Resources\Report\ExMaterialProjectCollection;
 use App\Http\Resources\Report\InAndExAccountCollection;
+use App\Http\Resources\Report\ExPersonProjectCollection;
 use PDF;
 
 class ReportController extends ApiController
@@ -330,6 +331,23 @@ class ReportController extends ApiController
           ->get();
 
         return new InAndExAccountCollection($data, array($params['account']['title'], $date));
+    }
+
+    public function getExpensePersonForProject(Request $request)
+    {
+        $params  = json_decode($request->data, true);
+        $data = DB::table('projects AS p')
+          ->join('expenses AS e', 'p.id', '=', 'e.project_id')
+          ->join('expense_person AS ep', 'e.id', '=', 'ep.expense_id')
+          ->join('people AS pe', 'ep.person_id', '=', 'pe.id')
+          ->where(function($query) use ($params) {
+            $query->where('p.id', '=', $params['id'])
+                  ->whereNull('e.deleted_at');
+            })
+          ->select('e.title', 'e.date', 'pe.name', 'e.amount')
+          ->get();
+
+        return new ExPersonProjectCollection($data, $params['name']);
     }
 
     public function getPdfReport(Request $request) 

@@ -160,6 +160,7 @@
           { name: 'Ingresos / Egresos por Proyecto' , data: { url: 'report-project', type: 'project' } },
           { name: 'Detalle de Egresos por Proyecto' , data: { url: 'report-detail', type: 'project' } },
           { name: 'Gasto de materiales por Proyecto' , data: { url: 'report-material', type: 'project' } },
+          { name: 'Gasto de personas por Proyecto' , data: { url: 'report-person', type: 'project' } },
           { header: 'Cuentas' },
           { name: 'Movimientos por Cuenta' , data: { url: 'report-account', type: 'account' } },
         ],

@@ -97,4 +97,10 @@ class UserController extends ApiController
         }
         return $this->respondDeleted();
     }
+
+    public function listing()
+    {
+        $users = $this->user->listUsers();
+        return $this->respond($users);
+    }
 }

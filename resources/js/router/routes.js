@@ -47,6 +47,10 @@ import FormAccount from '../views/account/FormAccount.vue'
 import ListBoxes from '../views/box/ListBoxes.vue'
 import FormBox from '../views/box/FormBox.vue'
 import ShowBox from '../views/box/ShowBox.vue'
+//small-box
+import ListSmallBoxes from '../views/small-box/ListSmallBoxes.vue'
+import FormSmallBox from '../views/small-box/FormSmallBox.vue'
+import ShowSmallBox from '../views/small-box/ShowSmallBox.vue'
 
 import NotFoundComponent  from '../components/404.vue'
 import DeniedComponent  from '../components/403.vue'
@@ -144,6 +148,48 @@ export default [
             component: ShowBox,
             meta: {
               AccessControlList: 'boxes.show',
+            }
+          }
+        ]
+      },
+      {
+        path: '/small-boxes',
+        name: 'SmallBoxes',
+        redirect: '/small-boxes',
+        component: {
+          render (c) { return c('router-view') }
+        },
+        children: [
+          {
+            path: '',
+            name: 'ListSmallBoxes',
+            component: ListSmallBoxes,
+            meta: {
+              AccessControlList: 'small-boxes.index',
+            }
+          },
+          {
+            path: 'create',
+            name: 'CreateSmallBox',
+            component: FormSmallBox,
+            meta: {
+              AccessControlList: 'small-boxes.create',
+            }
+          },
+          {
+            path: ':id/edit',
+            name: 'EditSmallBox',
+            component: FormSmallBox,
+            meta: {
+              AccessControlList: 'small-boxes.update',
+            }
+          },
+          {
+            path: ':id/show',
+            name: 'ShowSmallBox',
+            component: ShowSmallBox,
+            meta: {
+              AccessControlList: 'small-boxes.show',
             }
           }
         ]

@@ -1,7 +1,8 @@
 <template>
   <v-toolbar
-    color="red darken-3" fixed clipped-left app
+    color="grey darken-2" fixed clipped-left app
     app
+    flat
     :clipped-left="clipped"
   >
     <v-toolbar-side-icon dark @click.stop="toggleDrawer"></v-toolbar-side-icon>

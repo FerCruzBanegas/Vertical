@@ -37,6 +37,11 @@ class Expense extends ApiModel
         return $this->belongsTo(Project::class);
     }
 
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
+
     public function materials()
     {
         return $this->belongsToMany(Material::class)->withTrashed()->withPivot('quantity', 'price')->withTimestamps();

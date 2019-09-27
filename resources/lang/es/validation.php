@@ -39,6 +39,12 @@ return [
     'exists'               => ':attribute es inválido.',
     'file'                 => 'El campo :attribute debe ser un archivo.',
     'filled'               => 'El campo :attribute es obligatorio.',
+    'gt' => [
+        'numeric' => 'El :attribute debe ser mayor que :value.',
+        'file' => 'The :attribute must be greater than :value kilobytes.',
+        'string' => 'The :attribute must be greater than :value characters.',
+        'array' => 'The :attribute must have more than :value items.',
+    ],
     'image'                => ':attribute debe ser una imagen.',
     'in'                   => ':attribute es inválido.',
     'in_array'             => 'El campo :attribute no existe en :other.',
@@ -144,6 +150,7 @@ return [
         'subject'               => 'asunto',
         'message'               => 'mensaje',
         //added
+        'user_id'               => 'usuario',
         'profile_id'            => 'perfil',
         'project_id'            => 'proyecto',
         'account_id'            => 'cuenta',
@@ -163,5 +170,6 @@ return [
         'state'                 => 'estado',
         'password_current'      => 'contraseña actual',
         'surnames'              => 'apellidos',
+        'start_amount'          => 'monto de apertura',
     ],
 ];

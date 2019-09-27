@@ -8,7 +8,13 @@
           <v-toolbar dense>
             <v-toolbar-title>{{ project.name }}</v-toolbar-title>
             <v-spacer></v-spacer>
-            <v-tooltip left>
+            <v-tooltip left v-if="project.state === 0">
+              <template v-slot:activator="{ on }">
+                <v-btn v-if="permission('projects.update')" icon v-on="on" @click="openProject()" :disabled="loading" :loading="loading"><v-icon>history</v-icon></v-btn>
+              </template>
+              <span>Abrir Proyecto</span>
+            </v-tooltip>
+            <v-tooltip left v-else>
               <template v-slot:activator="{ on }">
                 <v-btn v-if="permission('projects.update')" icon v-on="on" @click="finishProject()" :disabled="loading" :loading="loading"><v-icon>event</v-icon></v-btn>
               </template>
@@ -115,6 +121,35 @@
         <v-card v-if="project">
           <v-card-title primary-title>
             <div><h3 class="headline mb-0">Lista de Ingresos y Egresos</h3></div>
+            <v-container fluid grid-list-md>
+              <v-layout row wrap>
+                <v-flex d-flex xs12 sm12 md3 lg3>
+                  <v-btn outline color="grey" @click="allData">
+                    Ver todos
+                  </v-btn>
+                </v-flex>
+                <v-flex d-flex xs12 sm12 md3 lg3>
+                  <v-radio-group v-model="type" :mandatory="false">
+                    <v-radio @change="filterEvents" label="Ver Ingresos" color="grey" value="1"></v-radio>
+                  </v-radio-group>
+                </v-flex>
+                <v-flex d-flex xs12 sm12 md3 lg3>
+                  <v-radio-group v-model="type" :mandatory="false">
+                    <v-radio @change="filterEvents" label="Ver Egresos" color="grey" value="2"></v-radio>
+                  </v-radio-group>
+                </v-flex>
+                <v-flex xs12 sm12 md3 lg3 class="py-2">
+                  <v-btn-toggle mandatory>
+                    <v-btn flat :to="{ name: 'CreateIncome', query: {q: $route.params.id}}">
+                      Ingreso <v-icon>attach_money</v-icon>
+                    </v-btn>
+                    <v-btn flat :to="{ name: 'CreateExpense', query: {q: $route.params.id}}">
+                      Egreso <v-icon>money_off</v-icon>
+                    </v-btn>
+                  </v-btn-toggle>
+                </v-flex>
+              </v-layout>
+            </v-container>
           </v-card-title>
           <v-data-table
             :headers="headers"
@@ -125,7 +160,7 @@
             class="elevation-1"
             rows-per-page-text="Items por página"
           >
-            <v-progress-linear height="3" slot="progress" color="red darken-3" indeterminate></v-progress-linear>
+            <v-progress-linear height="3" slot="progress" color="grey" indeterminate></v-progress-linear>
             <template v-slot:items="props">
               <tr :class="props.item.type" :key="props.item.id">
                 <td>{{ props.item.title }}</td>
@@ -181,6 +216,7 @@
         people: [],
         progress: false,
         project: null,
+        type: null,
         events: [],
         id: this.$route.params.id,
         headers: [
@@ -222,6 +258,32 @@
     },
 
     methods: {
+      allData() {
+        this.type = null
+        this.pagination.page = 1
+        this.getDataFromApi().then(data =>{
+          this.events = data.items
+        })
+      },
+      
+      filterEvents(s) {
+        this.type = s
+        this.pagination.page = 1
+        this.getDataFromApi().then(data =>{
+          this.events = data.items
+        })
+      },
+
+      openProject: async function() {
+        this.loading = true
+        const response = await ProjectService.getProjects(`projects/${this.id}/open`)
+        if (response.status === 200) {
+          this.project.end_date = response.data.end_date
+          this.project.state = response.data.state
+          this.loading = false
+        }
+      },
+
       finishProject: async function() {
         this.loading = true
         const response = await ProjectService.getProjects(`projects/${this.id}/finish`)
@@ -265,7 +327,8 @@
       buildURL() {
         let page = `?page=${this.pagination.page}`
         let rowsPerPage = `&rowsPerPage=${this.pagination.rowsPerPage}`
-        return `projects/${this.id}/events${page}${rowsPerPage}`
+        let type = this.type === null ? '' : `&type=${this.type}`
+        return `projects/${this.id}/events${page}${rowsPerPage}${type}`
       }
     }
   }

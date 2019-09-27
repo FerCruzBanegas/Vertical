@@ -15,7 +15,7 @@ class AccountCollection extends ResourceCollection
                     'title' => $account->title,
                     'date' => $account->date,
                     'amount' => $account->amount,
-                    'state' => $account->state === 1 ? 'Activa' : 'Inactiva',
+                    'state' => $account->state,
                 ];
             }),
         ];
