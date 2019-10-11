@@ -20,4 +20,9 @@ class Box extends ApiModel
     {
         return $this->belongsToMany(Account::class)->withPivot('income', 'expense', 'cash')->withTimestamps();
     }
+
+    public static function getLastBox()
+    {
+        return static::orderBy('id', 'desc')->take(1)->first();
+    }
 }

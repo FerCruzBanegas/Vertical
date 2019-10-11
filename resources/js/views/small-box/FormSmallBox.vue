@@ -1,7 +1,14 @@
 <template>
   <v-container fluid grid-list-md>
     <v-layout row wrap>
-      <v-flex d-flex xs12 sm12 md12>
+      <v-flex xs12 sm12 md12>
+        <v-system-bar status color="grey lighten-4">
+          <v-breadcrumbs :items="bread">
+            <template v-slot:divider>
+              <v-icon>forward</v-icon>
+            </template>
+          </v-breadcrumbs>
+        </v-system-bar>
         <v-card v-show="success">
           <v-card-title primary-title>
             <h3 class="headline mb-0">{{ addSubtitle }}</h3>
@@ -14,44 +21,68 @@
                     <small>Los campos con (*) son obligatorios.</small>
                     <v-layout row wrap>
                       <v-flex xs12 sm12 md6 lg6>
+                        <v-alert 
+                          v-if="alert" 
+                          color="error"
+                          icon="warning" 
+                          outline 
+                          :value="true"
+                        >
+                          {{ message }}
+                        </v-alert>
                         <v-layout row wrap>
                           <v-flex xs12 sm12 md12 lg12>
-                            <v-datetime-picker 
-                              v-model="small_box.date_init"
-                              data-vv-name="date_init"
-                              data-vv-as="fecha apertura"
-                              v-validate="'required'"
-                              :error-messages="errors.collect('date_init')"
-                              label="Fecha de Apertura *"
-                            ></v-datetime-picker>
+                            <v-menu
+                              v-model="picker"
+                              :close-on-content-click="false"
+                              :nudge-right="40"
+                              lazy
+                              transition="scale-transition"
+                              offset-y
+                              full-width
+                              min-width="290px"
+                            >
+                              <template v-slot:activator="{ on }">
+                                <v-text-field
+                                  box
+                                  color="grey darken-2"
+                                  v-model="dateFormatted"
+                                  label="Fecha de Ingreso *"
+                                  hint="DD/MM/YYYY format"
+                                  prepend-icon="event"
+                                  readonly
+                                  v-on="on"
+                                  data-vv-name="date"
+                                  data-vv-as="fecha"
+                                  v-validate="'required'"
+                                  :error-messages="errors.collect('date')"
+                                ></v-text-field>
+                              </template>
+                              <v-date-picker 
+                                color="red darken-3" 
+                                v-model="small_box.date_init" 
+                                @input="picker = false"
+                                :first-day-of-week="0"
+                                locale="es-es"
+                              ></v-date-picker>
+                            </v-menu>
                           </v-flex>
                         </v-layout>
-                        <v-layout row wrap>
-                          <v-flex xs12 sm12 md12 lg12>
-                            <v-checkbox
-                              v-model="check"
-                              label="Agregar un usuario diferente"
-                              color="grey darken-3"
-                            ></v-checkbox>
-                          </v-flex>
-                        </v-layout>
-                        <v-layout row wrap v-show="check">
-                          <v-flex xs12 sm12 md12 lg12>
-                            <v-autocomplete
-                              box
-                              color="grey darken-2"
-                              :items="users"
-                              v-model="small_box.user_id"
-                              data-vv-name="user_id"
-                              data-vv-as="usuario"
-                              v-validate="'required'"
-                              :error-messages="errors.collect('user_id')"
-                              label="Usuario *"
-                              item-text="name"
-                              item-value="id"
-                            ></v-autocomplete>
-                          </v-flex>
-                        </v-layout>
+                        <v-flex xs12 sm12 md12 lg12>
+                          <v-autocomplete
+                            box
+                            color="grey darken-2"
+                            :items="accounts"
+                            v-model="small_box.account_id"
+                            label="Cuenta *"
+                            data-vv-name="account_id"
+                            data-vv-as="cuenta"
+                            v-validate="'required'"
+                            :error-messages="errors.collect('account_id')"
+                            item-text="title"
+                            item-value="id"
+                          ></v-autocomplete>
+                        </v-flex>
                         <v-layout row wrap>
                           <v-flex xs12 sm12 md12 lg12>
                             <v-currency-field 
@@ -65,6 +96,20 @@
                               v-validate="'required|max:9'"
                               :error-messages="errors.collect('start_amount')" 
                             ></v-currency-field>
+                          </v-flex>
+                        </v-layout>
+                        <v-layout row wrap>
+                          <v-flex xs12 sm12 md12 lg12>
+                            <v-textarea
+                              box
+                              color="grey darken-2"
+                              label="Nota"
+                              v-model="small_box.note"
+                              data-vv-name="note"
+                              data-vv-as="nota"
+                              v-validate="'min:5|max:120'"
+                              :error-messages="errors.collect('note')"
+                            ></v-textarea>
                           </v-flex>
                         </v-layout>
                       </v-flex>
@@ -94,7 +139,7 @@
   import { mapGetters } from 'vuex'
   import moment from 'moment'
   import SmallBox from '../../models/SmallBox'
-  import UserService from '../../services/user.service'
+  import AccountService from '../../services/account.service'
   import SmallBoxService from '../../services/small.box.service'
 
   export default {
@@ -115,16 +160,39 @@
           min: Number.MIN_SAFE_INTEGER,
           max: Number.MAX_SAFE_INTEGER
         },
-        check: false,
+        picker: false,
+        dateFormatted: '',
         success: false,
         loading: false,
-        users: [],
+        alert: false,
+        message: '',
+        accounts: [],
         small_box: new SmallBox(),
         id: this.$route.params.id,
       }
     },
 
+    watch: {
+      'small_box.date_init': function (newVal, oldVal){
+        this.dateFormatted = this.formatDate(this.small_box.date_init)
+      }
+    },
+
     computed: {
+      bread() {
+        let bread = [
+          { text: 'Inicio',disabled: false,href: '/dashboard' },
+          { text: 'Cajas',disabled: false,href: '/small-boxes' }
+        ];
+        if(this.id) {
+          bread.push({text: 'Modificar Caja', disabled: true})
+          return bread
+        } else {
+          bread.push({text: 'Nueva Caja', disabled: true})
+          return bread
+        }
+      },
+
       addSubtitle () {
         if(this.id) {
           return 'Editar Caja Chica'
@@ -137,48 +205,45 @@
       ]),
     },
 
-    watch: {
-      check: function (newVal, oldVal) {
-        if (newVal) {
-          this.small_box.user_id = null
-        }
-      }
-    },
-
     created() {
-      this.listUsers();
+      this.listAccounts();
 
       if (this.id) {
         this.showSmallBox();
       }
     },
 
-    mounted() {
-      this.small_box.user_id = this.currentUser.id
-    },
-
     methods: {
-      listUsers: async function() {
-        const types = await UserService.getUsers('users/listing')
-        if (types.status === 200) {
-          this.users = types.data;
+      formatDate (date) {
+        if (!date) return null
+
+        const [year, month, day] = date.split('-')
+        return `${day}/${month}/${year}`
+      },
+
+      listAccounts: async function() {
+        const accounts = await AccountService.getAccounts('accounts/listing')
+        if (accounts.status === 200) {
+          this.accounts = accounts.data;
           this.success = true
         }
       },
 
       showSmallBox:async function() {
-        const response = await SmallBoxService.getSmallBoxes(`small-boxes/${this.id}`)
+        const response = await SmallBoxService.getSmallBoxes(`small-boxes/${this.id}/edit`)
         if (response.status === 200) {
           this.small_box = response.data.data;
+          this.small_box.date_init = moment(this.small_box.date_init).format('YYYY-MM-DD')
           this.success = true
         }
       },
 
       submit: async function() {
-        this.small_box.date_init = moment(this.small_box.date_init).format('YYYY-MM-DD HH:mm:ss')
-        this.$validator.errors.clear();
         const vm = this
-        console.log(this.small_box.date_init)
+        vm.alert = false
+        vm.$validator.errors.clear();
+        vm.small_box.date_init = moment(this.small_box.date_init).format('YYYY-MM-DD HH:mm:ss')
+        vm.small_box.user_id = this.currentUser.id
         vm.loading = true
         try {
           if(vm.id) {
@@ -189,14 +254,15 @@
           if (vm._save.status === 201 || vm._save.status === 200) {
             vm.$snotify.simple(vm._save.data.message, 'Felicidades')
             vm.loading = false
-            if (vm.retry) {
-              vm.small_box = new SmallBox()
-            } else {
-              vm.$router.push('/small-boxes')
-            }
+            vm.$router.push('/small-boxes')
           }
         } catch (err) {
-          if(err.response.status === 422) this.$setErrorsFromResponse(err.response.data);
+          vm.small_box.date_init = moment(this.small_box.date_init).format('YYYY-MM-DD')
+          if(err.response.status === 422) {
+            vm.alert = true
+            vm.message = err.response.data.message
+            vm.$setErrorsFromResponse(err.response.data);
+          }
           vm.loading = false
         }
       }

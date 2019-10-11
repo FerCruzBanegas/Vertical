@@ -1,20 +1,22 @@
 <template>
   <v-toolbar
-    color="grey darken-2" fixed clipped-left app
+    color="grey lighten-5"  
+    clipped-left 
     app
-    flat
+    dense
     :clipped-left="clipped"
   >
-    <v-toolbar-side-icon dark @click.stop="toggleDrawer"></v-toolbar-side-icon>
-    <v-btn dark icon @click.stop="toggleMiniVariant">
-      <v-icon v-html="miniVariant ? 'chevron_right' : 'chevron_left'"></v-icon>
-    </v-btn>
+    <v-toolbar-side-icon @click.stop="toggleDrawer"></v-toolbar-side-icon>
     
     <v-spacer></v-spacer>
-    <v-toolbar-title class="white--text" v-if="currentUser" v-text="currentUser.name"></v-toolbar-title>
-    <v-menu offset-y>
-      <v-btn dark icon slot="activator"><v-icon>menu</v-icon></v-btn>
-      <v-list>
+      <div id="clock">
+        <div class="font-weight-bold">{{ date }}</div>
+        <div class="title">{{ time }}</div>
+      </div>
+    <!-- <v-toolbar-title class="white--text" v-if="currentUser" v-text="currentUser.name"></v-toolbar-title> -->
+    <v-menu transition="scale-transition" offset-y>
+      <v-btn outline slot="activator" v-if="currentUser"><v-icon left>perm_identity</v-icon>{{ currentUser.name }}</v-btn>
+      <v-list dense>
         <v-list-tile @click="redirect">
           <v-list-tile-action>
             <v-icon>account_box</v-icon>
@@ -64,7 +66,10 @@
         menu: false,
         flat: false,
         empty: false,
-        items: []
+        items: [],
+        time: '',
+        date: '',
+        week: ['DOM', 'LUN', 'MAR', 'MIÉ', 'JUE', 'VIE', 'SAB']
       }
     },
 
@@ -75,7 +80,26 @@
       ])
     },
 
+    mounted() {
+      let timerID = setInterval(this.updateTime, 1000);
+      this.updateTime();
+    },
+
     methods: {
+      updateTime() {
+          let cd = new Date();
+          this.time = this.zeroPadding(cd.getHours(), 2) + ':' + this.zeroPadding(cd.getMinutes(), 2) + ':' + this.zeroPadding(cd.getSeconds(), 2);
+          this.date =  this.zeroPadding(cd.getDate(), 2) + '/' + this.zeroPadding(cd.getMonth()+1, 2) + '/' + this.zeroPadding(cd.getFullYear(), 4) + ' ' + this.week[cd.getDay()];
+      },
+
+      zeroPadding(num, digit) {
+          let zero = '';
+          for(let i = 0; i < digit; i++) {
+              zero += '0';
+          }
+          return (zero + num).slice(-digit);
+      },
+
       redirect() {
         this.$router.push({ name: 'UserProfile' })
       },
@@ -100,5 +124,16 @@
   >>>.v-badge__badge {
     top: -20px;
     right: -15px;
+  }
+
+  .v-list__tile__action, .v-list__tile__avatar {
+    display: flex;
+    justify-content: flex-start;
+    min-width: 36px;
+  }
+
+  #clock {
+    text-align: center;
+    margin-right: 2em;
   }
 </style>

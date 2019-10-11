@@ -4,6 +4,13 @@
     </modal-detail>
     <v-layout wrap>
       <v-flex xs12 sm12 md12 lg12>
+        <v-system-bar status color="grey lighten-4">
+          <v-breadcrumbs :items="bread">
+            <template v-slot:divider>
+              <v-icon>forward</v-icon>
+            </template>
+          </v-breadcrumbs>
+        </v-system-bar>
         <v-card v-if="project" flat>
           <v-toolbar dense>
             <v-toolbar-title>{{ project.name }}</v-toolbar-title>
@@ -210,6 +217,22 @@
     name: 'show-project',
     data () {
       return {
+        bread: [
+          {
+            text: 'Inicio',
+            disabled: false,
+            href: '/dashboard'
+          },
+          {
+            text: 'Proyectos',
+            disabled: false,
+            href: '/projects'
+          },
+          {
+            text: 'Detalle',
+            disabled: true
+          }
+        ],
         loading: false,
         dialog: false,
         materials: [],

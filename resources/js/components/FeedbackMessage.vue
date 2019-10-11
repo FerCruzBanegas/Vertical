@@ -16,17 +16,17 @@
 </template>
 
 <script>
-import { mapGetters } from 'vuex'
+  import { mapGetters } from 'vuex'
 
-export default {
-  name: 'feedback-message',
-  computed: mapGetters([
-    'responseMessage'
-  ]),
-  methods: {
-    close () {
-      this.$store.dispatch('clearMessage')
+  export default {
+    name: 'feedback-message',
+    computed: mapGetters([
+      'responseMessage'
+    ]),
+    methods: {
+      close () {
+        this.$store.dispatch('clearMessage')
+      }
     }
   }
-}
 </script>

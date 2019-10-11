@@ -1,7 +1,14 @@
 <template>
   <v-container fluid grid-list-md>
     <v-layout row wrap>
-      <v-flex d-flex xs12 sm12 md12>
+      <v-flex xs12 sm12 md12>
+        <v-system-bar status color="grey lighten-4">
+          <v-breadcrumbs :items="bread">
+            <template v-slot:divider>
+              <v-icon>forward</v-icon>
+            </template>
+          </v-breadcrumbs>
+        </v-system-bar>
         <v-card v-show="success">
           <v-card-title primary-title>
             <h3 class="headline mb-0">{{ addSubtitle }}</h3>
@@ -10,6 +17,15 @@
             <v-layout>
               <v-flex xs12 sm12 md12 lg12>
                 <v-card>
+                  <v-alert 
+                    v-if="flag" 
+                    color="error"
+                    icon="warning" 
+                    outline 
+                    :value="true"
+                  >
+                    {{ message }}
+                  </v-alert>
                   <v-card-text>
                     <small>Los campos con (*) son obligatorios.</small>
                     <v-layout row wrap>
@@ -60,6 +76,7 @@
                       </v-flex>
                       <v-flex xs12 sm12 md6 lg6>
                         <v-autocomplete
+                          disabled
                           box
                           color="grey darken-2"
                           :items="accounts"
@@ -240,7 +257,7 @@
                       Cancelar
                     </v-btn>
                     <v-spacer></v-spacer>
-                    <v-btn @click="submit" :loading="loading">
+                    <v-btn @click="submit" :loading="loading" v-if="!flag">
                       {{ id == null ? 'Registrar' : 'Actualizar' }}
                     </v-btn>
                   </v-card-actions>
@@ -255,6 +272,7 @@
 </template>
 
 <script>
+  import { mapGetters } from 'vuex'
   import TableMaterials from '../../components/Materials.vue'
   import TablePeople from '../../components/People.vue'
   import Expense from '../../models/Expense'
@@ -264,6 +282,7 @@
   import ProjectService from '../../services/project.service'
   import AccountService from '../../services/account.service'
   import PeopleService from '../../services/people.service'
+  import SmallBoxService from '../../services/small.box.service'
 
   export default {
     $_veeValidate: {
@@ -309,7 +328,9 @@
         expense: new Expense(),
         dateFormatted: '',
         id: this.$route.params.id,
-        retry: false
+        retry: false,
+        flag: false,
+        message: ''
       }
     },
 
@@ -319,12 +340,30 @@
     },
 
     computed: {
+      bread() {
+        let bread = [
+          { text: 'Inicio',disabled: false,href: '/dashboard' },
+          { text: 'Egresos',disabled: false,href: '/expenses' }
+        ];
+        if(this.id) {
+          bread.push({text: 'Modificar Egreso', disabled: true})
+          return bread
+        } else {
+          bread.push({text: 'Nuevo Egreso', disabled: true})
+          return bread
+        }
+      },
+
       addSubtitle () {
         if(this.id) {
           return 'Editar Egreso'
         }
         return 'Registrar Egreso'
-      }
+      },
+
+      ...mapGetters([
+        'currentUser'
+      ])
     },
 
     watch: {
@@ -355,9 +394,9 @@
     created() {
       if (this.id) {
         this.showExpense();
-      }
+      } 
 
-      Promise.all([this.listExpenseTypes(), this.listProjects(), this.listAccounts()])
+      Promise.all([this.active(), this.listExpenseTypes(), this.listProjects(), this.listAccounts()])
       .then(() =>{
         this.success = true
       })
@@ -426,6 +465,18 @@
         return `${day}/${month}/${year}`
       },
 
+      active: async function() {
+        const active = await SmallBoxService.getSmallBoxes(`small-boxes/active/${this.currentUser.id}`)
+        if (active.status === 200 && !this.id) {
+          if (active.data.flag) {
+            this.flag = active.data.flag;
+            this.message = active.data.message;
+          } else {
+            this.expense.account_id = active.data.account
+          }
+        }
+      },
+
       listExpenseTypes: async function() {
         const types = await ExpenseTypeService.getExpenseTypes('expense-types/listing')
         if (types.status === 200) {
@@ -466,6 +517,7 @@
       submit: async function() {
         this.$validator.errors.clear();
         const vm = this
+        vm.expense.user_id = this.currentUser.id
         const data = {expense: vm.expense, materials: vm.materials, people: vm.people}
         vm.loading = true
         try {
@@ -484,7 +536,11 @@
             }
           }
         } catch (err) {
-          if(err.response.status === 422) this.$setErrorsFromResponse(err.response.data);
+          if(err.response.status === 422) {
+            vm.flag = true
+            vm.message = err.response.data.message
+            vm.$setErrorsFromResponse(err.response.data);
+          }
           vm.loading = false
         }
       }

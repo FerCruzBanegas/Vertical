@@ -2,10 +2,17 @@
   <v-container fluid grid-list-md>
     <v-layout row wrap>
       <v-flex xs12 sm12 md12 lg12 xl12>
+        <v-system-bar status color="grey lighten-4">
+          <v-breadcrumbs :items="bread">
+            <template v-slot:divider>
+              <v-icon>forward</v-icon>
+            </template>
+          </v-breadcrumbs>
+        </v-system-bar>
         <modal-delete :message="message" :loading="loading" :remove="remove" @hide="remove = !remove" @deleted="deleted"></modal-delete>
         <v-card flat>
           <v-card-title primary-title>
-            <h3 class="headline mb-0">Lista de Arqueos</h3>
+            <h3 class="headline mb-0">LISTA DE CAJA CHICA</h3>
           </v-card-title>
           <v-container fluid>
             <v-layout>
@@ -39,6 +46,15 @@
                       </v-menu>
                     </v-flex>
                   </v-card-title>
+                  <v-alert 
+                    v-if="alert" 
+                    color="error"
+                    icon="warning" 
+                    outline 
+                    :value="true"
+                  >
+                    {{ msg }}
+                  </v-alert>
                   <v-data-table
                     :headers="headers"
                     :items="items"
@@ -67,7 +83,7 @@
                           flat 
                           icon class="mx-0" 
                           color="grey"
-                          :to="{ name: 'EditBox', params: { id: props.item.id }}"
+                          :to="{ name: 'EditSmallBox', params: { id: props.item.id }}"
                         >
                           <v-icon small color="grey">edit</v-icon>
                         </v-btn>
@@ -111,6 +127,17 @@
     name: 'list-boxes',
     data () {
       return {
+        bread: [
+          {
+            text: 'Inicio',
+            disabled: false,
+            href: '/dashboard'
+          },
+          {
+            text: 'Cajas',
+            disabled: true
+          }
+        ],
         menuRange: false,
         dateRange: [],
         progress: false,
@@ -129,7 +156,9 @@
         totalItems: 0,
         pagination: {
           rowsPerPage: 10
-        }
+        },
+        alert: false,
+        msg: '',
       }
     },
 
@@ -176,10 +205,15 @@
         if (response.status === 200) {
           this.loading = false
           this.remove = false
-          this.getDataFromApi()
-          .then(data => {
-            this.items = data.items
-          })
+          if (response.data.msg) {
+            this.alert = true
+            this.msg = response.data.msg
+          } else {
+            this.getDataFromApi()
+            .then(data => {
+              this.items = data.items
+            })
+          }
         }
       },
 

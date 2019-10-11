@@ -13,65 +13,51 @@
       <v-toolbar flat>
         <v-list>
           <v-list-tile>
-            <img src="/img/logo.png" width="200px" v-if="!miniVariant">
-            <img src="/img/logo2.png" width="45px" v-else>
+            <img src="/img/logo2.png" width="45px">
           </v-list-tile>
         </v-list>
       </v-toolbar>
       <v-divider></v-divider>
       <v-list>
-        <template v-for="item in items">
-          <v-layout
-            row
-            v-if="item.heading"
-            align-center
-            :key="item.heading"
-          >
-          </v-layout>
-          <v-list-group
-            v-else-if="item.children"
-            v-model="item.model"
-            :key="item.text"
-            :prepend-icon="item.model ? item.icon : item['icon-alt']"
-          >
-            <v-list-tile slot="activator">
-              <v-list-tile-content>
-                <v-list-tile-title>
-                  {{ item.text }}
-                </v-list-tile-title>
-              </v-list-tile-content>
-            </v-list-tile>
-            <v-list-tile
-              v-for="(child, i) in item.children"
-              :key="i"
-              router :to="child.url"
-              v-show="permission(child.permission) || child.permission ==''"
-            >
-              <v-list-tile-action v-if="child.icon">
-                <v-icon>{{ child.icon }}</v-icon>
-              </v-list-tile-action>
-              <v-list-tile-content>
-                <v-list-tile-title>
-                  {{ child.text }}
-                </v-list-tile-title>
-              </v-list-tile-content>
-            </v-list-tile>
-          </v-list-group>
-          <v-list-tile v-else :key="item.text" router :to="item.url" v-show="permission(item.permission) || item.permission ==''">
-            <v-list-tile-action>
-              <v-icon>{{ item.icon }}</v-icon>
-            </v-list-tile-action>
-            <v-list-tile-content>
-              <v-list-tile-title>
-                {{ item.text }}
-              </v-list-tile-title>
-            </v-list-tile-content>
-          </v-list-tile>
-        </template>
+        <v-list-tile router to="/dashboard">
+          <v-list-tile-action>
+            <v-icon>home</v-icon>
+          </v-list-tile-action>
+        </v-list-tile>
+        <v-list-tile router to="/reports" v-show="permission('reports.index')">
+          <v-list-tile-action>
+            <v-icon>find_in_page</v-icon>
+          </v-list-tile-action>
+        </v-list-tile>
+        <v-list-tile router to="/projects" v-show="permission('projects.index')">
+          <v-list-tile-action>
+            <v-icon>domain</v-icon>
+          </v-list-tile-action>
+        </v-list-tile>
+        <v-list-tile @click="openModalIncome" v-show="permission('incomes.index')">
+          <v-list-tile-action>
+            <v-icon>attach_money</v-icon>
+          </v-list-tile-action>
+        </v-list-tile>
+        <v-list-tile @click="openModalExpense" v-show="permission('expenses.index')">
+          <v-list-tile-action>
+            <v-icon>money_off</v-icon>
+          </v-list-tile-action>
+        </v-list-tile>
+        <v-list-tile @click="openModalSmallBox" v-show="permission('small-boxes.index')">
+          <v-list-tile-action>
+            <!-- <v-badge color="red">
+              <template v-slot:badge>
+                <span>!</span>
+              </template>
+              <v-icon>local_atm</v-icon>
+            </v-badge> -->
+            <v-icon>local_atm</v-icon>
+          </v-list-tile-action>
+        </v-list-tile>
       </v-list>
     </v-navigation-drawer>
-    <v-system-bar status color="primary">
-    </v-system-bar>
+    <app-bar></app-bar>
     <app-toolbar 
       v-on:toggleDrawer="drawer = !drawer" :drawer="drawer" 
       v-on:toggleMiniVariant="miniVariant = !miniVariant" :miniVariant="miniVariant"
@@ -90,6 +76,7 @@
   import permission from '../mixins/permission'
   import AppFooter from './AppFooter.vue'
   import AppToolbar from './AppToolbar.vue'
+  import AppBar from './AppBar.vue'
 
   export default {
     name: 'layout',
@@ -98,7 +85,8 @@
 
     components: {
       'app-footer': AppFooter,
-      'app-toolbar': AppToolbar
+      'app-toolbar': AppToolbar,
+      'app-bar': AppBar
     },
 
     data () {
@@ -106,94 +94,21 @@
         clipped: false,
         drawer: true,
         miniVariant: true,
-        items: [
-        { icon: 'home', text: 'Inicio', url: '/dashboard', permission: '' },
-        { icon: 'find_in_page', text: 'Informes', url: '/reports', permission: 'reports.index' },
-        {
-          icon: 'domain',
-          'icon-alt': 'domain',
-          text: 'Proyectos',
-          model: false,
-          children: [
-            { icon: 'create', text: 'Registrar Nuevo', url: '/projects/create', permission: 'projects.create' },
-            { icon: 'list', text: 'Ver Lista', url: '/projects', permission: 'projects.index' }
-          ]
-        },
-        {
-          icon: 'build',
-          'icon-alt': 'build',
-          text: 'Materiales',
-          model: false,
-          children: [
-            { icon: 'create', text: 'Registrar Nuevo', url: '/materials/create', permission: 'materials.create' },
-            { icon: 'list', text: 'Ver Lista', url: '/materials', permission: 'materials.index' }
-          ]
-        },
-        {
-          icon: 'credit_card',
-          'icon-alt': 'credit_card',
-          text: 'Cuentas',
-          model: false,
-          children: [
-            { icon: 'create', text: 'Registrar Nuevo', url: '/accounts/create', permission: 'accounts.create' },
-            { icon: 'list', text: 'Ver Lista', url: '/accounts', permission: 'accounts.index' }
-          ]
-        },
-        {
-          icon: 'attach_money',
-          'icon-alt': 'attach_money',
-          text: 'Ingresos',
-          model: false,
-          children: [
-            { icon: 'create', text: 'Registrar Nuevo', url: '/incomes/create', permission: 'incomes.create' },
-            { icon: 'list', text: 'Ver Lista', url: '/incomes', permission: 'incomes.index' }
-          ]
-        },
-        {
-          icon: 'money_off',
-          'icon-alt': 'money_off',
-          text: 'Egresos',
-          model: false,
-          children: [
-            { icon: 'create', text: 'Registrar Nuevo', url: '/expenses/create', permission: 'expenses.create' },
-            { icon: 'list', text: 'Ver Lista', url: '/expenses', permission: 'expenses.index' }
-          ]
-        },
-        {
-          icon: 'local_atm',
-          'icon-alt': 'local_atm',
-          text: 'Arqueos de Caja',
-          model: false,
-          children: [
-            { icon: 'remove', text: 'Caja General', url: '/boxes', permission: 'boxes.index' },
-            { icon: 'remove', text: 'Caja Chica', url: '/small-boxes', permission: 'small-boxes.index' }
-          ]
-        },
-        {
-          icon: 'style',
-          'icon-alt': 'style',
-          text: 'Categorías',
-          model: false,
-          children: [
-            { icon: 'remove', text: 'Tipos de Proyecto', url: '/project-types', permission: 'project-types.index' },
-            { icon: 'remove', text: 'Tipos de Material', url: '/material-types', permission: 'material-types.index' },
-            { icon: 'remove', text: 'Tipos de Ingreso', url: '/income-types', permission: 'income-types.index' },
-            { icon: 'remove', text: 'Tipos de Egreso', url: '/expense-types', permission: 'expense-types.index' }
-          ]
-        },
-        {
-          icon: 'settings',
-          'icon-alt': 'settings',
-          text: 'Configuración',
-          model: false,
-          children: [
-            { icon: 'remove', text: 'Personas', url: '/people', permission: 'people.index' },
-            { icon: 'remove', text: 'Usuarios', url: '/users', permission: 'users.index' },
-            { icon: 'remove', text: 'Perfil y Permisos', url: '/profiles', permission: 'profiles.index' }
-          ]
-        }
-      ],
         width: 260
+      }
+    },
+
+    methods: {
+      openModalIncome() {
+        this.$store.dispatch('openLastIncome')
+      },
+
+      openModalExpense() {
+        this.$store.dispatch('openLastExpense')
+      },
+
+      openModalSmallBox() {
+        this.$store.dispatch('getSmallBoxesActives')
       }
     }
   }

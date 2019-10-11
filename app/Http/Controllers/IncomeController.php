@@ -8,6 +8,7 @@ use App\Http\Requests\IncomeRequest;
 use App\Http\Resources\Income\IncomeResource;
 use App\Http\Resources\Income\IncomeDetailResource;
 use App\Http\Resources\Income\IncomeCollection;
+use App\Http\Resources\Income\LastIncomeCollection;
 
 class IncomeController extends ApiController
 {
@@ -66,6 +67,16 @@ class IncomeController extends ApiController
 
         $data = ['month' => $monthlyAmount, 'week' => $weeklyAmount, 'day' => $dailyAmount];
         return $this->respond($data);
+    }
+
+    public function getLastIncome() 
+    {
+        $income = $this->income->with('project')
+          ->orderBy('id', 'desc')
+          ->take(5)
+          ->get();
+
+        return new LastIncomeCollection($income);
     }
 
     public function detail(Request $request, $id)

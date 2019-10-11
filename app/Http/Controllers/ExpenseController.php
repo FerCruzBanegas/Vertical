@@ -3,11 +3,13 @@
 namespace App\Http\Controllers;
 
 use App\Expense;
+use App\Box;
 use Illuminate\Http\Request;
 use App\Http\Requests\ExpenseRequest;
 use App\Http\Resources\Expense\ExpenseResource;
 use App\Http\Resources\Expense\ExpenseDetailResource;
 use App\Http\Resources\Expense\ExpenseCollection;
+use App\Http\Resources\Expense\LastExpenseCollection;
 use Illuminate\Support\Facades\DB;
 
 class ExpenseController extends ApiController
@@ -69,6 +71,17 @@ class ExpenseController extends ApiController
         return $this->respond($data);
     }
 
+    public function getLastExpense() 
+    {
+        $expense = $this->expense->with('project')
+          ->orderBy('id', 'desc')
+          ->take(5)
+          ->get();
+
+        return new LastExpenseCollection($expense);
+    }
+
+
     public function detail(Request $request, $id)
     {
         $expense = $this->expense->findOrFail($id);
@@ -113,6 +126,16 @@ class ExpenseController extends ApiController
         DB::beginTransaction();
         try {
             $expense = $this->expense->find($id);
+
+            $box = Box::getLastBox();
+            if ($box) {
+                if ($expense->created_at <= $box->created_at) {
+                    return response()->json([
+                        'message' => message('MSG017'),
+                    ], 422);
+                }
+            }
+            
             $expense->update($request->expense);
             if (!empty($request->materials)) {
                 $material = array();
@@ -139,7 +162,17 @@ class ExpenseController extends ApiController
     public function destroy($id)
     {
         try {
-            $expense = $this->expense::find($id);
+            $expense = $this->expense->find($id);
+
+            $box = Box::getLastBox();
+            if ($box) {
+                if ($expense->created_at <= $box->created_at) {
+                    return $this->respond([
+                        'msg' => message('MSG017')
+                    ]);
+                }
+            }
+
             $expense->delete();
         } catch (\Exception $e) {
             return $this->respondInternalError();

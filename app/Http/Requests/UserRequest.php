@@ -32,7 +32,7 @@ class UserRequest extends FormRequest
         if($this->method() == 'PATCH' || $this->method() == 'PUT') {
             $rules['name'] .= ',' . $this->id;
             $rules['email'] .= ',' . $this->id;
-            if (!$this->has('state')) {
+            if ($this->filled('state')) {
                 $rules['state'] = 'required|integer';
                 $rules['profile_id'] = 'required|integer';
             }

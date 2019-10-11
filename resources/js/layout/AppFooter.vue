@@ -1,7 +1,7 @@
 <template>
-  <v-footer :fixed="fixed" app>
+  <v-footer :fixed="fixed" app class="pa-3">
     <v-spacer></v-spacer>
-    <div>&copy; {{ new Date().getFullYear() }}</div>
+    <div><strong>Vertical S.R.L</strong> &copy; {{ new Date().getFullYear() }}</div>
   </v-footer>
 </template>
 

@@ -2,6 +2,13 @@
   <v-container fluid grid-list-md v-show="success">
     <v-layout row wrap>
       <v-flex xs12 sm12 md12 lg12 xl12>
+        <v-system-bar status color="grey lighten-4">
+          <v-breadcrumbs :items="bread">
+            <template v-slot:divider>
+              <v-icon>forward</v-icon>
+            </template>
+          </v-breadcrumbs>
+        </v-system-bar>
         <v-card>
           <v-container fluid>
             <v-layout row wrap>
@@ -141,6 +148,18 @@
     name: 'Report',
     data () {
       return {
+        bread: [
+          {
+            text: 'Inicio',
+            disabled: false,
+            href: '/dashboard'
+          },
+          {
+            text: 'Reportes',
+            disabled: true,
+            href: '/reports'
+          }
+        ],
         success: false,
         dateRange: [],
         menuRange: false,

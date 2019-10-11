@@ -4,7 +4,6 @@ import VeeValidate from 'vee-validate'
 import VueValidationEs  from 'vee-validate/dist/locale/es';
 import Vuetify from 'vuetify'
 import currency from 'v-currency-field'
-import DatetimePicker from 'vuetify-datetime-picker'
 import App from './App.vue'
 import VueRouter from 'vue-router'
 import router from './router'
@@ -20,7 +19,6 @@ Vue.use(VeeValidate, {
 Vue.use(Vuetify);
 Vue.use(VueRouter);
 Vue.use(currency);
-Vue.use(DatetimePicker);
 Vue.filter('formatDate', require('./filters/formatDate'));
 Vue.filter('currency', require('./filters/currency'));
 

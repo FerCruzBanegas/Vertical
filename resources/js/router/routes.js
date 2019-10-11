@@ -185,9 +185,10 @@ export default [
             }
           },
           {
-            path: ':id/show',
+            path: ':id',
             name: 'ShowSmallBox',
             component: ShowSmallBox,
+            props: true,
             meta: {
               AccessControlList: 'small-boxes.show',
             }

@@ -8,14 +8,14 @@ use Spatie\Activitylog\Traits\LogsActivity;
 
 class Expense extends ApiModel
 {
-    use SoftDeletes, LogsActivity, FullTextSearch;
+    use LogsActivity, FullTextSearch;
 
     // protected $cascadeDeletes = ['materials'];
 
     protected $dates = ['deleted_at'];
 
     protected $fillable = [
-        'title', 'payment', 'date', 'note', 'amount', 'expense_type_id', 'project_id', 'account_id'
+        'title', 'payment', 'date', 'note', 'amount', 'expense_type_id', 'project_id', 'account_id', 'user_id'
     ];
 
     protected $searchable = [

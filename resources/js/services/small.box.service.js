@@ -37,6 +37,15 @@ const SmallBoxService = {
       throw error
     }
   },
+
+  getExpenseSmallBox: async function(url, params) {
+    try {
+      const response = await ApiService.getParams(url, params)
+      return response
+    } catch (error) {
+      console.log(error)
+    }
+  },
 }
 
 export default SmallBoxService

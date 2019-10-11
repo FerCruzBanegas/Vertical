@@ -4,9 +4,12 @@ namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
+use App\Http\Requests\Traits\UsesCustomErrorMessage;
 
 class ExpenseRequest extends FormRequest
 {
+    use UsesCustomErrorMessage;
+    
     protected $payments = ['Tarjeta', 'Efectivo', 'Cheque', 'Credito', 'Transferencia'];
 
     public function authorize()

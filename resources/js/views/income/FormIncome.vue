@@ -1,7 +1,14 @@
 <template>
   <v-container fluid grid-list-md>
     <v-layout row wrap>
-      <v-flex d-flex xs12 sm12 md12>
+      <v-flex xs12 sm12 md12>
+        <v-system-bar status color="grey lighten-4">
+          <v-breadcrumbs :items="bread">
+            <template v-slot:divider>
+              <v-icon>forward</v-icon>
+            </template>
+          </v-breadcrumbs>
+        </v-system-bar>
         <v-card v-show="success">
           <v-card-title primary-title>
             <h3 class="headline mb-0">{{ addSubtitle }}</h3>
@@ -223,6 +230,19 @@
     },
 
     computed: {
+      bread() {
+        let bread = [
+          { text: 'Inicio',disabled: false,href: '/dashboard' },
+          { text: 'Ingresos',disabled: false,href: '/incomes' }
+        ];
+        if(this.id) {
+          bread.push({text: 'Modificar Ingreso', disabled: true})
+          return bread
+        } else {
+          bread.push({text: 'Nuevo Ingreso', disabled: true})
+          return bread
+        }
+      },
       addSubtitle () {
         if(this.id) {
           return 'Editar Ingreso'

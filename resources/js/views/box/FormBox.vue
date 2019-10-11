@@ -1,10 +1,17 @@
 <template>
   <v-container fluid grid-list-md>
     <v-layout row wrap  v-show="success">
-      <v-flex d-flex xs12 sm12 md12 v-if="accounts.length > 0">
+      <v-flex xs12 sm12 md12 v-if="accounts.length > 0">
+        <v-system-bar status color="grey lighten-4">
+          <v-breadcrumbs :items="bread">
+            <template v-slot:divider>
+              <v-icon>forward</v-icon>
+            </template>
+          </v-breadcrumbs>
+        </v-system-bar>
         <v-card>
           <v-card-title primary-title>
-            <h3 class="headline mb-0">Arqueo de Caja</h3>
+            <h3 class="headline mb-0">ARQUEO DE CAJA GENERAL</h3>
           </v-card-title>
           <v-container fluid>
             <div class="div-group">
@@ -32,6 +39,13 @@
                 <span class="display-1 grey--text"> {{ totalBox | currency }}</span>
               </div>
             </div>
+            <br>
+            <v-layout wrap>
+              <v-flex xs12 sm12 md10 lg10>
+                <div class="title">Detalle de caja chica:</div>
+                <table-smallbox :items="smallbox"></table-smallbox>
+              </v-flex>
+            </v-layout>
             <v-layout wrap>
               <v-flex xs12 sm12 md12 lg12>
                 <small>Agregar alguna nota u observación</small>
@@ -82,6 +96,7 @@
 <script>
   import { mapGetters } from 'vuex'
   import TableAccounts from '../../components/TableAccounts.vue'
+  import TableSmallBox from '../../components/TableSmallBox.vue'
   import Box from '../../models/Box'
   import AccountService from '../../services/account.service'
   import BoxService from '../../services/box.service'
@@ -97,6 +112,7 @@
         success: false,
         loading: false,
         accounts: [],
+        smallbox: [],
         box: new Box(),
         id: this.$route.params.id,
         causer: null
@@ -104,10 +120,25 @@
     },
 
     components: {
-      'table-accounts' : TableAccounts
+      'table-accounts' : TableAccounts,
+      'table-smallbox' : TableSmallBox
     },
 
     computed: {
+      bread() {
+        let bread = [
+          { text: 'Inicio',disabled: false,href: '/dashboard' },
+          { text: 'Cajas',disabled: false,href: '/boxes' }
+        ];
+        if(this.id) {
+          bread.push({text: 'Modificar Arqueo', disabled: true})
+          return bread
+        } else {
+          bread.push({text: 'Nuevo Arqueo', disabled: true})
+          return bread
+        }
+      },
+
       ...mapGetters([
         'currentUser'
       ]),
@@ -142,6 +173,7 @@
           if (total > 0) {
             this.accounts = accounts.data.accounts;
           }
+          this.smallbox = accounts.data.smallbox;
           this.box.date_init = accounts.data.dates.init;
           this.box.date_end = accounts.data.dates.end;
         }

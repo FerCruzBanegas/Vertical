@@ -63,7 +63,7 @@ class UserController extends ApiController
     {
         try {
             $user = $this->user->find($id);
-            if (!$request->has('state')) {
+            if ($request->filled('state')) {
                 $user->update($request->all());
             } else {
                 $user->name = $request->name;
@@ -73,7 +73,7 @@ class UserController extends ApiController
         } catch (\Exception $e) {
             return $this->respondInternalError();
         }
-        return $this->respondUpdated();
+        return $this->respondUpdated($request->all());
     }
 
     public function password(UserPasswordRequest $request, $id)

@@ -2,12 +2,19 @@
   <v-container fluid grid-list-md>
     <v-layout row wrap>
       <v-flex xs12 sm12 md12 lg12 xl12>
+        <v-system-bar status color="grey lighten-4">
+          <v-breadcrumbs :items="bread">
+            <template v-slot:divider>
+              <v-icon>forward</v-icon>
+            </template>
+          </v-breadcrumbs>
+        </v-system-bar>
         <modal-delete :message="message" :loading="loading" :remove="remove" @hide="remove = !remove" @deleted="deleted"></modal-delete>
         <modal-loader :loader="loader"></modal-loader>
         <modal-users :modal="modal" @hide="modal = !modal" :data="user"></modal-users>
         <v-card flat>
           <v-card-title primary-title>
-            <h3 class="headline mb-0">Lista de Usuarios</h3>
+            <h3 class="headline mb-0">LISTA DE USUARIOS</h3>
           </v-card-title>
           <v-container fluid>
             <v-layout>
@@ -113,6 +120,18 @@
     name: 'list-users',
     data () {
       return {
+        bread: [
+          {
+            text: 'Inicio',
+            disabled: false,
+            href: '/dashboard'
+          },
+          {
+            text: 'Usuarios',
+            disabled: true,
+            href: '/users'
+          }
+        ],
         search: '',
         progress: false,
         message: 'Realmente desea borrar los datos de este registro?',

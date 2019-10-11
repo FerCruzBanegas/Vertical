@@ -2,9 +2,13 @@
   <v-container fluid grid-list-xl>
     <v-layout wrap>
       <v-flex xs12 sm12 md12 lg12>
-         <div>
-          <v-breadcrumbs :items="items" divider="/"></v-breadcrumbs>
-        </div>
+        <v-system-bar status color="grey lighten-4">
+          <v-breadcrumbs :items="bread">
+            <template v-slot:divider>
+              <v-icon>forward</v-icon>
+            </template>
+          </v-breadcrumbs>
+        </v-system-bar>
         <v-card v-if="expense" flat>
           <v-toolbar dense>
             <v-toolbar-title>{{ expense.title }}</v-toolbar-title>
@@ -129,16 +133,16 @@
       return {
         expense: null,
         id: this.$route.params.id,
-        items: [
+        bread: [
           {
-            text: 'Lista de Egresos',
+            text: 'Inicio',
             disabled: false,
-            href: '/expenses'
+            href: '/dashboard'
           },
           {
-            text: 'Registrar Nuevo',
+            text: 'Egresos',
             disabled: false,
-            href: '/expenses/create'
+            href: '/expenses'
           },
           {
             text: 'Detalle',

@@ -1,5 +1,5 @@
 export default class User {
-    constructor(name = '', email = '', password_current, password = '', password_confirmation ="" , state = '', profile_id='') {
+    constructor(name = '', email = '', password_current, password = '', password_confirmation = '' , state = null, profile_id = null) {
         this.name = name;
         this.email = email;
         this.password_current = password_current;

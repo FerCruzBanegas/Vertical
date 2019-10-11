@@ -2,13 +2,20 @@
   <v-container fluid grid-list-md>
     <v-layout row wrap>
       <v-flex xs12 sm12 md12 lg12 xl12>
+        <v-system-bar status color="grey lighten-4">
+          <v-breadcrumbs :items="bread">
+            <template v-slot:divider>
+              <v-icon>forward</v-icon>
+            </template>
+          </v-breadcrumbs>
+        </v-system-bar>
         <modal-state :title="title_state" :message="message_state" :loading="loading_state" :state="state" @hide="state = !state" @change_state="changeState"></modal-state>
         <modal-delete :message="message" :loading="loading" :remove="remove" @hide="remove = !remove" @deleted="deleted"></modal-delete>
         <modal-loader :loader="loader"></modal-loader>
         <modal-account :modal="modal" @hide="modal = !modal" :data="account"></modal-account>
         <v-card flat>
           <v-card-title primary-title>
-            <h3 class="headline mb-0">Lista de Cuentas</h3>
+            <h3 class="headline mb-0">LISTA DE CUENTAS</h3>
           </v-card-title>
           <v-container fluid>
             <v-layout>
@@ -141,6 +148,18 @@
     name: 'list-accounts',
     data () {
       return {
+        bread: [
+          {
+            text: 'Inicio',
+            disabled: false,
+            href: '/dashboard'
+          },
+          {
+            text: 'Cuentas',
+            disabled: true,
+            href: '/accounts'
+          }
+        ],
         search: '',
         progress: false,
         message: 'Realmente desea borrar los datos de este registro?',

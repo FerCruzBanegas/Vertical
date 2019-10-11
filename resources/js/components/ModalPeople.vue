@@ -1,7 +1,11 @@
 <template>
   <v-dialog v-model="modal" persistent max-width="500">
     <v-card>
-      <v-card-title class="headline grey lighten-2" primary-title>DETALLES DEL REGISTRO</v-card-title>
+      <v-system-bar color="grey darken-3" dark>
+        <div class="title">DETALLES DEL REGISTRO</div>
+        <v-spacer></v-spacer>
+        <v-icon @click="hide">close</v-icon>
+      </v-system-bar>
       <v-card-text>
         <v-list two-line subheader v-if="data !== null">
           <v-list-tile avatar>
@@ -42,10 +46,6 @@
           </v-list-tile>
         </v-list>
       </v-card-text>
-      <v-card-actions>
-        <v-spacer></v-spacer>
-        <v-btn color="grey darken-1" flat @click.native="hide">Cerrar</v-btn>
-      </v-card-actions>
     </v-card>
   </v-dialog>
 </template>

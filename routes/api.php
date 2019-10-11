@@ -151,18 +151,15 @@ Route::get('/test', function(Request $request) {
         //   ->get();
 
 
-        $data = DB::table('projects AS p')
-          ->join('expenses AS e', 'p.id', '=', 'e.project_id')
-          ->join('expense_person AS ep', 'e.id', '=', 'ep.expense_id')
-          ->join('people AS pe', 'ep.person_id', '=', 'pe.id')
-          ->where(function($query) {
-            $query->where('p.id', '=', 64)
-                  ->whereNull('e.deleted_at');
-            })
-          ->select('e.title', 'e.date', 'pe.name', 'e.amount')
+        $data = DB::table('users AS u')
+          ->join('small_boxes AS s', 'u.id', '=', 's.user_id')
+          ->join('amounts AS a', 's.id', '=', 'a.small_box_id')
+          ->select('u.name', DB::raw('(s.start_amount + SUM(a.amount)) AS total_amount'), 's.used_amount')
+          ->where('s.state', 1)
+          ->groupBy('s.id')
           ->get();
 
-        return response()->json($data);
+        return $data;
         // $expense = DB::table('expenses')
         //   ->select('account_id', DB::raw('SUM(amount) AS amount'))
         //   ->where(function($query) {
@@ -282,7 +279,7 @@ Route::group(['middleware' => ['auth:api', 'acl:api']], function () {
     Route::put('accounts/{id}/state', 'AccountController@changeState')->name('accounts.destroy');
     Route::delete('accounts/{id}', 'AccountController@destroy')->name('accounts.destroy');
 
-    //Boxes
+    //Boxes   
     Route::get('boxes', 'BoxController@index')->name('boxes.index');
     Route::get('boxes/{id}', 'BoxController@show')->name('boxes.show');
     Route::post('boxes', 'BoxController@store')->name('boxes.create');
@@ -290,14 +287,19 @@ Route::group(['middleware' => ['auth:api', 'acl:api']], function () {
     Route::put('boxes/{id}', 'BoxController@update')->name('boxes.update');
     Route::delete('boxes/{id}', 'BoxController@destroy')->name('boxes.destroy');
 
+    Route::post('amounts', 'AmountController@store');
+    Route::delete('amounts/{id}', 'AmountController@destroy');
+
     //Small-Boxes
     Route::get('small-boxes', 'SmallBoxController@index')->name('small-boxes.index');
-    Route::get('small-boxes/{id}', 'SmallBoxController@show')->name('small-boxes.show');
+    Route::get('small-boxes/actives', 'SmallBoxController@getSmallBoxesActives')->name('small-boxes.index');
+    Route::get('small-boxes/active/{id}', 'SmallBoxController@active');
+    Route::get('small-boxes/expenses', 'SmallBoxController@getExpenseSmallBox')->name('small-boxes.show');
+    Route::get('small-boxes/{id}/detail', 'SmallBoxController@detail')->name('small-boxes.show');
     Route::post('small-boxes', 'SmallBoxController@store')->name('small-boxes.create');
     Route::get('small-boxes/{id}/edit', 'SmallBoxController@show');
     Route::put('small-boxes/{id}', 'SmallBoxController@update')->name('small-boxes.update');
     Route::delete('small-boxes/{id}', 'SmallBoxController@destroy')->name('small-boxes.destroy');
-
 
     //Project-Types yes
     Route::get('project-types', 'ProjectTypeController@index')->name('project-types.index');
@@ -345,6 +347,7 @@ Route::group(['middleware' => ['auth:api', 'acl:api']], function () {
 
     //Income yes
     Route::get('incomes', 'IncomeController@index')->name('incomes.index');
+    Route::get('incomes/last', 'IncomeController@getLastIncome')->name('incomes.index');
     Route::get('incomes/{id}/detail', 'IncomeController@detail')->name('incomes.show');
     Route::get('incomes/amounts', 'IncomeController@amounts');
     Route::post('incomes', 'IncomeController@store')->name('incomes.create');
@@ -362,6 +365,7 @@ Route::group(['middleware' => ['auth:api', 'acl:api']], function () {
 
     //Expense yes
     Route::get('expenses', 'ExpenseController@index')->name('expenses.index');
+    Route::get('expenses/last', 'ExpenseController@getLastExpense')->name('expenses.index');
     Route::get('expenses/{id}/detail', 'ExpenseController@detail')->name('expenses.show');
     Route::get('expenses/amounts', 'ExpenseController@amounts');
     Route::post('expenses', 'ExpenseController@store')->name('expenses.create');
@@ -409,6 +413,7 @@ Route::group(['middleware' => ['auth:api', 'acl:api']], function () {
 // 2.- Validar que los proeyectos finalisados no aparescan para ser seleccionados.
 // 3.- validar montos en formularios de egresos
 // 4.- ver permisos para actualizar contrasena de un usuario
+//validar egresos triger
 
 //5.- validar array de montos en caja general
 //6.- validar fecha apertura
@@ -758,3 +763,302 @@ Route::group(['middleware' => ['auth:api', 'acl:api']], function () {
 // monto restante  remaining amount
 // monto actual  actual amount
 // comentario/nota  note
+// items: [
+//       'All', 'Family', 'Friends', 'Coworkers'
+//     ]
+// <div id="app">
+//   <v-app id="inspire">
+      
+//       <v-system-bar status color="grey lighten-1">
+//         <v-menu offset-y :nudge-width="100">
+//         <template v-slot:activator="{ on }">
+//           <v-toolbar-items >
+//             <v-btn v-on="on" flat>
+//               <span class="caption">Proyectos</span>
+//               <v-icon>keyboard_arrow_down</v-icon>
+//             </v-btn>
+//           </v-toolbar-items>
+//         </template>
+
+//         <v-list dense>
+//           <v-list-tile
+//             v-for="item in items"
+//             :key="item"
+//             @click=""
+//           >
+//             <v-list-tile-title v-text="item"></v-list-tile-title>
+//           </v-list-tile>
+//         </v-list>
+//       </v-menu>
+//         <v-menu transition="scale-transition" offset-y :nudge-width="100">
+//         <template v-slot:activator="{ on }">
+//           <v-toolbar-items >
+//             <v-btn v-on="on" flat>
+//               <span class="caption">Proyectos</span>
+//             </v-btn>
+//           </v-toolbar-items>
+//         </template>
+
+//         <v-list dense>
+//           <v-list-tile
+//             v-for="item in items"
+//             :key="item"
+//             @click=""
+//           >
+            
+//             <v-list-tile-avatar>
+//               <v-icon>keyboard_arrow_down</v-icon>
+//             </v-list-tile-avatar>
+//             <v-list-tile-title v-text="item"></v-list-tile-title>
+//           </v-list-tile>
+//         </v-list>
+//       </v-menu>
+//       </v-system-bar>
+//       <v-toolbar color="grey lighten-5"  dense>
+//         <v-spacer></v-spacer>
+//         <v-btn icon>
+//           <v-icon>more_vertd</v-icon>
+//         </v-btn>
+//       </v-toolbar>
+//   </v-app>
+// </div>
+// <template>
+//   <div>
+//     <v-navigation-drawer
+//       persistent
+//       :mini-variant="miniVariant"
+//       :clipped="clipped"
+//       v-model="drawer"
+//       :width="width"
+//       enable-resize-watcher
+//       fixed
+//       app
+//     >
+//       <v-toolbar flat>
+//         <v-list>
+//           <v-list-tile>
+//             <img src="/img/logo.png" width="200px" v-if="!miniVariant">
+//             <img src="/img/logo2.png" width="45px" v-else>
+//           </v-list-tile>
+//         </v-list>
+//       </v-toolbar>
+//       <v-divider></v-divider>
+//       <v-list>
+//         <template v-for="item in items">
+//           <v-layout
+//             row
+//             v-if="item.heading"
+//             align-center
+//             :key="item.heading"
+//           >
+//           </v-layout>
+//           <v-list-group
+//             v-else-if="item.children"
+//             v-model="item.model"
+//             :key="item.text"
+//             :prepend-icon="item.model ? item.icon : item['icon-alt']"
+//           >
+//             <v-list-tile slot="activator">
+//               <v-list-tile-content>
+//                 <v-list-tile-title>
+//                   {{ item.text }}
+//                 </v-list-tile-title>
+//               </v-list-tile-content>
+//             </v-list-tile>
+//             <v-list-tile
+//               v-for="(child, i) in item.children"
+//               :key="i"
+//               router :to="child.url"
+//               v-show="permission(child.permission) || child.permission ==''"
+//             >
+//               <v-list-tile-action v-if="child.icon">
+//                 <v-icon>{{ child.icon }}</v-icon>
+//               </v-list-tile-action>
+//               <v-list-tile-content>
+//                 <v-list-tile-title>
+//                   {{ child.text }}
+//                 </v-list-tile-title>
+//               </v-list-tile-content>
+//             </v-list-tile>
+//           </v-list-group>
+//           <v-list-tile v-else :key="item.text" router :to="item.url" v-show="permission(item.permission) || item.permission ==''">
+//             <v-list-tile-action>
+//               <v-icon>{{ item.icon }}</v-icon>
+//             </v-list-tile-action>
+//             <v-list-tile-content>
+//               <v-list-tile-title>
+//                 {{ item.text }}
+//               </v-list-tile-title>
+//             </v-list-tile-content>
+//           </v-list-tile>
+//         </template>
+//       </v-list>
+//     </v-navigation-drawer>
+//     <app-bar></app-bar>
+//     <app-toolbar 
+//       v-on:toggleDrawer="drawer = !drawer" :drawer="drawer" 
+//       v-on:toggleMiniVariant="miniVariant = !miniVariant" :miniVariant="miniVariant"
+//     >
+//     </app-toolbar>
+//     <v-content>
+//       <transition name="fade">
+//         <router-view></router-view>
+//       </transition>
+//     </v-content>
+//     <app-footer/>
+//   </div>
+// </template>
+
+// <script>
+//   import permission from '../mixins/permission'
+//   import AppFooter from './AppFooter.vue'
+//   import AppToolbar from './AppToolbar.vue'
+//   import AppBar from './AppBar.vue'
+
+//   export default {
+//     name: 'layout',
+
+//     mixins: [permission],
+
+//     components: {
+//       'app-footer': AppFooter,
+//       'app-toolbar': AppToolbar,
+//       'app-bar': AppBar
+//     },
+
+//     data () {
+//       return {
+//         clipped: false,
+//         drawer: true,
+//         miniVariant: true,
+//         items: [
+//         { icon: 'home', text: 'Inicio', url: '/dashboard', permission: '' },
+//         { icon: 'find_in_page', text: 'Informes', url: '/reports', permission: 'reports.index' },
+//         {
+//           icon: 'domain',
+//           'icon-alt': 'domain',
+//           text: 'Proyectos',
+//           model: false,
+//           children: [
+//             { icon: 'create', text: 'Registrar Nuevo', url: '/projects/create', permission: 'projects.create' },
+//             { icon: 'list', text: 'Ver Lista', url: '/projects', permission: 'projects.index' }
+//           ]
+//         },
+//         {
+//           icon: 'build',
+//           'icon-alt': 'build',
+//           text: 'Materiales',
+//           model: false,
+//           children: [
+//             { icon: 'create', text: 'Registrar Nuevo', url: '/materials/create', permission: 'materials.create' },
+//             { icon: 'list', text: 'Ver Lista', url: '/materials', permission: 'materials.index' }
+//           ]
+//         },
+//         {
+//           icon: 'credit_card',
+//           'icon-alt': 'credit_card',
+//           text: 'Cuentas',
+//           model: false,
+//           children: [
+//             { icon: 'create', text: 'Registrar Nuevo', url: '/accounts/create', permission: 'accounts.create' },
+//             { icon: 'list', text: 'Ver Lista', url: '/accounts', permission: 'accounts.index' }
+//           ]
+//         },
+//         {
+//           icon: 'attach_money',
+//           'icon-alt': 'attach_money',
+//           text: 'Ingresos',
+//           model: false,
+//           children: [
+//             { icon: 'create', text: 'Registrar Nuevo', url: '/incomes/create', permission: 'incomes.create' },
+//             { icon: 'list', text: 'Ver Lista', url: '/incomes', permission: 'incomes.index' }
+//           ]
+//         },
+//         {
+//           icon: 'money_off',
+//           'icon-alt': 'money_off',
+//           text: 'Egresos',
+//           model: false,
+//           children: [
+//             { icon: 'create', text: 'Registrar Nuevo', url: '/expenses/create', permission: 'expenses.create' },
+//             { icon: 'list', text: 'Ver Lista', url: '/expenses', permission: 'expenses.index' }
+//           ]
+//         },
+//         {
+//           icon: 'local_atm',
+//           'icon-alt': 'local_atm',
+//           text: 'Arqueos de Caja',
+//           model: false,
+//           children: [
+//             { icon: 'remove', text: 'Caja General', url: '/boxes', permission: 'boxes.index' },
+//             { icon: 'remove', text: 'Caja Chica', url: '/small-boxes', permission: 'small-boxes.index' }
+//           ]
+//         },
+//         {
+//           icon: 'style',
+//           'icon-alt': 'style',
+//           text: 'Categorías',
+//           model: false,
+//           children: [
+//             { icon: 'remove', text: 'Tipos de Proyecto', url: '/project-types', permission: 'project-types.index' },
+//             { icon: 'remove', text: 'Tipos de Material', url: '/material-types', permission: 'material-types.index' },
+//             { icon: 'remove', text: 'Tipos de Ingreso', url: '/income-types', permission: 'income-types.index' },
+//             { icon: 'remove', text: 'Tipos de Egreso', url: '/expense-types', permission: 'expense-types.index' }
+//           ]
+//         },
+//         {
+//           icon: 'settings',
+//           'icon-alt': 'settings',
+//           text: 'Configuración',
+//           model: false,
+//           children: [
+//             { icon: 'remove', text: 'Personas', url: '/people', permission: 'people.index' },
+//             { icon: 'remove', text: 'Usuarios', url: '/users', permission: 'users.index' },
+//             { icon: 'remove', text: 'Perfil y Permisos', url: '/profiles', permission: 'profiles.index' }
+//           ]
+//         }
+//       ],
+//         width: 260
+//       }
+//     }
+//   }
+// </script>
+
+// <style>
+//   .fade-enter-active, .fade-leave-active {
+//     transition-property: opacity;
+//     transition-duration: .25s;
+//   }
+
+//   .fade-enter-active {
+//     transition-delay: .25s;
+//   }
+
+//   .fade-enter, .fade-leave-active {
+//     opacity: 0
+//   }
+// </style>
+
+// select t1.amount - COALESCE(t2.amount,0) as resta
+// from accounts a
+// inner join (
+//   select account_id, COALESCE(sum(amount), 0) as amount
+//   from incomes 
+//   where account_id = 4
+// ) t1 on a.id = t1.account_id
+// left join (
+//   select account_id, COALESCE(sum(amount), 0) as amount
+//   from expenses 
+//   where account_id = 4
+// ) t2 on a.id = t2.account_id
+
+
+
+// select ab.*
+// from accounts as a
+// inner join account_box as ab
+// on a.id = ab.account_id
+// inner join boxes as b
+// on ab.box_id = b.id
+// where a.id = 1
+// order by b.id desc limit 1 

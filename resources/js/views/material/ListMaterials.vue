@@ -2,12 +2,19 @@
   <v-container fluid grid-list-md>
     <v-layout row wrap>
       <v-flex xs12 sm12 md12 lg12 xl12>
+        <v-system-bar status color="grey lighten-4">
+          <v-breadcrumbs :items="bread">
+            <template v-slot:divider>
+              <v-icon>forward</v-icon>
+            </template>
+          </v-breadcrumbs>
+        </v-system-bar>
         <v-card flat>
           <modal-delete :message="message" :loading="loading" :remove="remove" @hide="remove = !remove" @deleted="deleted"></modal-delete>
           <modal-loader :loader="loader"></modal-loader>
           <modal-material :modal="modal" @hide="modal = !modal" :data="material"></modal-material>
           <v-card-title primary-title>
-            <h3 class="headline mb-0">Lista de Materiales</h3>
+            <h3 class="headline mb-0">LISTA DE MATERIALES</h3>
           </v-card-title>
           <v-container fluid>
             <v-layout>
@@ -37,6 +44,7 @@
                       single-line
                       hide-details
                       clearable
+                      outline
                     ></v-text-field>
                   </v-card-title>
                   <v-data-table
@@ -110,6 +118,18 @@
     name: 'list-material',
     data () {
       return {
+        bread: [
+          {
+            text: 'Inicio',
+            disabled: false,
+            href: '/dashboard'
+          },
+          {
+            text: 'Materiales',
+            disabled: true,
+            href: '/materials'
+          }
+        ],
         search: '',
         progress: false,
         message: '',
@@ -232,3 +252,4 @@
     }
   }
 </script>
+

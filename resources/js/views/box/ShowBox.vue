@@ -1,10 +1,17 @@
 <template>
   <v-container fluid grid-list-md>
     <v-layout row wrap>
-      <v-flex d-flex xs12 sm12 md12>
+      <v-flex xs12 sm12 md12>
+        <v-system-bar status color="grey lighten-4">
+          <v-breadcrumbs :items="bread">
+            <template v-slot:divider>
+              <v-icon>forward</v-icon>
+            </template>
+          </v-breadcrumbs>
+        </v-system-bar>
         <v-card v-show="success">
           <v-card-title primary-title>
-            <h3 class="headline mb-0">Detalle Arqueo de Caja</h3>
+            <h3 class="headline mb-0">DETALLE ARQUEO DE CAJA GENERAL</h3>
             <v-spacer></v-spacer>
             <v-btn fab flat small color="red darken-3" @click="downloadPdf" :loading="loading">
               <v-icon>get_app</v-icon>
@@ -66,6 +73,22 @@
     name: 'show-box',
     data() {
       return {
+        bread: [
+          {
+            text: 'Inicio',
+            disabled: false,
+            href: '/dashboard'
+          },
+          {
+            text: 'Cajas',
+            disabled: false,
+            href: '/boxes'
+          },
+          {
+            text: 'Detalle',
+            disabled: true
+          }
+        ],
         success: false,
         loading: false,
         accounts: [],

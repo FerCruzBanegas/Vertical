@@ -3,10 +3,17 @@
     <info-events v-if="infoExpense" :data="infoExpense" :icon="'trending_down'"></info-events>
     <v-layout row wrap>
       <v-flex xs12 sm12 md12 lg12 xl12>
+        <v-system-bar status color="grey lighten-4">
+          <v-breadcrumbs :items="bread">
+            <template v-slot:divider>
+              <v-icon>forward</v-icon>
+            </template>
+          </v-breadcrumbs>
+        </v-system-bar>
         <v-card flat>
           <modal-delete :message="message" :loading="loading" :remove="remove" @hide="remove = !remove" @deleted="deleted"></modal-delete>
           <v-card-title primary-title>
-            <h3 class="headline mb-0">Lista de Egresos</h3>
+            <h3 class="headline mb-0">LISTA DE EGRESOS</h3>
           </v-card-title>
           <v-container fluid>
             <v-layout>
@@ -49,6 +56,15 @@
                       <filters @changeDate="dateFilter" @selectProject="projectFilter"></filters>
                     </v-container>
                   </v-card-title>
+                  <v-alert 
+                    v-if="alert" 
+                    color="error"
+                    icon="warning" 
+                    outline 
+                    :value="true"
+                  >
+                    {{ msg }}
+                  </v-alert>
                   <v-data-table
                     :headers="headers"
                     :items="items"
@@ -120,6 +136,18 @@
     name: 'list-expense',
     data () {
       return {
+        bread: [
+          {
+            text: 'Inicio',
+            disabled: false,
+            href: '/dashboard'
+          },
+          {
+            text: 'Egresos',
+            disabled: true,
+            href: '/expenses'
+          }
+        ],
         date: '',
         project: null,
         search: null,
@@ -140,7 +168,9 @@
         totalItems: 0,
         pagination: {
           rowsPerPage: 10
-        }
+        },
+        alert: false,
+        msg: '',
       }
     },
 
@@ -201,10 +231,15 @@
         if (response.status === 200) {
           this.loading = false
           this.remove = false
-          this.getDataFromApi()
-          .then(data => {
-            this.items = data.items
-          })
+          if (response.data.msg) {
+            this.alert = true
+            this.msg = response.data.msg
+          } else {
+            this.getDataFromApi()
+            .then(data => {
+              this.items = data.items
+            })
+          }
         }
       },
 

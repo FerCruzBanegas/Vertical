@@ -17,7 +17,7 @@ class AccountController extends ApiController
 {
     protected $account;
 
-	public function __construct(Account $account)
+	  public function __construct(Account $account)
     {
         $this->account = $account;
     }
@@ -52,6 +52,14 @@ class AccountController extends ApiController
            $date_init = $box->created_at; 
         }
 
+        $smallbox = DB::table('users AS u')
+          ->join('small_boxes AS s', 'u.id', '=', 's.user_id')
+          ->join('amounts AS a', 's.id', '=', 'a.small_box_id')
+          ->select('u.name', DB::raw('(s.start_amount + SUM(a.amount)) AS total_amount'), 's.used_amount')
+          ->where('s.state', 1)
+          ->groupBy('s.id')
+          ->get();
+
         $expense = DB::table('expenses')
           ->select('account_id', DB::raw('SUM(amount) AS amount'))
           ->where(function($query) use ($date_init, $date_end) {
@@ -85,6 +93,7 @@ class AccountController extends ApiController
 
         $data = [
             'accounts' => $query,
+            'smallbox' => $smallbox,
             'dates' => [ 'init' => $date_init, 'end' => $date_end], 
         ];
 

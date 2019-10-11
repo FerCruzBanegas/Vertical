@@ -11,7 +11,7 @@
       <v-card-title>
         <v-progress-linear
           indeterminate
-          color="red darken-3"
+          color="grey darken-1"
         ></v-progress-linear>
       </v-card-title>
     </v-card>

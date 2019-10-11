@@ -10,5 +10,10 @@
   "MSG009":"No tiene una sesión activa. Desconecte e ingrese nuevamente.",
   "MSG010":"Usted no está autorizado para realizar esta acción.",
   "MSG011":"El recurso al que intenta acceder no se encuentra disponible.",
-  "MSG012":"No es posible realizar esta acción, por favor inténtelo de nuevo más tarde."
+  "MSG012":"No es posible realizar esta acción, por favor inténtelo de nuevo más tarde.",
+  "MSG013":"Usted ya tiene una caja chica activa!.",
+  "MSG014":"Usted no tiene una caja chica activa!.",
+  "MSG015":"No puede editar los datos, esta caja fue cerrada.",
+  "MSG016":"No puede eliminar esta caja ya fue cerrada.",
+  "MSG017":"No puede alterar los datos de este registro, ya fue contabilizado."
 }

@@ -2,10 +2,17 @@
   <v-container fluid grid-list-md>
     <v-layout row wrap>
       <v-flex xs12 sm12 md12 lg12 xl12>
+        <v-system-bar status color="grey lighten-4">
+          <v-breadcrumbs :items="bread">
+            <template v-slot:divider>
+              <v-icon>forward</v-icon>
+            </template>
+          </v-breadcrumbs>
+        </v-system-bar>
         <modal-delete :message="message" :loading="loading" :remove="remove" @hide="remove = !remove" @deleted="deleted"></modal-delete>
         <v-card flat>
           <v-card-title primary-title>
-            <h3 class="headline mb-0">Lista de Proyectos</h3>
+            <h3 class="headline mb-0">LISTA DE PROYECTOS</h3>
           </v-card-title>
           <v-container fluid>
             <v-layout>
@@ -125,6 +132,18 @@
     name: 'list-projects',
     data () {
       return {
+        bread: [
+          {
+            text: 'Inicio',
+            disabled: false,
+            href: '/dashboard'
+          },
+          {
+            text: 'Proyectos',
+            disabled: true,
+            href: '/projects'
+          }
+        ],
         search: '',
         progress: false,
         message: 'Realmente desea borrar los datos de este registro?',
