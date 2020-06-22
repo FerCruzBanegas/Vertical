@@ -22,6 +22,7 @@ class ExpenseDetailResource extends JsonResource
             'materials' => collect($this->materials)->transform(function($material){
                 return [
                     'name' => $material->name,
+                    'unity' => $material->unity,
                     'quantity' => $material->pivot->quantity,
                     'price' => $material->pivot->price
                 ];

@@ -21,12 +21,11 @@
                   <v-card-title>
                     <v-btn
                       v-if="permission('boxes.create')"
-                      dark color="grey darken-1" 
-                      slot="activator" 
-                      class="mb-2" 
+                      outline
                       to="small-boxes/create"
                     >
-                      <v-icon dark>note_add</v-icon>
+                      <v-icon left>add_circle</v-icon>
+                      NUEVO
                     </v-btn>
                     <v-spacer></v-spacer>
                     <v-btn flat icon color="red darken-3" @click="allData">

@@ -9,6 +9,7 @@
 		padding: 0;
 		width: 100%;
 		table-layout: fixed;
+		font-size: 13px;
       }
 
 	  th ,td {
@@ -63,6 +64,10 @@
 	    background-color: #FFF083;
 	  }
 
+	  tr td:nth-child(4){
+	    background-color: #C1FFC6;
+	  }
+
 	  tfoot tr th {
 	    border-bottom: none;
 	  }
@@ -91,8 +96,8 @@
 
       body {
         margin-top: 3cm;
-        margin-left: 2cm;
-        margin-right: 2cm;
+        margin-left: 1cm;
+        margin-right: 1cm;
         margin-bottom: 2cm;
         font-family: 'Lucida Console', Monaco, monospace;
       }
@@ -120,7 +125,7 @@
         bottom: 0cm; 
         left: 0cm; 
         right: 0cm;
-        height: 2cm;
+        height: 1.5cm;
         color: #FFFFFF;
         background-color: #636363;
         text-align: center;
@@ -141,7 +146,7 @@
       }
 
 	  .div-table {
-		margin-top: 1em;
+		margin-top: 0em;
 		width: 100%;
 	  }
 
@@ -182,7 +187,7 @@
       }
     </style>
   </head>
-  <body>
+  <body style="">
   	<header>
       <img src="{{url('/img/logo3.png')}}"/>
       <div class="date pull-right">{{ $date }}</div>
@@ -191,13 +196,13 @@
     <h1 class="pull-center">ARQUEO DE CAJA CENTRAL</h1>
 
     <div class="container">
-	  <div><strong>Fecha Desde:</strong> {{ date('d/m/Y H:i:s', strtotime($box['date_init'])) }}</div>
+	  <div><strong>Fecha Desde:</strong> {{ date('d/m/Y', strtotime($box['date_init'])) }}</div>
 	  <div><strong>Realizado por:</strong> {{ $box['created']['causer'] }}</div>
-	  <div><strong>Fecha Hasta:</strong> {{ date('d/m/Y H:i:s', strtotime($box['date_end'])) }}</div>
+	  <div><strong>Fecha Hasta:</strong> {{ date('d/m/Y', strtotime($box['date_end'])) }}</div>
 	</div>
 
     <div class="div-table">
-      <h2 class="pull-center">Lista de Cuentas y Montos</h2>
+      <h2 class="pull-center">LISTA DE CUENTAS Y MONTOS</h2>
       <table>
 	    <thead>
 	      <tr id="tr1">
@@ -209,7 +214,7 @@
 	        <th scope="col">Cuenta</th>
 	        <th scope="col">Ingresos</th>
 	        <th scope="col">Egresos</th>
-	        <th scope="col">Diferencia</th>
+	        <th scope="col">Saldo</th>
 	        <th scope="col">Monto Real</th>
 	      </tr>
 	    </thead>
@@ -219,7 +224,7 @@
 	          <td data-label="Cuenta">{{ $account['title']  }}</td>
               <td data-label="Ingresos">{{ number_format($account['incomes'], 2, '.', ',') }}</td>
               <td data-label="Egresos">{{ number_format($account['expenses'], 2, '.', ',') }}</td>
-              <td data-label="Diferencia">{{ number_format($account['incomes']  - $account['expenses'], 2, '.', ',') }}</td>
+              <td data-label="Saldo">{{ number_format($account['current_amount'], 2, '.', ',') }}</td>
               <td data-label="Monto Real">{{ number_format($account['cash'], 2, '.', ',') }}</td>
 	        </tr>
 	      @endforeach
@@ -235,7 +240,7 @@
 	  </table>
     </div>
 
-    <div class="amount"><strong>Saldo actual en caja:</strong></div>
+    <div class="amount"><strong>SALDO ACTUAL EN CAJA:</strong></div>
 
     <div class="total pull-right">
       <div><strong>TOTAL:</strong>
@@ -243,7 +248,30 @@
       </div>
     </div>
 
-    <div class="amount"><strong>Nota:</strong></div>
+    <div class="amount"><strong>DETALLE CAJA CHICA:</strong></div>
+
+    <table>
+		<thead>
+		  <tr>  
+			<th>USUARIO</th>
+			<th>MONTO ASIGNADO</th>
+			<th>MONTO GASTADO</th>
+			<th>SALDO</th>
+		  </tr> 
+		</thead>  
+		<tbody>
+		  @foreach($small_boxes as $smallbox)
+		    <tr>
+		      <td>{{ $smallbox['user'] }}</td>
+		      <td>{{ $smallbox['total_amount'] }}</td>
+		      <td>{{ $smallbox['used_amount'] }}</td>
+		      <td>{{ number_format($smallbox['total_amount']  - $smallbox['used_amount'], 2, '.', ',') }}</td>
+		    </tr>
+		  @endforeach
+		</tbody>
+		</table> 
+
+    <div class="amount"><strong>NOTA:</strong></div>
 
     <div class="total">
       <div>{{ $box['note'] }}</div>

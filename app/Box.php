@@ -18,7 +18,12 @@ class Box extends ApiModel
 
     public function accounts()
     {
-        return $this->belongsToMany(Account::class)->withPivot('income', 'expense', 'cash')->withTimestamps();
+        return $this->belongsToMany(Account::class)->withPivot('income', 'expense', 'balance', 'cash')->withTimestamps();
+    }
+
+    public function small_boxes()
+    {
+        return $this->belongsToMany(SmallBox::class)->withPivot('total_amount', 'used_amount');
     }
 
     public static function getLastBox()

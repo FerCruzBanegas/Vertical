@@ -16,7 +16,7 @@ class Account extends ApiModel
     protected $dates = ['deleted_at'];
 
     protected $fillable = [
-        'title', 'date', 'number', 'amount', 'note', 'state',
+        'title', 'date', 'number', 'amount', 'current_amount', 'cash_amount', 'note', 'state',
     ];
 
     protected $searchable = [

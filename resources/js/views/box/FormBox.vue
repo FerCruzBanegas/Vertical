@@ -80,7 +80,7 @@
           <v-card-title primary-title>
             <div>
               <div class="headline">Sin movimientos</div>
-              <span>No puede realizar esta acción por que no se realizaron movimientos en las cuentas desde su último arqueo.</span>
+              <span>No puede realizar esta acción por que no se realizaron movimientos de egresos.</span>
             </div>
           </v-card-title>
           <v-card-actions>
@@ -166,16 +166,18 @@
         const accounts = await AccountService.getAccounts('accounts/box')
         if (accounts.status === 200) {
           this.success = true
-          let total = 0;
-          accounts.data.accounts.forEach(account => {
-            total = total + account.incomes + account.expenses
-          })
-          if (total > 0) {
-            this.accounts = accounts.data.accounts;
+          if (accounts.data.accounts) {
+            let total = 0;
+            accounts.data.accounts.forEach(account => {
+              total = total + account.incomes + account.expenses
+            })
+            if (total > 0) {
+              this.accounts = accounts.data.accounts;
+            }
+            this.smallbox = accounts.data.smallbox;
+            this.box.date_init = accounts.data.dates.init;
+            this.box.date_end = accounts.data.dates.end;
           }
-          this.smallbox = accounts.data.smallbox;
-          this.box.date_init = accounts.data.dates.init;
-          this.box.date_end = accounts.data.dates.end;
         }
       },
 
@@ -183,6 +185,7 @@
         const response = await BoxService.getBoxes(`boxes/${this.id}/edit`)
         if (response.status === 200) {
           this.accounts = response.data.data.accounts;
+          this.smallbox = response.data.data.small_boxes;
           this.box.date_init = response.data.data.date_init;
           this.box.date_end = response.data.data.date_end;
           this.box.note = response.data.data.note;
@@ -194,7 +197,7 @@
       submit: async function() {
         this.$validator.errors.clear();
         const vm = this
-        const data = {box: vm.box, accounts: vm.accounts}
+        const data = {box: vm.box, accounts: vm.accounts, smallbox: vm.smallbox}
         vm.loading = true
         try {
           if(vm.id) {

@@ -21,7 +21,7 @@ class IncomeRequest extends FormRequest
             'payment' => ['required', Rule::in($this->payments)],
             'date' => 'required|date_format:Y-m-d',
             'note' => 'nullable|min:5|max:120',
-            'amount' => 'required|max:9|regex:/^-?[0-9]+(?:\.[0-9]{1,2})?$/',
+            'amount' => 'required|max:15|regex:/^-?[0-9]+(?:\.[0-9]{1,2})?$/',
             'income_type_id' => 'required|integer',
             'project_id' => 'required|integer',
             'account_id' => 'required|integer'

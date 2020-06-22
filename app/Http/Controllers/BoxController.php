@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Box;
+use App\Account;
+use App\SmallBox;
 use Illuminate\Http\Request;
 use App\Http\Requests\BoxRequest;
 use App\Http\Resources\Box\BoxResource;
@@ -53,19 +55,28 @@ class BoxController extends ApiController
         DB::beginTransaction();
         try {
             $box = $this->box->create($request->box);
-            if (!empty($request->accounts)) {
+            if (!empty($request->accounts) && !empty($request->smallbox)) {
                 $account = array();
+                $smallbox = array();
                 foreach ($request->accounts as $key => $value) {
-                    $account[$value['id']] = ['income' => $value['incomes'], 'expense' => $value['expenses'], 'cash' => $value['cash']];
+                    $account[$value['id']] = ['income' => $value['incomes'], 'expense' => $value['expenses'], 'balance' => $value['current_amount'], 'cash' => $value['cash']];
+                    Account::where('id', $value['id'])->update(['cash_amount' =>  $value['current_amount']]);
                 }
+
+                foreach ($request->smallbox as $key => $value) {
+                    $smallbox[$value['id']] = ['total_amount' => $value['total_amount'], 'used_amount' => $value['used_amount']];
+                }
+
+                $box->small_boxes()->attach($smallbox);
                 $box->accounts()->attach($account);
+                SmallBox::where('state', 1)->update(['state' => 0, 'date_end' => $box->created_at]);
             } 
             DB::commit();
         } catch (\Exception $e) {
             DB::rollback();
             return $this->respondInternalError();
         }
-        return $this->respondCreated();
+        return $this->respondCreated($request->accounts);
     }
 
     public function update(BoxRequest $request, $id)
@@ -74,11 +85,18 @@ class BoxController extends ApiController
         try {
             $box = $this->box->find($id);
             $box->update($request->box);
-            if (!empty($request->accounts)) {
+            if (!empty($request->accounts) && !empty($request->smallbox)) {
                 $account = array();
+                $smallbox = array();
                 foreach ($request->accounts as $key => $value) {
                     $account[$value['id']] = ['income' => $value['incomes'], 'expense' => $value['expenses'], 'cash' => $value['cash']];
                 }
+
+                foreach ($request->smallbox as $key => $value) {
+                    $smallbox[$value['id']] = ['total_amount' => $value['total_amount'], 'used_amount' => $value['used_amount']];
+                }
+
+                $box->small_boxes()->sync($smallbox);
                 $box->accounts()->sync($account);
             } 
             DB::commit();

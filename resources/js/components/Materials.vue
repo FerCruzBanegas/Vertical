@@ -7,6 +7,7 @@
   >
     <template v-slot:items="props">
       <td>{{ props.item.name }}</td>
+      <td>{{ props.item.unity }}</td>
       <td class="text-xs-right">
         <v-text-field
           v-model="props.item.quantity"
@@ -65,7 +66,8 @@
           v => v.length <= 10 || 'Máximo 10 caracteres'
         ],
         headers: [
-          { text: 'Producto', value: 'calories', sortable: false, width: "250"},
+          { text: 'Producto', value: 'producto', sortable: false, width: "250"},
+          { text: 'Unidad', value: 'unidad', sortable: false},
           { text: 'Cantidad', value: 'cantidad', sortable: false},
           { text: 'Precio Unitario', value: 'unitario', sortable: false},
           { text: 'Sub Total', value: 'total', sortable: false, align: 'center'},

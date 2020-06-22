@@ -47,15 +47,18 @@ class AccountController extends ApiController
         if ($box === null) {
            $date_ex = Expense::orderBy('id', 'ASC')->first();
            $date_in = Income::orderBy('id', 'ASC')->first();
-           $date_init = ($date_ex->created_at > $date_in->created_at) ? $date_in->created_at : $date_ex->created_at;
+           if ($date_ex && $date_in) {
+              $date_init = ($date_ex->created_at > $date_in->created_at) ? $date_in->created_at : $date_ex->created_at;
+           } else return;
+           
         } else {
            $date_init = $box->created_at; 
         }
 
         $smallbox = DB::table('users AS u')
           ->join('small_boxes AS s', 'u.id', '=', 's.user_id')
-          ->join('amounts AS a', 's.id', '=', 'a.small_box_id')
-          ->select('u.name', DB::raw('(s.start_amount + SUM(a.amount)) AS total_amount'), 's.used_amount')
+          ->leftjoin('amounts AS a', 's.id', '=', 'a.small_box_id')
+          ->select('s.id', 'u.name AS user', DB::raw('(s.start_amount + IFNULL(SUM(a.amount), 0)) AS total_amount'), 's.used_amount')
           ->where('s.state', 1)
           ->groupBy('s.id')
           ->get();
@@ -87,7 +90,7 @@ class AccountController extends ApiController
           ->leftJoinSub($income, 't3', function ($join) {
               $join->on('t1.id', '=', 't3.account_id');
           })
-          ->select('t1.id', 't1.title', DB::raw('ROUND(COALESCE(t2.amount, 0), 2) AS expenses'), DB::raw('ROUND(COALESCE(t3.amount, 0), 2) AS incomes'), DB::raw('0 AS cash'))
+          ->select('t1.id', 't1.title', 't1.current_amount', DB::raw('ROUND(COALESCE(t2.amount, 0), 2) AS expenses'), DB::raw('ROUND(COALESCE(t3.amount, 0), 2) AS incomes'), DB::raw('0 AS cash'))
           ->orderBy('t1.id')
           ->get();
 

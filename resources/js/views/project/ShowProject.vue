@@ -169,7 +169,7 @@
           >
             <v-progress-linear height="3" slot="progress" color="grey" indeterminate></v-progress-linear>
             <template v-slot:items="props">
-              <tr :class="props.item.type" :key="props.item.id">
+              <tr :class="props.item.type" :key="props.item.key">
                 <td>{{ props.item.title }}</td>
                 <td><strong>{{ props.item.payment }}</strong></td>
                 <td>{{ props.item.date | formatDate('DD/MM/YYYY') }}</td>

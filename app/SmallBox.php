@@ -31,6 +31,11 @@ class SmallBox extends ApiModel
         return $this->hasMany(Amount::class);
     }
 
+    public function boxes()
+    {
+        return $this->belongsToMany(Box::class);
+    }
+
     public static function getState($id)
     {
         return static::where('user_id', $id)->orderBy('id', 'desc')->take(1)->first();

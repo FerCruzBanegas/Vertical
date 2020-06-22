@@ -1,15 +1,15 @@
 <template>
   <v-dialog v-model="dialog" persistent max-width="700">
     <v-card>
-      <v-card-title class="headline grey lighten-2" primary-title>Detalles</v-card-title>
+      <v-system-bar color="grey darken-3" dark>
+        <div class="title">DETALLES</div>
+        <v-spacer></v-spacer>
+        <v-icon @click="hide">close</v-icon>
+      </v-system-bar>
       <v-card-text>
         <pivot-material :materials="materials"></pivot-material>
         <pivot-people :people="people"></pivot-people>
       </v-card-text>
-      <v-card-actions>
-        <v-spacer></v-spacer>
-        <v-btn color="grey darken-1" flat @click.native="hide">Cerrar</v-btn>
-      </v-card-actions>
     </v-card>
   </v-dialog>
 </template>

@@ -10,7 +10,7 @@
     </thead>
     <tbody>
       <tr v-for="(item, index) in items" :key="index">
-        <td data-label="Usuario">{{ item.name }}</td>
+        <td data-label="Usuario">{{ item.user }}</td>
         <td data-label="Total Monto Asignado">{{ item.total_amount | currency }}</td>
         <td data-label="Total Monto Gastado">{{ item.used_amount | currency }}</td>
         <td data-label="Saldo">{{ (item.total_amount - item.used_amount) | currency }}</td>

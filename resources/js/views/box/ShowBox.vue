@@ -52,6 +52,13 @@
                 <span class="display-1 grey--text"> {{ box.amount | currency }}</span>
               </div>
             </div>
+            <br>
+            <v-layout wrap>
+              <v-flex xs12 sm12 md10 lg10>
+                <div class="title">Detalle de caja chica:</div>
+                <table-smallbox :items="small_boxes"></table-smallbox>
+              </v-flex>
+            </v-layout>
             <div class="title top">Nota / Observaciones:</div>
             <div class="group">
               <div class="body-2">{{ box.note }}</div>
@@ -65,6 +72,7 @@
 
 <script>
   import TableAccounts from '../../components/TableAccounts.vue'
+  import TableSmallBox from '../../components/TableSmallBox.vue'
   import Box from '../../models/Box'
   import BoxService from '../../services/box.service'
   import ReportService from '../../services/report.service'
@@ -92,13 +100,15 @@
         success: false,
         loading: false,
         accounts: [],
+        small_boxes: [],
         box: new Box(),
         id: this.$route.params.id,
       }
     },
 
     components: {
-      'table-accounts' : TableAccounts
+      'table-accounts' : TableAccounts,
+      'table-smallbox' : TableSmallBox
     },
 
     created() {
@@ -112,7 +122,8 @@
           method: 'post',
           url: 'pdf-report',
           data: {
-            accounts: this.box.accounts,
+            accounts: this.accounts,
+            small_boxes: this.small_boxes,
             box: this.box
           },
           responseType: 'arraybuffer'
@@ -136,6 +147,7 @@
         const response = await BoxService.getBoxes(`boxes/${this.id}`)
         if (response.status === 200) {
           this.accounts = response.data.data.accounts;
+          this.small_boxes = response.data.data.small_boxes;
           this.box = response.data.data;
           this.success = true
         }

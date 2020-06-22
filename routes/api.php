@@ -1,7 +1,6 @@
 <?php
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use Carbon\Carbon;
 //use Illuminate\Http\Request;
 
 /*
@@ -150,16 +149,32 @@ Route::get('/test', function(Request $request) {
         //   ->groupBy('p.name')
         //   ->get();
 
+        // $smallbox = DB::table('small_boxes AS s')
+        //   ->join('users AS u', 's.user_id', '=', 'u.id')
+        //   ->leftjoin('amounts AS a', 's.id', '=', 'a.small_box_id')
+        //   ->select('s.id', 's.date_init', 's.start_amount', DB::raw('COALESCE(SUM(a.amount), 0) add_amount'), 'u.name')
+        //   ->where('s.state', 1)
+        //   ->groupBy('s.id')
+        //   ->get();
 
-        $data = DB::table('users AS u')
-          ->join('small_boxes AS s', 'u.id', '=', 's.user_id')
-          ->join('amounts AS a', 's.id', '=', 'a.small_box_id')
-          ->select('u.name', DB::raw('(s.start_amount + SUM(a.amount)) AS total_amount'), 's.used_amount')
-          ->where('s.state', 1)
-          ->groupBy('s.id')
-          ->get();
+        // return response()->json($smallbox);
+        
+        $data = \App\SmallBox::where('state', 1)->sum('start_amount'); 
+        return response()->json($data);
 
-        return $data;
+        // $smallbox = DB::table('small_boxes AS s')
+        //   ->leftJoin('amounts AS a', 's.id', '=', 'a.small_box_id')
+        //   ->select(DB::raw('(s.start_amount + IFNULL(SUM(a.amount), 0)) AS total_amount'), 's.used_amount')
+        //   ->where(function($query) {
+        //     $query->where('user_id', 1)
+        //           ->where('state', 1);
+        //     })
+        //   ->groupBy('s.id') 
+        //   ->first();
+
+        // // $total = $smallbox->total_amount - $smallbox->used_amount;
+
+        
         // $expense = DB::table('expenses')
         //   ->select('account_id', DB::raw('SUM(amount) AS amount'))
         //   ->where(function($query) {
@@ -403,6 +418,7 @@ Route::group(['middleware' => ['auth:api', 'acl:api']], function () {
     Route::get('report-material', 'ReportController@getExpenseMaterialForProject');
     Route::get('report-account', 'ReportController@getIncomeAndExpenseForAccount');
     Route::get('report-person', 'ReportController@getExpensePersonForProject');
+    Route::get('report-type-project', 'ReportController@getIncomeAndExpenseForTypeProject');
 });
 
 //LEER

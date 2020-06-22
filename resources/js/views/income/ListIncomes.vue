@@ -25,17 +25,17 @@
                         <v-flex xs12 sm12 md4 lg4>
                           <v-btn
                             v-if="permission('incomes.create')"
-                            dark color="grey darken-1" 
-                            slot="activator" 
-                            class="mb-2" 
+                            outline
                             to="incomes/create"
                           >
-                            <v-icon dark>note_add</v-icon>
+                            <v-icon left>add_circle</v-icon>
+                            NUEVO
                           </v-btn>
                         </v-flex>
                         <v-spacer></v-spacer>
                         <v-flex xs12 sm12 md6 lg6>
                           <v-text-field
+                            box
                             color="grey darken-2"
                             v-model="search"
                             @keypress.enter.prevent="filterData"

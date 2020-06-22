@@ -21,16 +21,16 @@
                   <v-card-title>
                     <v-btn 
                       v-if="permission('profiles.create')"
-                      dark color="grey darken-1" 
-                      slot="activator" 
-                      class="mb-2"
+                      outline
                       to="profiles/create"
                     >
-                      <v-icon dark>note_add</v-icon>
+                      <v-icon left>add_circle</v-icon>
+                      NUEVO
                     </v-btn>
                     </v-btn>
                     <v-spacer></v-spacer>
                     <v-text-field
+                      box
                       color="grey darken-2"
                       v-model="search"
                       @keypress.enter.prevent="filterData"

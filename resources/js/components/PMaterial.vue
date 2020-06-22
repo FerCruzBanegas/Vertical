@@ -13,6 +13,7 @@
       >
         <template v-slot:items="props">
           <td>{{ props.item.name }}</td>
+          <td>{{ props.item.unity }}</td>
           <td>{{ props.item.quantity }}</td>
           <td>Bs. {{ props.item.price | currency }}</td>
         </template>
@@ -38,6 +39,7 @@
       return {
         headerMaterials: [
           { text: 'Nombre', value: 'nombre' },
+          { text: 'Unidad', value: 'unidad' },
           { text: 'Cantidad', value: 'cantidad' },
           { text: 'Precio Unitario', value: 'precio' },
         ]

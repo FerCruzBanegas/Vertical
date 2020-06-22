@@ -18,7 +18,7 @@
               <v-flex xs12 sm12 md12 lg12>
                 <v-card>
                   <v-alert 
-                    v-if="flag" 
+                    v-if="alert || active" 
                     color="error"
                     icon="warning" 
                     outline 
@@ -76,24 +76,6 @@
                       </v-flex>
                       <v-flex xs12 sm12 md6 lg6>
                         <v-autocomplete
-                          disabled
-                          box
-                          color="grey darken-2"
-                          :items="accounts"
-                          v-model="expense.account_id"
-                          label="Cuenta *"
-                          data-vv-name="expense.account_id"
-                          data-vv-as="cuenta"
-                          v-validate="'required'"
-                          :error-messages="errors.collect('expense.account_id')"
-                          item-text="title"
-                          item-value="id"
-                        ></v-autocomplete>
-                      </v-flex>
-                    </v-layout>
-                    <v-layout row wrap>
-                      <v-flex xs12 sm12 md6 lg6>
-                        <v-autocomplete
                           box
                           color="grey darken-2"
                           :items="payment"
@@ -105,6 +87,8 @@
                           :error-messages="errors.collect('expense.payment')"
                         ></v-autocomplete>
                       </v-flex>
+                    </v-layout>
+                    <v-layout row wrap>
                       <v-flex xs12 sm12 md6 lg6>
                         <v-menu
                           v-model="picker"
@@ -141,9 +125,7 @@
                           ></v-date-picker>
                         </v-menu>
                       </v-flex>
-                    </v-layout>
-                    <v-layout row wrap>
-                      <v-flex xs12 sm12 md12 lg12>
+                      <v-flex xs12 sm12 md6 lg6>
                         <v-text-field
                           box
                           color="grey darken-2"
@@ -252,12 +234,12 @@
                     ></v-switch>
                   </v-card-text>
                   <v-divider class="mt-5"></v-divider>
-                  <v-card-actions>
+                  <v-card-actions v-if="!active">
                     <v-btn :disabled="loading" to="/expenses">
                       Cancelar
                     </v-btn>
                     <v-spacer></v-spacer>
-                    <v-btn @click="submit" :loading="loading" v-if="!flag">
+                    <v-btn @click="submit" :loading="loading">
                       {{ id == null ? 'Registrar' : 'Actualizar' }}
                     </v-btn>
                   </v-card-actions>
@@ -329,7 +311,8 @@
         dateFormatted: '',
         id: this.$route.params.id,
         retry: false,
-        flag: false,
+        alert: false,
+        active: false,
         message: ''
       }
     },
@@ -396,7 +379,7 @@
         this.showExpense();
       } 
 
-      Promise.all([this.active(), this.listExpenseTypes(), this.listProjects(), this.listAccounts()])
+      Promise.all([this.activeSmallBox(), this.listExpenseTypes(), this.listProjects(), this.listAccounts()])
       .then(() =>{
         this.success = true
       })
@@ -428,6 +411,7 @@
         this.comboMaterial = true
         const material = await MaterialService.getMaterials(`search-material/${v}`)
         if (material.status === 200) {
+          console.log(material.data)
           this.itemsMaterial = material.data;
           this.comboMaterial = false
         }
@@ -444,7 +428,7 @@
 
       addMaterial() {
         if (this.selectMaterial) {
-          let obj = { id: this.selectMaterial.id, name: this.selectMaterial.name, quantity: 0, price: 0 }
+          let obj = { id: this.selectMaterial.id, name: this.selectMaterial.name, unity: this.selectMaterial.unity, quantity: 0, price: 0 }
           const flag = this.materials.some(item => item.id === obj.id)
           if (!flag) this.materials.push(obj)
         }
@@ -465,11 +449,11 @@
         return `${day}/${month}/${year}`
       },
 
-      active: async function() {
+      activeSmallBox: async function() {
         const active = await SmallBoxService.getSmallBoxes(`small-boxes/active/${this.currentUser.id}`)
         if (active.status === 200 && !this.id) {
-          if (active.data.flag) {
-            this.flag = active.data.flag;
+          if (active.data.active) {
+            this.active = active.data.active;
             this.message = active.data.message;
           } else {
             this.expense.account_id = active.data.account
@@ -537,7 +521,7 @@
           }
         } catch (err) {
           if(err.response.status === 422) {
-            vm.flag = true
+            vm.alert = true
             vm.message = err.response.data.message
             vm.$setErrorsFromResponse(err.response.data);
           }

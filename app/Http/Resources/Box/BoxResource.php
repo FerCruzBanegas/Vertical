@@ -22,7 +22,16 @@ class BoxResource extends JsonResource
                     'title' => $account->title,
                     'incomes' => $account->pivot->income,
                     'expenses' => $account->pivot->expense,
+                    'current_amount' => $account->pivot->balance,
                     'cash' => $account->pivot->cash
+                ];
+            }),
+            'small_boxes' => collect($this->small_boxes)->transform(function($smallbox){
+                return [
+                    'id' => $smallbox->id,
+                    'user' => $smallbox->user->name,
+                    'total_amount' => $smallbox->pivot->total_amount,
+                    'used_amount' => $smallbox->pivot->used_amount,
                 ];
             }),
             'created' => new ActivityCreatedResource($this->activities),

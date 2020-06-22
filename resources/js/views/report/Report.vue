@@ -182,6 +182,8 @@
           { name: 'Gasto de personas por Proyecto' , data: { url: 'report-person', type: 'project' } },
           { header: 'Cuentas' },
           { name: 'Movimientos por Cuenta' , data: { url: 'report-account', type: 'account' } },
+          { header: 'Tipos de Proyecto' },
+          { name: 'Ingresos / Egresos por Tipo' , data: { url: 'report-type-project', type: null } },
         ],
         submitShow: false,
         yearData: ['2018','2019', '2020', '2021'],

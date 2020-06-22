@@ -47,7 +47,7 @@
                                   box
                                   color="grey darken-2"
                                   v-model="dateFormatted"
-                                  label="Fecha de Ingreso *"
+                                  label="Fecha *"
                                   hint="DD/MM/YYYY format"
                                   prepend-icon="event"
                                   readonly

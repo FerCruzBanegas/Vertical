@@ -15,6 +15,7 @@ class AccountCollection extends ResourceCollection
                     'title' => $account->title,
                     'date' => $account->date,
                     'amount' => $account->amount,
+                    'current_amount' => $account->current_amount,
                     'state' => $account->state,
                 ];
             }),

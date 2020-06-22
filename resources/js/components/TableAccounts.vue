@@ -11,7 +11,7 @@
         <th scope="col">Cuenta</th>
         <th scope="col">Ingresos</th>
         <th scope="col">Egresos</th>
-        <th scope="col">Diferencia</th>
+        <th scope="col">Saldo</th>
         <th scope="col">Monto Real</th>
       </tr>
     </thead>
@@ -20,7 +20,7 @@
         <td class="body-2" data-label="Cuenta">{{ account.title }}</td>
         <td class="body-2" data-label="Ingresos">{{ account.incomes | currency }}</td>
         <td class="body-2" data-label="Egresos">{{ account.expenses | currency }}</td>
-        <td class="body-2" data-label="Total">{{ (account.incomes - account.expenses) | currency }}</td>
+        <td class="body-2" data-label="Saldo">{{ account.current_amount | currency }}</td>
         <td v-if="!show">
           <v-currency-field 
             color="grey darken-2"
@@ -158,6 +158,10 @@
 
   tr td:nth-child(3){
     background-color: #FFF083;
+  }
+
+  tr td:nth-child(4){
+    background-color: #C1FFC6;
   }
 
   tfoot tr th {

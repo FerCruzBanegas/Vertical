@@ -27,9 +27,11 @@ class ProjectEventsCollection extends ResourceCollection
                     'title' => $event->title,
                     'date' => $event->date,
                     'amount' => $event->amount,
+                    'key' => $event->created_at,
                     'materials' => collect($event->materials)->transform(function($material){
                         return [
                             'name' => $material->name,
+                            'unity' => $material->unity,
                             'quantity' => $material->pivot->quantity,
                             'price' => $material->pivot->price
                         ];

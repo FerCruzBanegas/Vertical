@@ -94,6 +94,13 @@
                       @click="addAmount"
                     ><v-icon>add_circle</v-icon></v-btn>
                   </v-card-title>
+                  <v-alert
+                    v-if="alert" 
+                    :value="true"
+                    type="error"
+                  >
+                    {{ msg_error }}
+                  </v-alert>
                   <v-data-table
                     :headers="headerAmount"
                     :items="amounts"
@@ -206,6 +213,8 @@
         amounts: [],
         expenses:[],
         smallbox: null,
+        msg_error: '',
+        alert: false,
         headerAmount: [
           { text: 'Cantidad', value: 'cantidad', width: "80" },
           { text: 'Registrado', value: 'registrado', width: "80" },
@@ -261,12 +270,14 @@
       },
 
       addAmount:async function() {
+        this.alert = false
         this.$validator.errors.clear();
         try {
           this.loading = true
           let data = {
             amount: this.amount,
-            small_box_id: this.id
+            small_box_id: this.id,
+            account_id: this.smallbox.account.id
           }
 
           const response = await AmountService.storeAmount(data)
@@ -275,7 +286,12 @@
             this.loading = false
           }
         } catch (err) {
+          let error = err.response.data.errors.account_id
           if(err.response.status === 422) this.$setErrorsFromResponse(err.response.data);
+          if(error) {
+            this.msg_error = error[0]
+            this.alert = true
+          } 
           this.loading = false
         }
       },
@@ -284,7 +300,7 @@
         const response = await SmallBoxService.getSmallBoxes(`small-boxes/${this.id}/detail`)
         if (response.status === 200) {
           let amounts = response.data.data.amounts
-          this.amounts = amounts.sort((obj2, obj1) => obj1.id - obj2.id);
+          this.amounts = amounts.sort((obj2, obj1) => obj1.id - obj2.id)
           this.smallbox = response.data.data
           this.getExpenseSmallBox()
         }

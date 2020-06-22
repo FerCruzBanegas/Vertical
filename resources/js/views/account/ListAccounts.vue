@@ -24,12 +24,11 @@
                   <v-card-title>
                     <v-btn
                       v-if="permission('accounts.create')"
-                      dark color="grey darken-1" 
-                      slot="activator" 
-                      class="mb-2" 
+                      outline
                       to="accounts/create"
                     >
-                      <v-icon dark>note_add</v-icon>
+                      <v-icon left>add_circle</v-icon>
+                      NUEVO
                     </v-btn>
                     </v-btn>
                     <v-spacer></v-spacer>
@@ -37,6 +36,7 @@
                       <v-icon>cached</v-icon>
                     </v-btn>
                     <v-text-field
+                      box
                       color="grey darken-2"
                       v-model="search"
                       @keypress.enter.prevent="filterData"
@@ -66,6 +66,7 @@
                       <td>{{ props.item.title }}</td>
                       <td>{{ props.item.date | formatDate('DD/MM/YYYY') }}</td>
                       <td><strong>{{ props.item.amount | currency }}</strong></td>
+                      <td><strong>{{ props.item.current_amount | currency }}</strong></td>
                       <td>
                         <v-chip
                           v-if="props.item.state === 1"
@@ -175,8 +176,9 @@
         headers: [
           { text: '', align: 'left', sortable: false, width: "50" },
           { text: 'Título', value: 'titulo', width: "200" },
-          { text: 'Fecha Apertura', value: 'fecha', width: "200" },
-          { text: 'Monto Inicial', value: 'monto', width: "100" },
+          { text: 'Fecha Apertura', value: 'fecha', width: "100" },
+          { text: 'Monto Inicial', value: 'monto', width: "120" },
+          { text: 'Saldo Actual', value: 'saldo', width: "120" },
           { text: 'Estado', value: 'estado', width: "100" },
           { text: 'Acciones', sortable: false, value: 'acciones', width: "150" }
         ],

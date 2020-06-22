@@ -17,12 +17,12 @@ class SmallBoxRequest extends FormRequest
 
     public function rules()
     {
-        $account = $this->input('start_amount');
+        $amount = $this->input('start_amount');
 
         $rules = [
             'date_init' => 'required|date_format:Y-m-d H:i:s',
-            'start_amount' => 'required|max:9|gt:0|regex:/^-?[0-9]+(?:\.[0-9]{1,2})?$/',
-            'account_id' => ['required', new BalanceAccount($account)],
+            'start_amount' => 'required|max:15|gt:0|regex:/^-?[0-9]+(?:\.[0-9]{1,2})?$/',
+            'account_id' => ['required', new BalanceAccount($amount)],
             'user_id' => 'required|integer',
             'note' => 'nullable|min:5|max:120',
         ];

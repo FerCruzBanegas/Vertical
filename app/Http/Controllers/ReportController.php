@@ -10,6 +10,7 @@ use App\Http\Resources\Report\InAndExYearCollection;
 use App\Http\Resources\Report\InAndExRangeCollection;
 use App\Http\Resources\Report\InAndExMonthCollection;
 use App\Http\Resources\Report\InAndExProjectCollection;
+use App\Http\Resources\Report\InAndExTypeProjectCollection;
 use App\Http\Resources\Report\ExDetailProjectCollection;
 use App\Http\Resources\Report\ExMaterialProjectCollection;
 use App\Http\Resources\Report\InAndExAccountCollection;
@@ -251,6 +252,30 @@ class ReportController extends ApiController
     	  return new InAndExProjectCollection($data, $params['name']);
     }
 
+    public function getIncomeAndExpenseForTypeProject()
+    {
+        $expense = DB::table('expenses as e')
+                   ->select('pt.name', DB::raw('0 as inc_amount'), DB::raw('SUM(e.amount) as exp_amount'))
+                   ->join('projects as p', 'p.id', '=', 'e.project_id')
+                   ->join('project_types as pt', 'pt.id', '=', 'p.project_type_id')
+                   ->whereNull('e.deleted_at')
+                   ->groupBy('pt.name');
+
+        $data = DB::query()->fromSub(function ($query) use ($expense) {
+            $query->select('pt.name', DB::raw('SUM(i.amount) as inc_amount'), DB::raw('0 as exp_amount'))
+                  ->from('incomes as i')
+                  ->join('projects as p', 'p.id', '=', 'i.project_id')
+                  ->join('project_types as pt', 'pt.id', '=', 'p.project_type_id')
+                  ->whereNull('i.deleted_at')
+                  ->groupBy('pt.name')
+                  ->unionAll($expense);
+          }, 'sp')
+          ->select('*')
+          ->get();
+
+        return new InAndExTypeProjectCollection($data);
+    }
+
     public function getExpenseDetailForProject(Request $request)
     {
     	  $params  = json_decode($request->data, true);
@@ -361,7 +386,7 @@ class ReportController extends ApiController
           $totalExpense = $totalExpense + $value['expenses'];
           $totalCash = $totalCash + $value['cash'];
         }
-        $array = array('accounts' => $request->accounts, 'box' => $request->box, 'totals' => [$totalIncome, $totalExpense, $totalCash], 'date' => $date->isoFormat('dddd Do MMMM, YYYY'));
+        $array = array('accounts' => $request->accounts, 'small_boxes' => $request->small_boxes, 'box' => $request->box, 'totals' => [$totalIncome, $totalExpense, $totalCash], 'date' => $date->isoFormat('dddd Do MMMM, YYYY'));
         $path = public_path() . '/arqueo-caja.pdf';
 
         $pdf = PDF::loadView('report', $array);

@@ -5,7 +5,7 @@
         <v-card>
           <v-card-title primary-title>
             <div>
-              <h1 class="title mb-0">Ingresos VS Egresos 2019</h1><br>
+              <h1 class="title mb-0">Ingresos VS Egresos {{ new Date().getFullYear() }}</h1><br>
               <p class="caption mb-0">Monitoreo de ingresos y gastos del año actual.</p>
             </div>
           </v-card-title>

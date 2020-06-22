@@ -62,14 +62,14 @@ class SmallBoxController extends ApiController
         if ($query) {
             if ($query->state == 1) {
                 return $this->respond([
-                    'flag' => false,
+                    'active' => false,
                     'account' => $query->account_id
                 ]);
             }
         }
 
         return $this->respond([
-            'flag' => true,
+            'active' => true,
             'message' => message('MSG014'),
         ]);
     }
