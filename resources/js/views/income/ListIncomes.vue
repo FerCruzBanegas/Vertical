@@ -56,6 +56,15 @@
                       <filters @changeDate="dateFilter" @selectProject="projectFilter"></filters>
                     </v-container>
                   </v-card-title>
+                  <v-alert 
+                    v-if="alert" 
+                    color="error"
+                    icon="warning" 
+                    outline 
+                    :value="true"
+                  >
+                    {{ msg }}
+                  </v-alert>
                   <v-data-table
                     :headers="headers"
                     :items="items"
@@ -159,7 +168,9 @@
         totalItems: 0,
         pagination: {
           rowsPerPage: 10
-        }
+        },
+        alert: false,
+        msg: '',
       }
     },
 
@@ -220,10 +231,15 @@
         if (response.status === 200) {
           this.loading = false
           this.remove = false
-          this.getDataFromApi()
-          .then(data => {
-            this.items = data.items
-          })
+          if (response.data.msg) {
+            this.alert = true
+            this.msg = response.data.msg
+          } else {
+            this.getDataFromApi()
+            .then(data => {
+              this.items = data.items
+            })
+          }
         }
       },
 

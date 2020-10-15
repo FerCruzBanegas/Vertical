@@ -1,5 +1,36 @@
 <template>
   <v-container fluid grid-list-md>
+    <v-dialog v-model="dialog" persistent max-width="500px">
+      <v-card>
+        <v-card-title>
+          <span class="headline">Nuevo Cargo</span>
+        </v-card-title>
+        <v-card-text>
+          <v-container grid-list-md>
+            <v-layout wrap>
+              <v-flex xs12>
+                <v-text-field
+                  box
+                  color="grey darken-2"
+                  label="Descripción *"
+                  v-model="position.description"
+                  data-vv-name="description"
+                  data-vv-as="descripcion"
+                  v-validate="'required|min:5|max:64'"
+                  :error-messages="errors.collect('description')"
+                ></v-text-field>
+              </v-flex>
+            </v-layout>
+          </v-container>
+          <small>Los campos con (*) son obligatorios.</small>
+        </v-card-text>
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn :disabled="loadingPosition" @click="dialog = false">Cancelar</v-btn>
+          <v-btn :loading="loadingPosition" @click="submitPosition">Registrar</v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
     <v-layout row wrap>
       <v-flex xs12 sm12 md12>
         <v-system-bar status color="grey lighten-4">
@@ -65,15 +96,40 @@
                         </v-layout>
                         <v-layout row wrap>
                           <v-flex xs12 sm12 md12 lg12>
+                            <!-- :items="projects" -->
+                            <!-- return-object -->
+                            <v-autocomplete
+                              box
+                              color="grey darken-2"
+                              v-model="people.position_id"
+                              :items="positions"
+                              label="Cargo *"
+                              data-vv-name="people.position_id"
+                              data-vv-as="cargo"
+                              v-validate="'required'"
+                              :error-messages="errors.collect('people.position_id')"
+                              item-text="description"
+                              item-value="id"
+                            >
+                              <template v-slot:append-outer>
+                                <v-btn @click="openForm" flat icon color="red darken-3">
+                                  <v-icon>add_circle</v-icon>
+                                </v-btn>
+                              </template>
+                            </v-autocomplete>
+                          </v-flex>
+                        </v-layout>
+                        <v-layout row wrap>
+                          <v-flex xs12 sm12 md12 lg12>
                             <v-textarea
                               box
                               color="grey darken-2"
-                              label="Dirección"
-                              v-model="people.address"
-                              data-vv-name="address"
-                              data-vv-as="dirección"
+                              label="Nota"
+                              v-model="people.note"
+                              data-vv-name="note"
+                              data-vv-as="nota"
                               v-validate="'max:64'"
-                              :error-messages="errors.collect('address')"
+                              :error-messages="errors.collect('note')"
                             ></v-textarea>
                           </v-flex>
                         </v-layout>
@@ -108,6 +164,8 @@
 
 <script>
   import People from '../../models/People'
+  import Position from '../../models/Position'
+  import PositionService from '../../services/position.service'
   import PeopleService from '../../services/people.service'
 
   export default {
@@ -120,7 +178,11 @@
       return {
         success: false,
         loading: false,
+        loadingPosition: false,
+        dialog: false,
         people: new People(),
+        position: new Position(),
+        positions: [],
         id: this.$route.params.id,
         retry: false
       }
@@ -150,18 +212,50 @@
 
     created() {
       if (this.id) {
-        this.showPeople();
-      } else{
+        this.showPeople()
+      } 
+
+      Promise.all([this.listPositions()])
+      .then(() =>{
         this.success = true
-      }
+      })
     },
 
     methods: {
+      openForm(){
+        this.dialog = true
+      },
+
+      listPositions: async function() {
+        const positions = await PositionService.getPositions('position/listing')
+        if (positions.status === 200) {
+          this.positions = positions.data;
+        }
+      },
+
       showPeople:async function() {
         const response = await PeopleService.getPeople(`people/${this.id}/edit`)
         if (response.status === 200) {
           this.people = response.data.data;
-          this.success = true
+        }
+      },
+
+      submitPosition: async function() {
+        this.$validator.errors.clear()
+        this.loadingPosition = true
+        try {
+          const response = await PositionService.storePosition(this.position)
+          if (response.status === 201) {
+            this.listPositions()
+            .then(() =>{
+              this.loadingPosition = false
+              this.dialog = false
+              this.position = new Position()
+            })
+          }
+        } catch (err) {
+          if(err.response.status === 422) this.$setErrorsFromResponse(err.response.data);
+          this.loadingPosition = false
         }
       },
 

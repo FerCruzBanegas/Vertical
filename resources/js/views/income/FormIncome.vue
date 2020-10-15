@@ -327,6 +327,9 @@
             } else {
               vm.$router.push('/incomes')
             }
+          } else if (vm._save.status === 202) {
+            vm.$snotify.simple(vm._save.data.message, 'Alerta')
+            vm.loading = false
           }
         } catch (err) {
           if(err.response.status === 422) this.$setErrorsFromResponse(err.response.data);

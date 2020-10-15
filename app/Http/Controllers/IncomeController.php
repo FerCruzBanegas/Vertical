@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Income;
+use App\Box;
 use Illuminate\Http\Request;
 use App\Http\Requests\IncomeRequest;
 use App\Http\Resources\Income\IncomeResource;
@@ -104,8 +105,14 @@ class IncomeController extends ApiController
     public function update(IncomeRequest $request, $id)
     {
         try {
+            $box = Box::latest()->first();
             $income = $this->income->find($id);
-            $income->update($request->all());
+            if ($income->created_at > $box->created_at) {
+                $income->update($request->all());
+            } else {
+                return $this->respondAccepted();
+            }
+            
         } catch (\Exception $e) {
             return $this->respondInternalError();
         }
@@ -114,8 +121,26 @@ class IncomeController extends ApiController
 
     public function destroy($id)
     {
+        // try {
+        //     $income = $this->income::find($id);
+        //     $income->delete();
+        // } catch (\Exception $e) {
+        //     return $this->respondInternalError();
+        // }
+        // return $this->respondDeleted();
+
         try {
-            $income = $this->income::find($id);
+            $income = $this->income->find($id);
+
+            $box = Box::getLastBox();
+            if ($box) {
+                if ($income->created_at <= $box->created_at) {
+                    return $this->respond([
+                        'msg' => message('MSG017')
+                    ]);
+                }
+            }
+
             $income->delete();
         } catch (\Exception $e) {
             return $this->respondInternalError();

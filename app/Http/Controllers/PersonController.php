@@ -6,6 +6,7 @@ use App\Person;
 use Illuminate\Http\Request;
 use App\Http\Requests\PersonRequest;
 use App\Http\Resources\Person\PersonResource;
+use App\Http\Resources\Person\PersonDetailResource;
 use App\Http\Resources\Person\PersonCollection;
 
 class PersonController extends ApiController
@@ -33,6 +34,12 @@ class PersonController extends ApiController
 
         $people = $people->paginate($rowsPerPage);
     	return new PersonCollection($people); 
+    }
+
+    public function detail($id)
+    {
+        $person = $this->person->findOrFail($id);
+        return new PersonDetailResource($person); 
     }
 
     public function show($id)

@@ -100,6 +100,13 @@ class ApiController extends Controller
      *
      * @return \Illuminate\Http\JsonResponse
      */
+    protected function respondAccepted()
+    {
+        return $this->respond([
+            'message' => message('MSG017')
+        ], 202);
+    }
+
     protected function respondNoContent()
     {
         return $this->respond(null, 204);

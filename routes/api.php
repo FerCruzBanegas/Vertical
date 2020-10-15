@@ -160,7 +160,8 @@ Route::get('/test', function(Request $request) {
         // return response()->json($smallbox);
         
         $data = \App\SmallBox::where('state', 1)->sum('start_amount'); 
-        return response()->json($data);
+        $box = \App\Box::latest()->first();
+        return response()->json($box);
 
         // $smallbox = DB::table('small_boxes AS s')
         //   ->leftJoin('amounts AS a', 's.id', '=', 'a.small_box_id')
@@ -265,6 +266,7 @@ Route::get('projects/list-report', 'ProjectController@listReport');
 Route::get('material-types/listing', 'MaterialTypeController@listing');
 Route::get('income-types/listing', 'IncomeTypeController@listing');
 Route::get('expense-types/listing', 'ExpenseTypeController@listing');
+Route::get('position/listing', 'PositionController@listing');
 Route::get('people/listing', 'PersonController@listing');
 Route::get('profiles/listing', 'ProfileController@listing');
 Route::get('actions/listing', 'ActionController@listing');
@@ -388,9 +390,12 @@ Route::group(['middleware' => ['auth:api', 'acl:api']], function () {
     Route::put('expenses/{id}', 'ExpenseController@update')->name('expenses.update');
     Route::delete('expenses/{id}', 'ExpenseController@destroy')->name('expenses.destroy');
 
+    //Position
+    Route::post('positions', 'PositionController@store');
+
     //People yes
     Route::get('people', 'PersonController@index')->name('people.index');
-    Route::get('people/{id}', 'PersonController@show')->name('people.show');
+    Route::get('people/{id}/detail', 'PersonController@detail')->name('people.show');
     Route::get('search-person/{name}', 'PersonController@searchPerson');
     Route::post('people', 'PersonController@store')->name('people.create');
     Route::get('people/{id}/edit', 'PersonController@show');

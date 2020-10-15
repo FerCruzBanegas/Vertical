@@ -28,8 +28,14 @@
           </v-list-tile>
           <v-list-tile avatar>
             <v-list-tile-content>
-              <v-list-tile-title>Dirección</v-list-tile-title>
-              <v-list-tile-sub-title>{{ data.address }}</v-list-tile-sub-title>
+              <v-list-tile-title>Cargo</v-list-tile-title>
+              <v-list-tile-sub-title>{{ data.position }}</v-list-tile-sub-title>
+            </v-list-tile-content>
+          </v-list-tile>
+          <v-list-tile avatar>
+            <v-list-tile-content>
+              <v-list-tile-title>Nota</v-list-tile-title>
+              <v-list-tile-sub-title>{{ data.note }}</v-list-tile-sub-title>
             </v-list-tile-content>
           </v-list-tile>
           <v-list-tile avatar>

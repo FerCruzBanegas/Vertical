@@ -17,7 +17,7 @@ class PersonRequest extends FormRequest
             'name' => 'required|max:32|unique:people,name',
             'surnames' => 'nullable|max:32',
             'phone' => 'required|max:10',
-            'address' => 'nullable|max:64'
+            'note' => 'nullable|max:64'
         ];
 
         if($this->method() == 'PATCH' || $this->method() == 'PUT') {

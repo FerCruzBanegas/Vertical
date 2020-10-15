@@ -1,0 +1,92 @@
+tg_sum_amount_cr:
+BEGIN
+    DECLARE t_user_id integer;
+    DECLARE t_amount_expense double;
+    DECLARE t_small_box_id integer;
+    DECLARE t_small_box_amount double;
+    DECLARE t_total double;
+    
+    SET t_user_id = NEW.user_id;
+    SET t_amount_expense = NEW.amount;
+    
+    SELECT id, used_amount into t_small_box_id, t_small_box_amount FROM small_boxes WHERE user_id = t_user_id and state = 1;
+    
+    SET t_total = t_small_box_amount + t_amount_expense;
+    
+    UPDATE small_boxes SET used_amount = t_total WHERE small_boxes.id = t_small_box_id;
+    UPDATE accounts SET current_amount = current_amount - NEW.amount WHERE id = NEW.account_id;
+END
+
+
+tg_sum_amount_de:
+BEGIN
+    DECLARE t_user_id integer;
+    DECLARE t_amount_expense double;
+    DECLARE t_small_box_id integer;
+    DECLARE t_small_box_amount double;
+    DECLARE t_small_box_date_init double;
+    DECLARE t_total double;
+       
+    SET t_user_id = OLD.user_id;
+    SELECT id, date_init, used_amount into t_small_box_id, t_small_box_date_init, t_small_box_amount FROM small_boxes WHERE user_id = t_user_id and state = 1;
+    
+    IF OLD.created_at >=  t_small_box_date_init THEN
+      SET t_total = t_small_box_amount - OLD.amount;
+     
+      UPDATE small_boxes SET used_amount = t_total WHERE small_boxes.id = t_small_box_id;
+      UPDATE accounts SET current_amount = current_amount + OLD.amount WHERE id = OLD.account_id;
+     END IF;
+END
+
+tg_sum_amount_up:
+BEGIN
+    DECLARE t_user_id integer;
+    DECLARE t_amount_expense double;
+    DECLARE t_small_box_id integer;
+    DECLARE t_small_box_amount double;
+    DECLARE t_small_box_date_init datetime;
+    DECLARE t_total double;
+       
+    IF OLD.amount <> NEW.amount THEN
+    
+       SET t_user_id = OLD.user_id;
+       SELECT id, date_init, used_amount into t_small_box_id, t_small_box_date_init, t_small_box_amount FROM small_boxes WHERE user_id = t_user_id and state = 1;
+       
+       IF OLD.created_at >=  t_small_box_date_init THEN
+             SET t_amount_expense = NEW.amount;
+           SET t_total = t_small_box_amount - OLD.amount;
+           SET t_total = t_total + t_amount_expense;
+             
+           UPDATE small_boxes SET used_amount = t_total WHERE small_boxes.id = t_small_box_id;
+            UPDATE accounts SET current_amount = current_amount + OLD.amount WHERE id = NEW.account_id;
+            UPDATE accounts SET current_amount = current_amount - NEW.amount WHERE id = NEW.account_id;
+            
+       END IF;
+    END IF;
+    
+END
+
+
+tg_update_acount:
+BEGIN
+    IF NEW.deleted_at IS NULL THEN
+        UPDATE accounts SET current_amount = current_amount - OLD.amount WHERE id = NEW.account_id;
+        UPDATE accounts SET current_amount = current_amount + NEW.amount WHERE id = NEW.account_id;
+    ELSE
+        UPDATE accounts SET current_amount = current_amount - OLD.amount WHERE id = OLD.account_id;
+    END IF;
+END
+
+
+
+CREATE TABLE `positions` (
+    `id` INT(10) UNSIGNED NOT NULL AUTO_INCREMENT,
+    `description` MEDIUMTEXT NOT NULL,
+    `created_at` TIMESTAMP NULL DEFAULT NULL,
+    `updated_at` TIMESTAMP NULL DEFAULT NULL,
+    PRIMARY KEY (`id`)
+)
+COLLATE='latin1_swedish_ci'
+ENGINE=InnoDB
+AUTO_INCREMENT=10
+;

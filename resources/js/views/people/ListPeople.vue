@@ -65,7 +65,7 @@
                       <td>{{ props.item.name }}</td>
                       <td>{{ props.item.surnames }}</td>
                       <td>{{ props.item.phone }}</td>
-                      <td>{{ props.item.address }}</td>
+                      <td>{{ props.item.position }}</td>
                       <td>
                         <v-btn
                           v-if="permission('people.update')"
@@ -142,7 +142,7 @@
           { text: 'Nombre', value: 'nombre', width: "200" },
           { text: 'Apellidos', value: 'apellidos', width: "300" },
           { text: 'Teléfono', sortable: false, value: 'telefono', width: "50" },
-          { text: 'Dirección', value: 'direccion', width: "300" },
+          { text: 'Cargo', value: 'cargo', width: "300" },
           { text: 'Acciones', sortable: false, value: 'acciones', width: "150" }
         ],
         items: [],
@@ -224,7 +224,7 @@
 
       getDetail: async function(id) {
         this.loader = true
-        const response = await PeopleService.getPeople(`people/${id}`)
+        const response = await PeopleService.getPeople(`people/${id}/detail`)
         if (response.status === 200) {
           this.people = response.data.data
           this.loader = false

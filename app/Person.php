@@ -13,7 +13,7 @@ class Person extends ApiModel
     protected $dates = ['deleted_at'];
 
     protected $fillable = [
-        'name', 'surnames', 'phone', 'address'
+        'name', 'surnames', 'phone', 'position_id', 'note'
     ];
 
     protected $searchable = [
@@ -23,6 +23,11 @@ class Person extends ApiModel
     public function expenses()
     {
         return $this->belongsToMany(Expense::class);
+    }
+
+    public function position()
+    {
+        return $this->belongsTo(Position::class);
     }
 
     public static function listPeople()

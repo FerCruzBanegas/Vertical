@@ -15,7 +15,7 @@ class PersonCollection extends ResourceCollection
                     'name' => $person->name,
                     'surnames' => $person->surnames,
                     'phone' => $person->phone,
-                    'address' => $person->address,
+                    'position' => $person->position->description,
                     'created' => (string) $person->created_at,
                 ];
             }),
