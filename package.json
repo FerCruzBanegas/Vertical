@@ -21,7 +21,7 @@
     },
     "dependencies": {
         "@amcharts/amcharts4": "^4.5.12",
-        "moment": "^2.24.0",
+        "moment": "^2.29.4",
         "v-currency-field": "^1.0.6",
         "vee-validate": "^2.2.13",
         "vue-router": "^3.0.6",
